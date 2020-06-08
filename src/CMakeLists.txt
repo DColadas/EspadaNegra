@@ -1,0 +1,16 @@
+include_directories(.)
+add_subdirectory(Events)
+add_subdirectory(Game)
+#add_subdirectory(IO)
+add_subdirectory(Utils)
+add_executable(espadaNegra main.cpp)
+
+target_compile_options(espadaNegra PRIVATE -Wall -Wextra -g)
+
+target_link_libraries(espadaNegra 
+PRIVATE 
+  Events
+  Game
+  #IO 
+  Utils
+)
