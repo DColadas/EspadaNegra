@@ -13,8 +13,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install Boost
+      run: |
+        sudo add-apt-repository ppa:mhier/libboost-latest -y
+        sudo apt-get update
+        sudo apt-get install libboost1.70 libboost1.70-dev -y
     - name: configure
-      run: mkdir build && cd build && cmake ..
+      run: |
+        mkdir build 
+        cd build 
+        cmake ..
     - name: build
       run: cmake --build build
     - name: test
