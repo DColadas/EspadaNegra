@@ -17,7 +17,7 @@ jobs:
       run: |
         sudo add-apt-repository ppa:mhier/libboost-latest -y
         sudo apt-get update
-        sudo apt-get install libboost-all-dev -y
+        sudo apt-get install libboost1.70 libboost1.70-dev -y
     - name: configure
       run: |
         mkdir build 
