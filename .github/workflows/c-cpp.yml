@@ -14,7 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install Boost
-      run: sudo apt-get install libboost-all-dev -y
+      run: |
+        sudo add-apt-repository ppa:mhier/libboost-latest -y
+        sudo apt-get update
+        sudo apt-get install libboost-all-dev -y
     - name: configure
       run: |
         mkdir build 
