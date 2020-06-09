@@ -14,12 +14,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install Boost
-      run: |
-        sudo add-apt-repository ppa:mhier/libboost-latest
-        sudo apt-get update
-        sudo apt-get install libboost-latest -y
+      run: sudo apt-get install libboost-all-dev -y
     - name: configure
-      run: mkdir build && cd build && cmake ..
+      run: |
+        mkdir build 
+        cd build 
+        cmake ..
     - name: build
       run: cmake --build build
     - name: test
