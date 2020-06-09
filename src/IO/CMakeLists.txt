@@ -16,6 +16,7 @@ add_library(IO
 
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
-target_link_libraries(IO PRIVATE ${Boost_LIBRARIES})
 
-#set_target_properties(IO PROPERTIES LINKER_LANGUAGE CXX)
+find_package(Threads REQUIRED)
+
+target_link_libraries(IO PRIVATE ${Boost_LIBRARIES} Threads::Threads)
