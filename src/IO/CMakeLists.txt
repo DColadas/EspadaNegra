@@ -1,17 +1,16 @@
 add_library(IO
   Asio.hpp
-  CMakeLists.txt
-  Listener.cpp
-  MatchManager.cpp
-  Server.cpp
-  WebsocketHandler.cpp
-  WebsocketSession.cpp
   Beast.hpp
   IOHandler.hpp
+  Listener.cpp
   Listener.hpp
+  MatchManager.cpp
   MatchManager.hpp
   Server.hpp
+  Server.cpp
+  WebsocketHandler.cpp
   WebsocketHandler.hpp
+  WebsocketSession.cpp
   WebsocketSession.hpp
 )
 
