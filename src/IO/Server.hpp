@@ -13,7 +13,7 @@
 class Server {
    private:
     asio::io_context ioc;
-    std::shared_ptr<Listener> listener_;
+    std::shared_ptr<Listener> listener;
     // Works until the defined signals are received
     asio::signal_set signals = asio::signal_set(ioc, SIGINT, SIGTERM);
     std::shared_ptr<MatchManager> matches = std::make_shared<MatchManager>();

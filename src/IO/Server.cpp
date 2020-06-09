@@ -3,7 +3,7 @@
 #include <iostream>
 Server::Server(const char* address,
                unsigned short port) {
-    listener_ = std::make_shared<Listener>(
+    listener = std::make_shared<Listener>(
         ioc,
         tcp::endpoint{asio::ip::make_address(address), port},
         [this](tcp::socket&& socket) {
@@ -18,7 +18,7 @@ Server::Server(const char* address,
 }
 
 void Server::run() {
-    listener_->run();
+    listener->run();
     // If the defined signals are received, stop the io_context
     signals.async_wait(
         [this](const boost::system::error_code&, int) {
