@@ -58,12 +58,12 @@ void WebsocketHandler::dispatchMessage(const std::string& message) {
     using GE = GameEvent::Type;
     const auto now = std::chrono::system_clock::now();
     auto event = JSONParser::messageToGameEvent(now, message);
-    switch (event->type) {
+    switch (event->getType()) {
         case GE::JoinMatchRequest:
         //TODO try static_cast (known it won't fail)
             joinMatch(*dynamic_cast<JoinMatchRequest*>(event.get()));
             break;
-        case GE::PlayerEvent:
+        case GE::Attack:
             //TODO Do something
             break;
         default:

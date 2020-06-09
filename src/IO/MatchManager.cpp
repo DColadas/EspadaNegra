@@ -24,7 +24,7 @@ void MatchManager::send(const std::string& message) {
 }
 
 int* MatchManager::joinMatch(const JoinMatchRequest& req) {
-    if (!req.isValid) {
+    if (!req.isValid()) {
         return nullptr;
     }
 
