@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "JSONParser.hpp"
+#include "Events/JSONParser.hpp"
 #include "WebsocketSession.hpp"
 
 WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches)

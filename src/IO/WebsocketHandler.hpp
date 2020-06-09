@@ -5,12 +5,12 @@
 #include <functional>
 #include <mutex>
 
-#include "GameEvent.hpp"
+#include "Asio.hpp"
+#include "Events/GameEvent.hpp"
+#include "Events/JoinMatchRequest.hpp"
 #include "IOHandler.hpp"
-#include "JoinMatchRequest.hpp"
 #include "MatchManager.hpp"
 #include "Time.hpp"
-#include "Asio.hpp"
 
 class WebsocketSession;
 
@@ -18,7 +18,7 @@ class WebsocketHandler : public IOHandler, public std::enable_shared_from_this<W
     using Message = std::pair<Timestamp, std::string>;
 
    private:
-    int* currentMatch = nullptr; //int for debug, should be Match*
+    int* currentMatch = nullptr;  //int for debug, should be Match*
     std::shared_ptr<MatchManager> matches = nullptr;
     WebsocketSession* ws = nullptr;
 
@@ -39,10 +39,9 @@ class WebsocketHandler : public IOHandler, public std::enable_shared_from_this<W
     void sendMessage(const std::shared_ptr<const std::string>& ss) override;
     void setSession(WebsocketSession* session);
 
-    void join(); //Join the matches room
-    void leave(); 
+    void join();  //Join the matches room
+    void leave();
 
     // Used when the session receives a new message
     void dispatchMessage(const std::string& message);
-
 };

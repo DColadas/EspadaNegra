@@ -3,7 +3,7 @@
 #include <iostream>
 #include <thread>
 
-#include "JoinMatchRequest.hpp"
+#include "Events/JoinMatchRequest.hpp"
 
 MatchManager::MatchManager() {
 }

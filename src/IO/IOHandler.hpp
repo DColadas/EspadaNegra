@@ -5,10 +5,9 @@
 #include <memory>
 #include <string>
 
-#include "GameEvent.hpp"
-#include "JoinMatchRequest.hpp"
-#include "PlayerAction.hpp"
-#include "Time.hpp"
+#include "Events/GameEvent.hpp"
+#include "Events/JoinMatchRequest.hpp"
+#include "Events/PlayerAction.hpp"
 
 class IOHandler {
    public:
