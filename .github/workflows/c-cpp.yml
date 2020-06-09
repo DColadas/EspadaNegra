@@ -15,8 +15,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install Boost
       run: sudo add-apt-repository ppa:mhier/libboost-latest &&
-           sudo apt update &&
-           sudo apt install libboost-latest -y
+           sudo apt-get update &&
+           sudo apt-get install libboost-latest -y
     - name: configure
       run: mkdir build && cd build && cmake ..
     - name: build
