@@ -10,13 +10,17 @@
 #include <memory>
 #include <string>
 
+#include "Attack.hpp"
 #include "GameEvent.hpp"
+#include "JoinMatchRequest.hpp"
+#include "Offer.hpp"
+#include "Pass.hpp"
 #include "Time.hpp"
 
 namespace {
 using GE = GameEvent::Type;
 const std::map<std::string, GE> stringToType{
-    {"joinMatch", GE::JoinMatchRequest},
+    {"joinMatchRequest", GE::JoinMatchRequest},
     {"attack", GE::Attack},
     {"offer", GE::Offer},
     {"pass", GE::Pass}};
@@ -38,7 +42,7 @@ namespace JSONParser {
 
 //TODO implement as visitor pattern (maybe not?)
 //Cool C++17 way! https://www.youtube.com/watch?v=MdtYi0vvct0x
-std::unique_ptr<GameEvent> messageToGameEvent(Timestamp time, const std::string& message) {
+std::unique_ptr<GameEvent> messageToGameEvent(Timestamp time, const std::string& nickname, const std::string& message) {
     using GE = GameEvent::Type;
     auto pt = parseJSON(message);
     try {
@@ -51,14 +55,28 @@ std::unique_ptr<GameEvent> messageToGameEvent(Timestamp time, const std::string&
             case GE::JoinMatchRequest: {
                 const auto matchID = pt.get<std::string>("matchID");
                 const auto nickname = pt.get<std::string>("nickname");  //TODO change nickname for id of the handler
-                if (!matchID.empty() && !nickname.empty()) {
-                    return std::make_unique<JoinMatchRequest>(time, matchID, nickname);
-                }
-                break;
-            }
+
+                //if (!matchID.empty() && !nickname.empty()) {
+                return std::make_unique<JoinMatchRequest>(time, matchID, nickname);
+                //}
+            } break;
             case GE::Attack:
-                //TODO add cases
+                return std::make_unique<Attack>(time, nickname);
                 break;
+            case GE::Pass:
+                return std::make_unique<Pass>(time, nickname);
+                break;
+            case GE::Offer: {
+                const auto gold = pt.get<int>("gold");
+                return std::make_unique<Offer>(time, nickname, gold);
+            } break;
+            case GE::Invalid:
+                //TODO logger
+                std::cerr << "Invalid message: " << message << std::endl;
+                break;
+            default:
+                //TODO panic
+                std::cerr << "Invalid message: " << message << std::endl;
         }
     } catch (boost::property_tree::ptree_error const& e) {
         std::cerr << e.what() << std::endl;
