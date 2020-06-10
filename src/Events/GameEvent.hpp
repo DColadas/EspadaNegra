@@ -41,7 +41,7 @@ class GameEvent {
 
     // True if the object was created correctly
     inline bool isValid() const {
-        return type == Type::Invalid;
+        return type != Type::Invalid;
     };
 
     // Returns the type of the current GameEvent (makes it read-only)
