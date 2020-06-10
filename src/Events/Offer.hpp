@@ -9,7 +9,7 @@
 // PlayerAction representing the amount of gold offered for the current card
 class Offer final : public PlayerAction {
    protected:
-    virtual bool isEqual(const GameEvent& obj) const override {
+    bool isEqual(const GameEvent& obj) const final {
         auto v = static_cast<const Offer&>(obj);
         return PlayerAction::isEqual(obj) &&
                gold == v.gold;

@@ -9,7 +9,7 @@
 // PlayerResult defining which player obtained the current auctioned card
 class GetCard final : public PlayerResult {
    protected:
-    virtual bool isEqual(const GameEvent& obj) const override {
+    bool isEqual(const GameEvent& obj) const final {
         auto v = static_cast<const GetCard&>(obj);
         return PlayerResult::isEqual(obj);
     }

@@ -9,7 +9,7 @@
 // PlayerResult representing the amount of gold paid for the current card
 class Pay final : public PlayerResult {
    protected:
-    virtual bool isEqual(const GameEvent& obj) const override {
+    bool isEqual(const GameEvent& obj) const final {
         auto v = static_cast<const Pay&>(obj);
         return PlayerResult::isEqual(obj) &&
                gold == v.gold;

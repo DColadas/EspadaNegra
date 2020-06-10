@@ -9,7 +9,7 @@
 // PlayerResult defining a player who won the match
 class Winner final : public PlayerResult {
    protected:
-    virtual bool isEqual(const GameEvent& obj) const override {
+    bool isEqual(const GameEvent& obj) const final {
         auto v = static_cast<const Winner&>(obj);
         return PlayerResult::isEqual(obj);
     }
