@@ -11,11 +11,15 @@
 #include <string>
 
 #include "Attack.hpp"
+#include "Earn.hpp"
 #include "GameEvent.hpp"
+#include "GetCard.hpp"
 #include "JoinMatchRequest.hpp"
 #include "Offer.hpp"
 #include "Pass.hpp"
+#include "Pay.hpp"
 #include "Time.hpp"
+#include "Winner.hpp"
 
 namespace {
 using GE = GameEvent::Type;
@@ -23,7 +27,15 @@ const std::map<std::string, GE> stringToType{
     {"joinMatchRequest", GE::JoinMatchRequest},
     {"attack", GE::Attack},
     {"offer", GE::Offer},
-    {"pass", GE::Pass}};
+    {"pass", GE::Pass},
+};
+
+const std::map<GE, std::string> typeToString{
+    {GE::Pay, "pay"},
+    {GE::Earn, "earn"},
+    {GE::Winner, "winner"},
+    {GE::GetCard, "getCard"},
+};
 
 boost::property_tree::ptree parseJSON(const std::string& json) {
     boost::iostreams::stream<boost::iostreams::array_source> stream(json.c_str(), json.size());
@@ -84,9 +96,56 @@ std::unique_ptr<GameEvent> messageToGameEvent(Timestamp time, const std::string&
     return std::make_unique<GameEvent>();
 }
 
-std::unique_ptr<std::string> gameEventToMessage(const GameEvent* event) {
-    switch (event->getType()) {
+// Returns unique_ptr with the event in JSON
+// If the event is not valid, returns nullptr
+std::unique_ptr<const std::string> gameEventToMessage(const GameEvent* event) {
+    using GE = GameEvent::Type;
+    if (!event->isValid()) {
+        return nullptr;
     }
+    const auto typeIter = typeToString.find(event->getType());
+    // If the received type does not exist, set type as invalid
+    const auto type = (typeIter != typeToString.end()) ? typeIter->second : "";
+
+    // Add each property to a tree node
+    boost::property_tree::ptree pt;
+    try {
+        pt.put("type", type);
+        switch (event->getType()) {
+            case GE::GetCard: {
+                const auto getCard = static_cast<const GetCard*>(event);
+                pt.put("nickname", getCard->nickname);
+            } break;
+            case GE::Winner: {
+                const auto winner = static_cast<const Winner*>(event);
+                pt.put("nickname", winner->nickname);
+            } break;
+            case GE::Pay: {
+                const auto pay = static_cast<const Pay*>(event);
+                pt.put("nickname", pay->nickname);
+                pt.put("gold", pay->gold);
+            } break;
+            case GE::Earn: {
+                const auto earn = static_cast<const Earn*>(event);
+                pt.put("nickname", earn->nickname);
+                pt.put("gold", earn->gold);
+            } break;
+            default:
+                std::cerr << "Invalid event!" << std::endl;
+                return nullptr;
+        }
+    } catch (const boost::property_tree::ptree_bad_data& e) {
+        std::cerr << "put: invalid data: " << e.what() << std::endl;
+    }
+
+    // Once the tree is created, convert to JSON string
+    std::stringstream ss;
+    try {
+        boost::property_tree::json_parser::write_json(ss, pt);
+    } catch (const boost::property_tree::json_parser_error& e) {
+        std::cerr << "write_json: " << e.what() << std::endl;
+    }
+    return std::make_unique<const std::string>(ss.str());
 }
 
 }  // namespace JSONParser
