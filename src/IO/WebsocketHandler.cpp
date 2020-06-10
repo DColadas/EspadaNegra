@@ -34,12 +34,11 @@ void WebsocketHandler::leave() {
 }
 
 void WebsocketHandler::joinMatch(const JoinMatchRequest& req) {
-    if (inMatch) {
+    if (currentMatch) {
         std::cout << "Already in match!" << std::endl;
         return;
     }
     currentMatch = matches->joinMatch(req);
-    inMatch = currentMatch ? true : false;
 }
 
 void WebsocketHandler::receiveMessage(const std::string& message) {

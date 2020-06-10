@@ -8,21 +8,20 @@
 #include "Asio.hpp"
 #include "Events/GameEvent.hpp"
 #include "Events/JoinMatchRequest.hpp"
+#include "Events/Time.hpp"
 #include "IOHandler.hpp"
 #include "MatchManager.hpp"
-#include "Events/Time.hpp"
 
 class WebsocketSession;
 
 class WebsocketHandler : public IOHandler, public std::enable_shared_from_this<WebsocketHandler> {
-    using Message = std::pair<Timestamp, std::string>;
-
    private:
     int* currentMatch = nullptr;  //int for debug, should be Match*
     std::shared_ptr<MatchManager> matches = nullptr;
     WebsocketSession* ws = nullptr;
 
     // Variables needed for message exchange
+    //using Message = std::pair<Timestamp, std::string>;
     //std::unique_ptr<std::mutex> m = std::make_unique<std::mutex>();
     //bool messageListening = false;
     //Message latestMessage;
