@@ -27,7 +27,7 @@ boost::property_tree::ptree parseJSON(const std::string& json) {
     boost::property_tree::ptree pt;
     try {
         boost::property_tree::read_json(stream, pt);
-    } catch (std::exception const& e) {
+    } catch (boost::property_tree::json_parser_error const& e) {
         std::cerr << e.what() << std::endl;
     }
     return pt;
@@ -60,7 +60,7 @@ std::unique_ptr<GameEvent> messageToGameEvent(Timestamp time, const std::string&
                 //TODO add cases
                 break;
         }
-    } catch (std::exception const& e) {
+    } catch (boost::property_tree::ptree_error const& e) {
         std::cerr << e.what() << std::endl;
     }
     return std::make_unique<GameEvent>();
