@@ -84,4 +84,9 @@ std::unique_ptr<GameEvent> messageToGameEvent(Timestamp time, const std::string&
     return std::make_unique<GameEvent>();
 }
 
+std::unique_ptr<std::string> gameEventToMessage(const GameEvent* event) {
+    switch (event->getType()) {
+    }
+}
+
 }  // namespace JSONParser
