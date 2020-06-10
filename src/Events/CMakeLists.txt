@@ -1,13 +1,18 @@
 add_library(Events
     Attack.hpp
+    Earn.hpp
     GameEvent.hpp
+    GetCard.hpp
     JoinMatchRequest.hpp
     JSONParser.hpp
     Offer.hpp
     Pass.hpp
+    Pay.hpp
     PlayerAction.hpp
     PlayerEvent.hpp
+    PlayerResult.hpp
     Time.hpp
+    Winner.hpp
 )
 
 find_package(Boost REQUIRED)

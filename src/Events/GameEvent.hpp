@@ -13,7 +13,11 @@ class GameEvent {
         Draw,
         Attack,
         Pass,
-        Offer
+        Offer,
+        Earn,
+        Pay,
+        GetCard,
+        Winner
         //TODO Add more
     };
 
