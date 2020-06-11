@@ -22,7 +22,7 @@ class PlayerResult : public PlayerEvent {
     PlayerResult(PlayerResult&&) = default;
     PlayerResult& operator=(PlayerResult&&) = default;
 
-    virtual bool isEqual(const GameEvent& obj) const override {
+    bool isEqual(const GameEvent& obj) const override {
         auto v = static_cast<const PlayerResult&>(obj);
         return PlayerEvent::isEqual(obj);
     }

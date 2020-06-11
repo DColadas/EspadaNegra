@@ -24,7 +24,7 @@ class PlayerEvent : public GameEvent {
     PlayerEvent(PlayerEvent&&) = default;
     PlayerEvent& operator=(PlayerEvent&&) = default;
 
-    virtual bool isEqual(const GameEvent& obj) const override {
+    bool isEqual(const GameEvent& obj) const override {
         auto v = static_cast<const PlayerEvent&>(obj);
         return GameEvent::isEqual(obj) &&
                nickname == v.nickname;

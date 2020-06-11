@@ -7,7 +7,7 @@
 // Contains necessary information to join a match
 class JoinMatchRequest final : public GameEvent {
    protected:
-    virtual bool isEqual(const GameEvent& obj) const override {
+    bool isEqual(const GameEvent& obj) const final {
         auto v = static_cast<const JoinMatchRequest&>(obj);
         return GameEvent::isEqual(obj) &&
                matchID == v.matchID &&

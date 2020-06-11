@@ -9,7 +9,7 @@
 // PlayerResult representing an amount of gold earned (for end of turn)
 class Earn final : public PlayerResult {
    protected:
-    virtual bool isEqual(const GameEvent& obj) const override {
+    bool isEqual(const GameEvent& obj) const final {
         auto v = static_cast<const Earn&>(obj);
         return PlayerResult::isEqual(obj) &&
                gold == v.gold;

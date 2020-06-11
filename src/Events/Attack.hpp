@@ -9,7 +9,7 @@
 // PlayerAction by which the player intents to attack the current card
 class Attack final : public PlayerAction {
    protected:
-    virtual bool isEqual(const GameEvent& obj) const override {
+    bool isEqual(const GameEvent& obj) const final {
         auto v = static_cast<const Attack&>(obj);
         return PlayerAction::isEqual(obj);
     }

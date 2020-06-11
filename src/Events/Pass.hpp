@@ -9,7 +9,7 @@
 // PlayerAction by which the player is not interested in the current attack/auction phase
 class Pass final : public PlayerAction {
    protected:
-    virtual bool isEqual(const GameEvent& obj) const override {
+    bool isEqual(const GameEvent& obj) const final {
         auto v = static_cast<const Pass&>(obj);
         return PlayerAction::isEqual(obj);
     }
