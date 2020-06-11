@@ -15,7 +15,7 @@ namespace JSONParser {
 //  {"type": "attack"}
 //  {"type": "pass"}
 //  {"type": "offer", "gold": int}
-std::unique_ptr<GameEvent> messageToGameEvent(Timestamp time, const std::string& nickname, const std::string& message);
+[[nodiscard]] std::unique_ptr<GameEvent> messageToGameEvent(Timestamp time, const std::string& nickname, const std::string& message);
 
 // Returns unique_ptr with the event in JSON
 // If the event is not valid, returns nullptr
@@ -24,6 +24,6 @@ std::unique_ptr<GameEvent> messageToGameEvent(Timestamp time, const std::string&
 //  {"type": "earn", "nickname": "XXX", "gold": int}
 //  {"type": "winner", "nickname": "XXX"}
 //  {"type": "getCard", "nickname": "XXX"}
-std::unique_ptr<const std::string> gameEventToMessage(const GameEvent* event);
+[[nodiscard]] std::unique_ptr<const std::string> gameEventToMessage(const GameEvent* event);
 
 }  // namespace JSONParser
