@@ -39,6 +39,10 @@ void WebsocketHandler::joinMatch(const JoinMatchRequest& req) {
         return;
     }
     currentMatch = matches->joinMatch(req);
+    if (currentMatch) {
+        // Accepted into the match
+        nickname = req.nickname;
+    }
 }
 
 void WebsocketHandler::receiveMessage(const std::string& message) {
@@ -56,16 +60,29 @@ void WebsocketHandler::setSession(WebsocketSession* session) {
 void WebsocketHandler::dispatchMessage(const std::string& message) {
     using GE = GameEvent::Type;
     const auto now = std::chrono::system_clock::now();
-    auto event = JSONParser::messageToGameEvent(now, message);
-    switch (event->getType()) {
-        case GE::JoinMatchRequest:
-        //TODO try static_cast (known it won't fail)
-            joinMatch(*dynamic_cast<JoinMatchRequest*>(event.get()));
-            break;
-        case GE::Attack:
-            //TODO Do something
-            break;
-        default:
-            break;
+    auto event = JSONParser::messageToGameEvent(now, nickname, message);
+    // TODO nickname check disable until a login action is implemented
+    if (/*!nickname.empty() && */ !currentMatch) {
+        // Not in match
+        switch (event->getType()) {
+            case GE::JoinMatchRequest:
+                joinMatch(*static_cast<JoinMatchRequest*>(event.get()));
+                break;
+            default:
+                std::cerr << "Event not implemented, not in match" << std::endl;
+        }
+    } else {
+        // In match
+        switch (event->getType()) {
+            case GE::Attack:
+            case GE::Pass:
+            case GE::Offer:
+                //TODO Do something
+                std::cout << "Event of type " << static_cast<int>(event->getType()) << " received." << std::endl;
+                break;
+            default:
+                std::cerr << "Event not implemented, in match" << std::endl;
+                break;
+        }
     }
 }

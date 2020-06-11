@@ -17,6 +17,7 @@ class WebsocketSession;
 class WebsocketHandler : public IOHandler, public std::enable_shared_from_this<WebsocketHandler> {
    private:
     int* currentMatch = nullptr;  //int for debug, should be Match*
+    std::string nickname{};
     std::shared_ptr<MatchManager> matches = nullptr;
     WebsocketSession* ws = nullptr;
 
