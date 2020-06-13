@@ -5,13 +5,13 @@
 #include "Events/JSONParser.hpp"
 #include "WebsocketSession.hpp"
 
-WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches)
-    : matches(matches) {
+WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches_)
+    : matches(matches_) {
 }
 
-WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches,
+WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches_,
                                    tcp::socket socket)
-    : matches(matches) {
+    : matches(matches_) {
     //TODO cannot do this
     auto s = shared_from_this();
 
@@ -22,7 +22,7 @@ WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches,
     ws->run();
 }
 
-void WebsocketHandler::sendEvent(const std::shared_ptr<const GameEvent>& event) {
+void WebsocketHandler::sendEvent(const std::shared_ptr<const GameEvent>& /*event*/) {
 }
 
 void WebsocketHandler::join() {

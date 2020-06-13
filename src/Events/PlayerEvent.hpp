@@ -8,16 +8,16 @@
 // GameEvent related to the state of a player
 class PlayerEvent : public GameEvent {
    protected:
-    PlayerEvent(Type type,
-                const std::string& nickname)
-        : GameEvent(type),
-          nickname(nickname){};
+    PlayerEvent(Type type_,
+                const std::string& nickname_)
+        : GameEvent(type_),
+          nickname(nickname_){};
 
-    PlayerEvent(Type type,
-                Timestamp time,
-                const std::string& nickname)
-        : GameEvent(type, time),
-          nickname(nickname){};
+    PlayerEvent(Type type_,
+                Timestamp time_,
+                const std::string& nickname_)
+        : GameEvent(type_, time_),
+          nickname(nickname_){};
 
     PlayerEvent(const PlayerEvent&) = default;
     PlayerEvent& operator=(const PlayerEvent&) = default;

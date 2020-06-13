@@ -20,14 +20,14 @@ class Pay final : public PlayerResult {
 
     Pay() : PlayerResult(){};
 
-    Pay(const std::string& nickname,
-        int gold)
-        : PlayerResult(Type::Pay, nickname),
-          gold(gold){};
+    Pay(const std::string& nickname_,
+        int gold_)
+        : PlayerResult(Type::Pay, nickname_),
+          gold(gold_){};
 
-    Pay(Timestamp time,
-        const std::string& nickname,
-        int gold)
-        : PlayerResult(Type::Pay, time, nickname),
-          gold(gold){};
+    Pay(Timestamp time_,
+        const std::string& nickname_,
+        int gold_)
+        : PlayerResult(Type::Pay, time_, nickname_),
+          gold(gold_){};
 };

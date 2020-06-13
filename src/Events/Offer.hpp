@@ -20,14 +20,14 @@ class Offer final : public PlayerAction {
 
     Offer() : PlayerAction(){};
 
-    Offer(const std::string& nickname,
-          int gold)
-        : PlayerAction(Type::Offer, nickname),
-          gold(gold){};
+    Offer(const std::string& nickname_,
+          int gold_)
+        : PlayerAction(Type::Offer, nickname_),
+          gold(gold_){};
 
-    Offer(Timestamp time,
-          const std::string& nickname,
-          int gold)
-        : PlayerAction(Type::Offer, time, nickname),
-          gold(gold){};
+    Offer(Timestamp time_,
+          const std::string& nickname_,
+          int gold_)
+        : PlayerAction(Type::Offer, time_, nickname_),
+          gold(gold_){};
 };

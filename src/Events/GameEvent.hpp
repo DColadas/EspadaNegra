@@ -25,8 +25,8 @@ class GameEvent {
     Type type;
 
     // Valid GameEvent objects must only be created or moved from concrete subclases
-    GameEvent(Type type) : type(type), time(Clock::now()){};
-    GameEvent(Type type, Timestamp time) : type(type), time(time){};
+    GameEvent(Type type_) : type(type_), time(Clock::now()){};
+    GameEvent(Type type_, Timestamp time_) : type(type_), time(time_){};
 
     GameEvent(const GameEvent&) = default;
     GameEvent& operator=(const GameEvent&) = default;

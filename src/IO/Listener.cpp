@@ -4,10 +4,10 @@
 
 Listener::Listener(asio::io_context& ioc,
                    tcp::endpoint endpoint,
-                   std::function<void(tcp::socket&&)> onAcceptCallback)
+                   std::function<void(tcp::socket&&)> onAcceptCallback_)
     : acceptor(ioc),
       socket(ioc),
-      onAcceptCallback(onAcceptCallback) {
+      onAcceptCallback(onAcceptCallback_) {
     error_code ec;
 
     // Open the acceptor

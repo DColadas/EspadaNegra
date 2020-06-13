@@ -17,10 +17,10 @@ class Winner final : public PlayerResult {
    public:
     Winner() : PlayerResult(){};
 
-    Winner(const std::string& nickname)
-        : PlayerResult(Type::Winner, nickname){};
+    Winner(const std::string& nickname_)
+        : PlayerResult(Type::Winner, nickname_){};
 
-    Winner(Timestamp time,
-           const std::string& nickname)
-        : PlayerResult(Type::Winner, time, nickname){};
+    Winner(Timestamp time_,
+           const std::string& nickname_)
+        : PlayerResult(Type::Winner, time_, nickname_){};
 };

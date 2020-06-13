@@ -17,10 +17,10 @@ class Pass final : public PlayerAction {
    public:
     Pass() : PlayerAction(){};
 
-    Pass(const std::string& nickname)
-        : PlayerAction(Type::Pass, nickname){};
+    Pass(const std::string& nickname_)
+        : PlayerAction(Type::Pass, nickname_){};
 
-    Pass(Timestamp time,
-         const std::string& nickname)
-        : PlayerAction(Type::Pass, time, nickname){};
+    Pass(Timestamp time_,
+         const std::string& nickname_)
+        : PlayerAction(Type::Pass, time_, nickname_){};
 };

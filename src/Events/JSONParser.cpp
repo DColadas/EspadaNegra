@@ -64,10 +64,10 @@ std::unique_ptr<GameEvent> JSONParser::messageToGameEvent(Timestamp time, const 
         switch (type) {
             case GE::JoinMatchRequest: {
                 const auto matchID = pt.get<std::string>("matchID");
-                const auto nickname = pt.get<std::string>("nickname");  //TODO change nickname for id of the handler
+                const auto jsonNickname = pt.get<std::string>("nickname");  //TODO change nickname for id of the handler
 
                 //if (!matchID.empty() && !nickname.empty()) {
-                return std::make_unique<JoinMatchRequest>(time, matchID, nickname);
+                return std::make_unique<JoinMatchRequest>(time, matchID, jsonNickname);
                 //}
             } break;
             case GE::Attack:
