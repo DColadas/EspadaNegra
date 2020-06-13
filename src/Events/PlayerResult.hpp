@@ -8,14 +8,14 @@
 // PlayerEvent representing an update of the state of a player
 class PlayerResult : public PlayerEvent {
    protected:
-    PlayerResult(Type type,
-                 const std::string& nickname)
-        : PlayerEvent(type, nickname){};
+    PlayerResult(Type type_,
+                 const std::string& nickname_)
+        : PlayerEvent(type_, nickname_){};
 
-    PlayerResult(Type type,
-                 Timestamp time,
-                 const std::string& nickname)
-        : PlayerEvent(type, time, nickname){};
+    PlayerResult(Type type_,
+                 Timestamp time_,
+                 const std::string& nickname_)
+        : PlayerEvent(type_, time_, nickname_){};
 
     PlayerResult(const PlayerResult&) = default;
     PlayerResult& operator=(const PlayerResult&) = default;

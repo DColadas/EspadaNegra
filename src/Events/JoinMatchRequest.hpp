@@ -20,18 +20,18 @@ class JoinMatchRequest final : public GameEvent {
 
     JoinMatchRequest() : GameEvent(){};
 
-    JoinMatchRequest(const std::string& matchID,
-                     const std::string& nickname)
+    JoinMatchRequest(const std::string& matchID_,
+                     const std::string& nickname_)
         : GameEvent(Type::JoinMatchRequest),
-          matchID(matchID),
-          nickname(nickname){};
+          matchID(matchID_),
+          nickname(nickname_){};
 
-    JoinMatchRequest(Timestamp time,
-                     const std::string& matchID,
-                     const std::string& nickname)
-        : GameEvent(Type::JoinMatchRequest, time),
-          matchID(matchID),
-          nickname(nickname){};
+    JoinMatchRequest(Timestamp time_,
+                     const std::string& matchID_,
+                     const std::string& nickname_)
+        : GameEvent(Type::JoinMatchRequest, time_),
+          matchID(matchID_),
+          nickname(nickname_){};
 
     /*
     JoinMatchRequest(const JoinMatchRequest& o) : GameEvent(Type::JoinMatchRequest, o.time) {

@@ -8,8 +8,8 @@ WebsocketSession::WebsocketSession(tcp::socket socket)
 
 WebsocketSession::WebsocketSession(
     tcp::socket socket,
-    const std::shared_ptr<WebsocketHandler>& handler)
-    : ws(std::move(socket)), handler(handler) {
+    const std::shared_ptr<WebsocketHandler>& handler_)
+    : ws(std::move(socket)), handler(handler_) {
 }
 
 WebsocketSession::~WebsocketSession() {
@@ -116,6 +116,6 @@ bool WebsocketSession::isOpen() const {
     return ws.is_open();
 }
 
-void WebsocketSession::setHandler(const std::shared_ptr<WebsocketHandler>& handler) {
-    this->handler = handler;
+void WebsocketSession::setHandler(const std::shared_ptr<WebsocketHandler>& handler_) {
+    this->handler = handler_;
 }

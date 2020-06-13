@@ -17,10 +17,10 @@ class Attack final : public PlayerAction {
    public:
     Attack() : PlayerAction(){};
 
-    Attack(const std::string& nickname)
-        : PlayerAction(Type::Attack, nickname){};
+    Attack(const std::string& nickname_)
+        : PlayerAction(Type::Attack, nickname_){};
 
-    Attack(Timestamp time,
-           const std::string& nickname)
-        : PlayerAction(Type::Attack, time, nickname){};
+    Attack(Timestamp time_,
+           const std::string& nickname_)
+        : PlayerAction(Type::Attack, time_, nickname_){};
 };

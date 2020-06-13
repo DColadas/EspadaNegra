@@ -8,14 +8,14 @@
 // PlayerEvent representing an intended action sent by a player (not yet executed)
 class PlayerAction : public PlayerEvent {
    protected:
-    PlayerAction(Type type,
-                 const std::string& nickname)
-        : PlayerEvent(type, nickname){};
+    PlayerAction(Type type_,
+                 const std::string& nickname_)
+        : PlayerEvent(type_, nickname_){};
 
-    PlayerAction(Type type,
-                 Timestamp time,
-                 const std::string& nickname)
-        : PlayerEvent(type, time, nickname){};
+    PlayerAction(Type type_,
+                 Timestamp time_,
+                 const std::string& nickname_)
+        : PlayerEvent(type_, time_, nickname_){};
 
     PlayerAction(const PlayerAction&) = default;
     PlayerAction& operator=(const PlayerAction&) = default;

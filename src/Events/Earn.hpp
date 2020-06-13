@@ -20,14 +20,14 @@ class Earn final : public PlayerResult {
 
     Earn() : PlayerResult(){};
 
-    Earn(const std::string& nickname,
-         int gold)
-        : PlayerResult(Type::Earn, nickname),
-          gold(gold){};
+    Earn(const std::string& nickname_,
+         int gold_)
+        : PlayerResult(Type::Earn, nickname_),
+          gold(gold_){};
 
-    Earn(Timestamp time,
-         const std::string& nickname,
-         int gold)
-        : PlayerResult(Type::Earn, time, nickname),
-          gold(gold){};
+    Earn(Timestamp time_,
+         const std::string& nickname_,
+         int gold_)
+        : PlayerResult(Type::Earn, time_, nickname_),
+          gold(gold_){};
 };

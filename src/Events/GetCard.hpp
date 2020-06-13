@@ -17,10 +17,10 @@ class GetCard final : public PlayerResult {
    public:
     GetCard() : PlayerResult(){};
 
-    GetCard(const std::string& nickname)
-        : PlayerResult(Type::GetCard, nickname){};
+    GetCard(const std::string& nickname_)
+        : PlayerResult(Type::GetCard, nickname_){};
 
-    GetCard(Timestamp time,
-            const std::string& nickname)
-        : PlayerResult(Type::GetCard, time, nickname){};
+    GetCard(Timestamp time_,
+            const std::string& nickname_)
+        : PlayerResult(Type::GetCard, time_, nickname_){};
 };
