@@ -1,7 +1,9 @@
 #include "PhaseHandler.hpp"
 
-PhaseHandler::PhaseHandler(Match& match)
-    : match(match) {}
+#include "Match.hpp"
+
+PhaseHandler::PhaseHandler(Match& match_)
+    : match(match_) {}
 
 void PhaseHandler::processPhase() {
     switch (match.currentPhase) {

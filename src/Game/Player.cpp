@@ -3,8 +3,8 @@
 #include <iterator>
 #include <numeric>
 
-Player::Player(const std::string& name)
-    : name(std::move(name)) {
+Player::Player(const std::string& name_)
+    : name(std::move(name_)) {
 }
 
 int Player::getTotalAttack() const {

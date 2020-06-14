@@ -8,6 +8,6 @@ class GameModifier {
     //TODO consider changing value to std::variant<int, bool>
     int value;
 
-    GameModifier(GameParameter parameter, int value) : parameter(parameter),
-                                                       value(value){};
+    GameModifier(GameParameter parameter_, int value_) : parameter(parameter_),
+                                                         value(value_){};
 };

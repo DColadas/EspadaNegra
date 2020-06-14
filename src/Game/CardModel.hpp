@@ -5,17 +5,17 @@
 
 class CardModel {
    private:
-   //TODO should provide a set of models per match, to apply modifiers to them
+    //TODO should provide a set of models per match, to apply modifiers to them
     static std::map<int, CardModel> models;  //modelId, model
-    CardModel(const std::string& name,
-              int attack,
-              int production,
-              int victory,
-              bool isBerserk) : name(name),
-                                attack(attack),
-                                production(production),
-                                victory(victory),
-                                isBerserk(isBerserk){};
+    CardModel(const std::string& name_,
+              int attack_,
+              int production_,
+              int victory_,
+              bool isBerserk_) : name(name_),
+                                 attack(attack_),
+                                 production(production_),
+                                 victory(victory_),
+                                 isBerserk(isBerserk_){};
 
    public:
     std::string name;

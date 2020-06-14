@@ -18,7 +18,7 @@ class Deck {
     bool isEmpty() const;
 
     // True if there are at least ${amount} cards left
-    bool canDraw(int amount) const;
+    bool canDraw(unsigned int amount) const;
 
     // Shuffle the deck
     void shuffle();

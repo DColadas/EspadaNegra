@@ -15,14 +15,14 @@ bool Deck::isEmpty() const {
     return cards.empty();
 }
 
-bool Deck::canDraw(int amount) const {
-    return cards.size() >= amount;
+bool Deck::canDraw(unsigned int amount) const {
+    return static_cast<unsigned int>(cards.size()) >= amount;
 }
 
 void Deck::shuffle() {
     Random::shuffle(cards.begin(), cards.end());
 }
 
-Deck Deck::createById(int id) {
-    //TODO
-}
+//Deck Deck::createById(int id) {
+//    //TODO
+//}

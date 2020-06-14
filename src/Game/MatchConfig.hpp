@@ -4,12 +4,12 @@
 
 class MatchConfig {
    public:
-    const int numPlayers;
-    int cardsPerTurn = numPlayers + 2;
-    int initialGold = 10;
+    const unsigned int numPlayers;
+    unsigned int cardsPerTurn = numPlayers + 2;
+    unsigned int initialGold = 10;
     int auctioneerGoldDisadvantage = 1;
 
-    MatchConfig(int numPlayers);
+    MatchConfig(unsigned int numPlayers);
 
     // Changes current parameters according to the modifier
     void applyModifier(const GameModifier& modifier);

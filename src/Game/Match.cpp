@@ -4,13 +4,13 @@
 
 #include "Utils/Random.hpp"
 
-Match::Match(const MatchConfig& config, const Deck& deck)
-    : config(std::move(config)), deck(std::move(deck)) {
+Match::Match(const MatchConfig& config_, const Deck& deck_)
+    : config(std::move(config_)), deck(std::move(deck_)) {
 }
 
 void Match::nextAuctioneer() {
     currentAuctioneer++;
-    if (currentAuctioneer >= players.size()) {
+    if (currentAuctioneer >= static_cast<int>(players.size())) {
         currentAuctioneer = 0;
     }
     currentPlayer = currentAuctioneer;
@@ -33,12 +33,12 @@ void Match::start() {
     }
 }
 
-std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction& action) {
-}
+//std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction& action) {
+//}
 
 void Match::onGameStartPhase() {
     // Decide a random auctioneer
-    currentAuctioneer = Random::randInt(0, players.size() - 1);
+    currentAuctioneer = Random::randInt(0, static_cast<int>(players.size()) - 1);
     currentPlayer = currentAuctioneer;
 
     //TODO draw 3 conditions and apply them
@@ -52,7 +52,7 @@ void Match::onTurnStartPhase() {
         return;
     }
 
-    for (auto i = 0; i < config.cardsPerTurn; ++i) {
+    for (unsigned int i = 0; i < config.cardsPerTurn; ++i) {
         cardsInAuction.push_back(deck.draw());
     }
 }

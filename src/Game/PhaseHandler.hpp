@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Match.hpp"
-
+class Match;
 class PhaseHandler {
    private:
    public:

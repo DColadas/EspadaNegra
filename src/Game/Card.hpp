@@ -5,11 +5,11 @@
 
 class Card {
    private:
-    Card(const CardModel& baseModel,
-         int id,
-         const GameModifier& initialCondition) : base(baseModel),
-                                                 id(id),
-                                                 initialCondition(initialCondition){};
+    Card(const CardModel& baseModel_,
+         int id_,
+         const GameModifier& initialCondition_) : base(baseModel_),
+                                                  id(id_),
+                                                  initialCondition(initialCondition_){};
 
    public:
     const CardModel& base;
@@ -37,7 +37,7 @@ class Card {
         return base.isBerserk;
     }
 
-    static Card createById(int id) {
-        //TODO
-    }
+    //static Card createById(int /*id*/) {
+    //    //TODO
+    //}
 };
