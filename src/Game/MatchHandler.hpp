@@ -9,7 +9,7 @@ class GameEvent;
 class PlayerAction;
 class MatchHandler {
    private:
-    Match& match;
+    Match match;
     std::map<std::string, IOHandler*> handlers;  //nickname, handler
 
     // Inform every player about the GameEvent
