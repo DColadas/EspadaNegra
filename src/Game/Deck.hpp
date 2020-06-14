@@ -27,8 +27,6 @@ class Deck {
     // Shuffle the deck
     void shuffle();
 
-    static Deck createById(int id);
-
     // Add a new deck type which to retrieve later
     static void add(int id, const std::vector<int>& cardIds);
     static void add(int id, const std::vector<Card>& cards);
