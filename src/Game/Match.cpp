@@ -5,7 +5,7 @@
 #include "Utils/Random.hpp"
 
 Match::Match(const MatchConfig& config, const Deck& deck)
-    : config(config), deck(deck) {
+    : config(std::move(config)), deck(std::move(deck)) {
 }
 
 void Match::nextAuctioneer() {
@@ -22,9 +22,8 @@ bool Match::arePossibleAttacks(int amount) const {
     });
 }
 
-void Match::addPlayer(std::unique_ptr<IOHandler>&& connection,
-                      const std::string& name) {
-    players.push_back(Player(*this, std::move(connection), name));
+void Match::addPlayer(const std::string& name) {
+    players.emplace_back(name);
 }
 
 void Match::start() {
@@ -34,10 +33,7 @@ void Match::start() {
     }
 }
 
-void Match::notifyPlayers(const GameEvent& event) {
-    for (auto& p : players) {
-        p.sendEvent(event);
-    }
+std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction& action) {
 }
 
 void Match::onGameStartPhase() {
@@ -62,23 +58,10 @@ void Match::onTurnStartPhase() {
 }
 
 void Match::onAttackPhase() {
-        //IDEA getAction() to every player that can attack
-        // When any input arrived, update and reset the timer,
-        // and ask everyone for action again.
-        // If PASS is received, dont update
-        //use future.wait_until
-
-        //Make it so the IOHandler is constantly listening for events,
-        //and update the ${latestAction} whenever a valid one is received
-
-        //When getAction() is called, set ${latestAction} to null (or similar),
-        //or just wait for an update
-
-        //Or even, set a flag in the IOHandler to enable reception or not, so that
-        //events received while not getAction() are not consuming resources
-    while(arePossibleAttacks()){
-
-    }
+    // When any input arrived, update and reset the timer,
+    // If PASS is received, dont update
+    //while (arePossibleAttacks()) {
+    //}
 }
 
 void Match::onAuctionPhase() {

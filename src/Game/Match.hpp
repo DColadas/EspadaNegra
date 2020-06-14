@@ -1,9 +1,12 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "Card.hpp"
 #include "Deck.hpp"
+#include "Events/GameEvent.hpp"
+#include "Events/PlayerAction.hpp"
 #include "MatchConfig.hpp"
 #include "Phase.hpp"
 #include "PhaseHandler.hpp"
@@ -15,7 +18,7 @@ class Match {
     void nextAuctioneer();
     // True if some player has ${amount} or more attack and can attack
     bool arePossibleAttacks(int amount) const;
-    
+
    public:
     Phase currentPhase = Phase::WaitForStart;
     PhaseHandler phaseHandler = PhaseHandler(*this);
@@ -31,14 +34,17 @@ class Match {
     Match(const MatchConfig& config, const Deck& deck);
 
     // Add a new player to the match
-    void addPlayer(std::unique_ptr<IOHandler>&& connection,
-                   const std::string& name);
+    void addPlayer(const std::string& name);
+
+    // Remove player from the match
+    void removePlayer(const std::string& nickname);
 
     // Start the game, process until the match ends
     void start();
 
-    // Inform every player about the GameEvent
-    void notifyPlayers(const GameEvent& event);
+    // Process PlayerAction and return GameEvent with update of the Match's state
+    // Returns nullptr if there is no valid update in the state
+    std::unique_ptr<const GameEvent> handlePlayerAction(const PlayerAction& action);
 
     // Methods for each Phase in the game
     void onGameStartPhase();
