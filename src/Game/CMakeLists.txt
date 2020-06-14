@@ -1,6 +1,8 @@
 add_library(Game
   Card.hpp
+  Card.cpp
   CardModel.hpp
+  CardModel.cpp
   Deck.cpp
   Deck.hpp
   GameModifier.hpp

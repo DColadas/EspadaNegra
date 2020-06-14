@@ -1,43 +1,39 @@
 #pragma once
 
+#include <map>
+
 #include "CardModel.hpp"
 #include "GameModifier.hpp"
 
 class Card {
    private:
-    Card(const CardModel& baseModel_,
-         int id_,
-         const GameModifier& initialCondition_) : base(baseModel_),
-                                                  id(id_),
-                                                  initialCondition(initialCondition_){};
+    static std::map<int, Card> cards;  //cardId, card
+
+    Card(const CardModel* baseModel,
+         int id,
+         const GameModifier& initialCondition);
 
    public:
-    const CardModel& base;
+    const CardModel* base;
     int id;
     //TODO consider allowing more than one modifier
     GameModifier initialCondition;
 
-    inline std::string getName() const {
-        return base.name;
-    }
+    // Get attributes
+    std::string getName() const;
+    int getAttack() const;
+    int getProduction() const;
+    int getVictory() const;
+    bool isBerserk() const;
 
-    inline int getAttack() const {
-        return base.attack;
-    }
+    // Add a new card type which to retrieve later
+    static void add(int id,
+                    const GameModifier& initialCondition,
+                    int modelId);
+    static void add(int id,
+                    const GameModifier& initialCondition,
+                    const CardModel* model);
 
-    inline int getProduction() const {
-        return base.production;
-    }
-
-    inline int getVictory() const {
-        return base.victory;
-    }
-
-    inline bool isBerserk() const {
-        return base.isBerserk;
-    }
-
-    //static Card createById(int /*id*/) {
-    //    //TODO
-    //}
+    // Returns first card if the id doesn't exist (should never happen)
+    static Card getById(int id);
 };
