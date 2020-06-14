@@ -4,6 +4,16 @@
 
 #include "Utils/Random.hpp"
 
+std::map<int, Deck> Deck::decks;
+
+Deck::Deck(const std::vector<int>& cardIds) {
+    for (const auto& id : cardIds) {
+        cards.push_back(Card::getById(id));
+    }
+}
+
+Deck::Deck(const std::vector<Card>& cards_) : cards(cards_) {}
+
 Card Deck::draw() {
     //TODO panic if no cards left
     const auto c = cards[cards.size() - 1];
@@ -23,6 +33,21 @@ void Deck::shuffle() {
     Random::shuffle(cards.begin(), cards.end());
 }
 
-//Deck Deck::createById(int id) {
-//    //TODO
-//}
+void Deck::add(int id, const std::vector<int>& cardIds) {
+    //TODO check decks[id] does not exist already (shouldn't happen)
+    decks.emplace(id, Deck(std::move(cardIds)));
+}
+
+void Deck::add(int id, const std::vector<Card>& cards_) {
+    //TODO check decks[id] does not exist already (shouldn't happen)
+    decks.emplace(id, Deck(std::move(cards_)));
+}
+
+Deck Deck::getById(int id) {
+    const auto it = decks.find(id);
+    if (it != decks.end()) {
+        return it->second;
+    }
+    //TODO panic
+    return decks.begin()->second;
+}
