@@ -3,18 +3,15 @@
 #include <iterator>
 #include <numeric>
 
-Player::Player(const Match& match,
-               std::unique_ptr<IOHandler>&& connection,
-               const std::string& name)
-    : match(match),
-      connection(std::move(connection)),
-      name(name) {
+Player::Player(const std::string& name)
+    : name(std::move(name)) {
 }
 
 int Player::getTotalAttack() const {
-    return std::accumulate(activeCards.begin(), activeCards.end(), 0, [](int a, const Card b) {
-        return a + b.getAttack();
-    });
+    return std::accumulate(activeCards.begin(), activeCards.end(), 0,
+                           [](int a, const Card b) {
+                               return a + b.getAttack();
+                           });
 }
 
 int Player::getTotalProduction() const {
@@ -59,8 +56,8 @@ void Player::onTurnEnd() {
     //earn(getTotalProduction());
 }
 
-void Player::addCard(Card card) {
-    purchasedThisTurnCards.push_back(card);
+void Player::addCard(const Card& card) {
+    purchasedThisTurnCards.push_back(std::move(card));
 }
 
 int Player::attack() {
@@ -87,12 +84,4 @@ void Player::pay(int amount) {
 
 void Player::earn(int amount) {
     gold += amount;
-}
-
-PlayerAction Player::getAction() {
-    connection->getAction();
-}
-
-void Player::sendEvent(const GameEvent& event) {
-    connection->sendEvent(event);
 }

@@ -1,17 +1,11 @@
 #pragma once
 
-#include <memory>
 #include <string>
 #include <vector>
 
 #include "Card.hpp"
-#include "Match.hpp"
 
 class Player {
-   private:
-    std::unique_ptr<IOHandler> connection;
-    const Match& match;
-
    public:
     std::string name;
     int gold = 0;  // Set when match starts, with the MatchConfig value
@@ -19,9 +13,7 @@ class Player {
     std::vector<Card> activeCards{};
     std::vector<Card> purchasedThisTurnCards{};
 
-    Player(const Match& match,
-           std::unique_ptr<IOHandler>&& connection,
-           const std::string& name);
+    Player(const std::string& name);
 
     // Add the attack of every active attack card
     // Doesn't consider ${hasAttacked} or ${purchasedThisTurnCards}
@@ -37,7 +29,7 @@ class Player {
     void onTurnEnd();
 
     // Add a new card to the owned ones
-    void addCard(Card card);
+    void addCard(const Card& card);
 
     // Sets ${hasAttacked} to true and returns the available attack amount
     int attack();
@@ -53,10 +45,4 @@ class Player {
     // Pay or earn ${amount} of gold
     void pay(int amount);
     void earn(int amount);
-
-    // Get user's latest valid PlayerAction
-    PlayerAction getAction();
-
-    // Notify player of a GameEvent
-    void sendEvent(const GameEvent& event);
 };
