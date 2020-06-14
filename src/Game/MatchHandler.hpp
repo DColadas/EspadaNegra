@@ -13,7 +13,7 @@ class MatchHandler {
     std::map<std::string, IOHandler*> handlers;  //nickname, handler
 
     // Inform every player about the GameEvent
-    void notifyPlayers(const GameEvent& event);
+    void notifyPlayers(const std::shared_ptr<const GameEvent>& event);
 
    public:
     //TODO consider making private and using a factory to create Match

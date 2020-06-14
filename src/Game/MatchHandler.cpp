@@ -23,18 +23,18 @@ void MatchHandler::start() {
     match.start();
 }
 
-void MatchHandler::notifyPlayers(const GameEvent& event) {
-    auto const e = std::make_shared<const GameEvent>(std::move(event));
+void MatchHandler::notifyPlayers(const std::shared_ptr<const GameEvent>& event) {
     for (auto& h : handlers) {
-        h.second->sendEvent(e);
+        h.second->sendEvent(event);
     }
 }
 
 // Receive a PlayerAction from a client
 void MatchHandler::handlePlayerAction(const PlayerAction& action) {
-    const auto event = match.handlePlayerAction(action);
+    auto event = match.handlePlayerAction(action);
     // If there is an update in the state of match, broadcast it
     if (event) {
-        notifyPlayers(*event);
+        std::shared_ptr<const GameEvent> s = std::move(event);
+        notifyPlayers(std::move(s));
     }
 }
