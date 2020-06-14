@@ -1,6 +1,7 @@
 #pragma once
 
 enum class GameParameter {
+    Nothing,
     CardsPerTurn,
     OnlyVictoryCardsAdditionalVictory,
     CanProduceWithOnlyVictory,
