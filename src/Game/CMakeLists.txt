@@ -1,17 +1,19 @@
 add_library(Game
   Card.hpp
-  Deck.hpp
-  GameParameter.hpp
-  MatchConfig.hpp
-  Match.hpp
-  PhaseHandler.hpp
-  Player.cpp
   CardModel.hpp
   Deck.cpp
+  Deck.hpp
   GameModifier.hpp
-  MatchConfig.cpp
+  GameParameter.hpp
   Match.cpp
-  PhaseHandler.cpp
+  Match.hpp
+  MatchConfig.cpp
+  MatchConfig.hpp
+  MatchHandler.cpp
+  MatchHandler.hpp
   Phase.hpp
+  PhaseHandler.cpp
+  PhaseHandler.hpp
+  Player.cpp
   Player.hpp
 )
