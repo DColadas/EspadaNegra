@@ -48,5 +48,11 @@ MatchHandler* MatchManager::joinMatch(IOHandler& client, const JoinMatchRequest&
     }
 
     std::cout << it->first << "::" << it->second->getPlayerCount() << std::endl;
+    if (it->second->isFull()) {
+        // If the match became full after joining, start it!
+        //TODO starting threads for each match is far from ideal
+        std::thread([it] { it->second->start(); }).detach();
+    }
+
     return it->second.get();
 }
