@@ -30,6 +30,9 @@ void WebsocketHandler::join() {
 }
 
 void WebsocketHandler::leave() {
+    if (currentMatch) {
+        currentMatch->removePlayer(nickname);
+    }
     matches->leave(*this);
 }
 
