@@ -74,9 +74,20 @@ void Match::onTurnStartPhase() {
         return;
     }
 
+    // Set cards in auction
     for (unsigned int i = 0; i < config.cardsPerTurn; ++i) {
         cardsInAuction.push_back(deck.draw());
     }
+
+    // Every player earns their production
+    std::for_each(players.begin(), players.end(), [&](Player& p) {
+        p.earn(p.getTotalProduction());
+    });
+
+    // Change auctioneer
+    nextAuctioneer();
+
+    currentPhase = Phase::Attack;
 }
 
 void Match::onAttackPhase() {
