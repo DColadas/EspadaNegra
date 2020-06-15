@@ -19,6 +19,10 @@ void MatchHandler::removePlayer(const std::string& nickname) {
     match.removePlayer(nickname);
 }
 
+std::size_t MatchHandler::getPlayerCount() const {
+    return handlers.size();
+}
+
 void MatchHandler::start() {
     match.start();
 }

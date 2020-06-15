@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <string>
 
 #include "Match.hpp"
 
@@ -25,6 +26,9 @@ class MatchHandler {
 
     // Remove player from the match
     void removePlayer(const std::string& nickname);
+
+    // Returns the amount of connected players
+    std::size_t getPlayerCount() const;
 
     // Start the game, process until the match ends
     void start();
