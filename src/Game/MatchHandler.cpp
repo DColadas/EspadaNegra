@@ -5,6 +5,7 @@
 
 #include "IO/IOHandler.hpp"
 #include "MatchConfig.hpp"
+#include "Phase.hpp"
 #include "Utils/Random.hpp"
 
 MatchHandler::MatchHandler()
@@ -17,12 +18,17 @@ MatchHandler::MatchHandler(const MatchConfig& config, const Deck& deck)
       maxPlayers(match.config.numPlayers) {
 }
 
-void MatchHandler::addPlayer(IOHandler* client, const std::string& name) {
-    handlers.emplace(name, client);
-    match.addPlayer(name);
-    if (handlers.size() == maxPlayers) {
-        std::cout << "Start!" << std::endl;
+bool MatchHandler::addPlayer(IOHandler* client, const std::string& name) {
+    if (isFull() || isRunning()) {
+        return false;
     }
+    const auto [it, inserted] = handlers.emplace(name, client);
+    if (!inserted) {
+        // The nickname existed already
+        return false;
+    }
+    match.addPlayer(name);
+    return true;
 }
 
 void MatchHandler::removePlayer(const std::string& nickname) {

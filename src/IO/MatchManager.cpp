@@ -42,7 +42,11 @@ MatchHandler* MatchManager::joinMatch(IOHandler& client, const JoinMatchRequest&
         //Match found, join
         std::cout << "Match found - ";
     }
-    it->second->addPlayer(&client, nickname);
+    if (!it->second->addPlayer(&client, nickname)) {
+        // Couldn't join the match (full or existing username)
+        return nullptr;
+    }
+
     std::cout << it->first << "::" << it->second->getPlayerCount() << std::endl;
     return it->second.get();
 }

@@ -26,7 +26,9 @@ class MatchHandler {
     MatchHandler(const MatchConfig& config, const Deck& deck);
 
     // Add a new player to the match
-    void addPlayer(IOHandler* client,
+    // True if the player was inserted
+    // False if the nickname already exists, match is full or running
+    bool addPlayer(IOHandler* client,
                    const std::string& nickname);
 
     // Remove player from the match
