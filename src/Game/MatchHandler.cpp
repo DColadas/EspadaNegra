@@ -53,3 +53,12 @@ void MatchHandler::handlePlayerAction(const PlayerAction& action) {
         notifyPlayers(std::move(s));
     }
 }
+
+bool MatchHandler::isRunning() const {
+    return match.currentPhase != Phase::WaitForStart &&
+           match.currentPhase != Phase::Finished;
+}
+
+bool MatchHandler::isFull() const {
+    return maxPlayers == handlers.size();
+}

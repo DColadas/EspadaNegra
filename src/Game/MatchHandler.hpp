@@ -40,4 +40,10 @@ class MatchHandler {
 
     // Receive a PlayerAction from a client
     void handlePlayerAction(const PlayerAction& action);
+
+    // True if the match is running
+    bool isRunning() const;
+
+    // True if the match is full (no more players can join)
+    bool isFull() const;
 };
