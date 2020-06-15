@@ -19,3 +19,5 @@ add_library(Game
   Player.cpp
   Player.hpp
 )
+
+target_link_libraries(Game PRIVATE Utils)

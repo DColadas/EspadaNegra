@@ -7,6 +7,7 @@
 // Utilities to generate random numbers
 namespace Random {
 namespace {
+//TODO I think this is incorrect in a header file
 std::random_device rd;  //Seed
 std::mt19937 rng{rd()};
 }  // namespace
