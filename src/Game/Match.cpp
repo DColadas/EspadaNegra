@@ -55,7 +55,15 @@ void Match::onGameStartPhase() {
     currentAuctioneer = Random::randInt(0, static_cast<int>(players.size()) - 1);
     currentPlayer = currentAuctioneer;
 
+    // Set initial gold
+    std::for_each(players.begin(), players.end(), [&](Player& p) {
+        p.gold = static_cast<int>(config.initialGold);
+    });
+    players[static_cast<std::size_t>(currentAuctioneer)].gold -= config.auctioneerGoldDisadvantage;
+
     //TODO draw 3 conditions and apply them
+
+    currentPhase = Phase::TurnStart;
 }
 
 void Match::onTurnStartPhase() {
