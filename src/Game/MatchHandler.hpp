@@ -12,12 +12,17 @@ class MatchHandler {
    private:
     Match match;
     std::map<std::string, IOHandler*> handlers;  //nickname, handler
+    unsigned int maxPlayers;
 
     // Inform every player about the GameEvent
     void notifyPlayers(const std::shared_ptr<const GameEvent>& event);
 
    public:
     //TODO consider making private and using a factory to create Match
+
+    // Creates a match of 2 people and deck 1
+    MatchHandler();
+
     MatchHandler(const MatchConfig& config, const Deck& deck);
 
     // Add a new player to the match

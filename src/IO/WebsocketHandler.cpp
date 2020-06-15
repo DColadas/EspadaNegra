@@ -38,7 +38,7 @@ void WebsocketHandler::joinMatch(const JoinMatchRequest& req) {
         std::cout << "Already in match!" << std::endl;
         return;
     }
-    currentMatch = matches->joinMatch(req);
+    currentMatch = matches->joinMatch(*this, req);
     if (currentMatch) {
         // Accepted into the match
         nickname = req.nickname;

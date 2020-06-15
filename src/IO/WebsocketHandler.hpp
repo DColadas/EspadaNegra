@@ -9,6 +9,7 @@
 #include "Events/GameEvent.hpp"
 #include "Events/JoinMatchRequest.hpp"
 #include "Events/Time.hpp"
+#include "Game/MatchHandler.hpp"
 #include "IOHandler.hpp"
 #include "MatchManager.hpp"
 
@@ -16,7 +17,7 @@ class WebsocketSession;
 
 class WebsocketHandler : public IOHandler, public std::enable_shared_from_this<WebsocketHandler> {
    private:
-    int* currentMatch = nullptr;  //int for debug, should be Match*
+    MatchHandler* currentMatch = nullptr;  //int for debug, should be Match*
     std::string nickname{};
     std::shared_ptr<MatchManager> matches = nullptr;
     WebsocketSession* ws = nullptr;

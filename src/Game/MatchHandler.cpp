@@ -1,17 +1,28 @@
 #include "MatchHandler.hpp"
 
 #include <algorithm>
+#include <iostream>
 
 #include "IO/IOHandler.hpp"
+#include "MatchConfig.hpp"
 #include "Utils/Random.hpp"
 
+MatchHandler::MatchHandler()
+    : match(MatchConfig(2), Deck::getById(1)),
+      maxPlayers(match.config.numPlayers) {
+}
+
 MatchHandler::MatchHandler(const MatchConfig& config, const Deck& deck)
-    : match(std::move(config), std::move(deck)) {
+    : match(std::move(config), std::move(deck)),
+      maxPlayers(match.config.numPlayers) {
 }
 
 void MatchHandler::addPlayer(IOHandler* client, const std::string& name) {
     handlers.emplace(name, client);
     match.addPlayer(name);
+    if (handlers.size() == maxPlayers) {
+        std::cout << "Start!" << std::endl;
+    }
 }
 
 void MatchHandler::removePlayer(const std::string& nickname) {

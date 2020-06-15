@@ -7,6 +7,7 @@
 
 #include "IOHandler.hpp"
 
+class MatchHandler;
 // Represents the shared server state
 class MatchManager {
    private:
@@ -14,8 +15,8 @@ class MatchManager {
     // Serialize access to this set using strands
     std::unordered_set<IOHandler*> handlers;
 
-    //matchID, Match (int for debugging purposes)
-    std::unordered_map<std::string, std::unique_ptr<int>> matches;
+    //matchID, MatchHandler
+    std::unordered_map<std::string, std::unique_ptr<MatchHandler>> matches;
 
    public:
     explicit MatchManager();
@@ -26,5 +27,5 @@ class MatchManager {
 
     // Returns pointer to the Match where accepted
     // Returns nullptr if not accepted to the match
-    int* joinMatch(const JoinMatchRequest& req);
+    MatchHandler* joinMatch(IOHandler& client, const JoinMatchRequest& req);
 };

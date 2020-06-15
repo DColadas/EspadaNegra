@@ -26,6 +26,19 @@ void Match::addPlayer(const std::string& name) {
     players.emplace_back(name);
 }
 
+void Match::removePlayer(const std::string& nickname) {
+    //TODO adjust indexes of current auctioneer, player...
+    auto p = std::find_if(players.begin(), players.end(), [&nickname](const Player& a) {
+        return a.name == nickname;
+    });
+    if (p != players.end()) {
+        players.erase(p);
+    } else {
+        //Should never happen
+        //TODO panic
+    }
+}
+
 void Match::start() {
     currentPhase = Phase::GameStart;
     while (currentPhase != Phase::Finished) {
@@ -33,8 +46,9 @@ void Match::start() {
     }
 }
 
-//std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction& action) {
-//}
+std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction& action) {
+    //TODO implement
+}
 
 void Match::onGameStartPhase() {
     // Decide a random auctioneer
