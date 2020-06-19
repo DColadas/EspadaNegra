@@ -14,6 +14,8 @@
 
 class Match {
    private:
+    // Get player index by nickname
+    unsigned int getPlayerIndex(const std::string& nickname) const;
     // Change the ${currentAuctioneer} index
     void nextAuctioneer();
     // True if some player has ${amount} or more attack and can attack

@@ -8,6 +8,19 @@ Match::Match(const MatchConfig& config_, const Deck& deck_)
     : config(std::move(config_)), deck(std::move(deck_)) {
 }
 
+unsigned int Match::getPlayerIndex(const std::string& nickname) const {
+    const auto it = std::find_if(players.begin(), players.end(), [nickname](const Player& p) {
+        return p.name == nickname;
+    });
+    const unsigned int index = static_cast<unsigned int>(std::distance(players.begin(), it));
+    if (index < players.size()) {
+        return index;
+    } else {
+        //TODO player not in the vector (should never happen)
+    }
+    abort();
+}
+
 void Match::nextAuctioneer() {
     currentAuctioneer++;
     if (currentAuctioneer >= static_cast<int>(players.size())) {
