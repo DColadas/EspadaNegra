@@ -49,8 +49,9 @@ void Player::onTurnEnd() {
                        std::make_move_iterator(purchasedThisTurnCards.end()));
     purchasedThisTurnCards.clear();
 
-    // Reset attack flag
+    // Reset attack flag and pass flag
     hasAttacked = false;
+    hasPassed = false;
 
     // Produce (should be carried out by Match)
     //earn(getTotalProduction());
@@ -65,16 +66,20 @@ int Player::attack() {
     return getTotalAttack();
 }
 
-bool Player::canOffer(int amount) const {
-    return amount <= gold;
+void Player::pass() {
+    hasPassed = true;
 }
 
-bool Player::canAttack() const {
-    return !hasAttacked && getTotalAttack() > 0;
+bool Player::canOffer(int amount) const {
+    return !hasPassed && amount <= gold;
 }
 
 bool Player::canAttack(int amount) const {
-    return !hasAttacked && getTotalAttack() > amount;
+    return !hasAttacked && !hasPassed && getTotalAttack() > amount;
+}
+
+bool Player::canAttack() const {
+    return canAttack(0);
 }
 
 void Player::pay(int amount) {

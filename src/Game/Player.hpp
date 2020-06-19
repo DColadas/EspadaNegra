@@ -10,6 +10,7 @@ class Player {
     std::string name;
     int gold = 0;  // Set when match starts, with the MatchConfig value
     bool hasAttacked = false;
+    bool hasPassed = false;
     std::vector<Card> activeCards{};
     std::vector<Card> purchasedThisTurnCards{};
 
@@ -34,13 +35,16 @@ class Player {
     // Sets ${hasAttacked} to true and returns the available attack amount
     int attack();
 
-    // True if ${amount} is less or equal than the available gold
+    // Sets ${hasPassed} to true (can't attack the current card or pay)
+    void pass();
+
+    // True if ${amount} is less or equal than the available gold and has not passed
     bool canOffer(int amount) const;
 
-    // True if there are active attack cards and not ${hasAttacked}
-    bool canAttack() const;
-    // True if ${canAttack()} and has equal or more ${amount} total attack
+    // True if has equal or more ${amount} total attack and has not attacked or passed
     bool canAttack(int amount) const;
+    // Same as ${canAttack(0)}
+    bool canAttack() const;
 
     // Pay or earn ${amount} of gold
     void pay(int amount);
