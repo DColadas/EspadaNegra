@@ -4,7 +4,7 @@
 
 #include "GameEvent.hpp"
 #include "PlayerResult.hpp"
-#include "Time.hpp"
+#include "Utils/Time.hpp"
 
 // PlayerResult defining a player who won the match
 class Winner final : public PlayerResult {

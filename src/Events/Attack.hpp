@@ -4,7 +4,7 @@
 
 #include "GameEvent.hpp"
 #include "PlayerAction.hpp"
-#include "Time.hpp"
+#include "Utils/Time.hpp"
 
 // PlayerAction by which the player intents to attack the current card
 class Attack final : public PlayerAction {

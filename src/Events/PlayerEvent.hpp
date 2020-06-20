@@ -3,7 +3,7 @@
 #include <string>
 
 #include "GameEvent.hpp"
-#include "Time.hpp"
+#include "Utils/Time.hpp"
 
 // GameEvent related to the state of a player
 class PlayerEvent : public GameEvent {

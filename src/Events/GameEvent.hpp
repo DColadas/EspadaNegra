@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Time.hpp"
+#include "Utils/Time.hpp"
 
 // Represents any action sent by or to a player
 class GameEvent {

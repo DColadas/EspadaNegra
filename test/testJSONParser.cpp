@@ -16,8 +16,8 @@
 #include "Events/Offer.hpp"
 #include "Events/Pass.hpp"
 #include "Events/Pay.hpp"
-#include "Events/Time.hpp"
 #include "Events/Winner.hpp"
+#include "Utils/Time.hpp"
 
 TEST_CASE("Test JSONParser::messageToGameEvent", "[parser]") {
     auto now = Clock::now();
