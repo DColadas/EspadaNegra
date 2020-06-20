@@ -41,7 +41,7 @@ class MatchHandler {
     void start();
 
     // Receive a PlayerAction from a client
-    void handlePlayerAction(const PlayerAction& action);
+    void handlePlayerAction(const PlayerAction* action);
 
     // True if the match is running
     bool isRunning() const;

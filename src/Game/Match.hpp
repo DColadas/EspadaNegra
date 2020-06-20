@@ -45,8 +45,8 @@ class Match {
     void start();
 
     // Process PlayerAction and return GameEvent with update of the Match's state
-    // Returns nullptr if there is no valid update in the state
-    std::unique_ptr<const GameEvent> handlePlayerAction(const PlayerAction& action);
+    // Returns invalid event if there is no valid update in the state
+    std::unique_ptr<const GameEvent> handlePlayerAction(const PlayerAction* action);
 
     // Methods for each Phase in the game
     void onGameStartPhase();
