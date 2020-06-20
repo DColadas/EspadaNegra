@@ -3,7 +3,7 @@
 #include <string>
 
 #include "PlayerEvent.hpp"
-#include "Time.hpp"
+#include "Utils/Time.hpp"
 
 // PlayerEvent representing an update of the state of a player
 class PlayerResult : public PlayerEvent {

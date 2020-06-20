@@ -4,7 +4,7 @@
 
 #include "GameEvent.hpp"
 #include "PlayerResult.hpp"
-#include "Time.hpp"
+#include "Utils/Time.hpp"
 
 // PlayerResult representing an amount of gold earned (for end of turn)
 class Earn final : public PlayerResult {

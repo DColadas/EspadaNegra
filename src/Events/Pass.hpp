@@ -4,7 +4,7 @@
 
 #include "GameEvent.hpp"
 #include "PlayerAction.hpp"
-#include "Time.hpp"
+#include "Utils/Time.hpp"
 
 // PlayerAction by which the player is not interested in the current attack/auction phase
 class Pass final : public PlayerAction {

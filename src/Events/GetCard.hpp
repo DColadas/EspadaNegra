@@ -4,7 +4,7 @@
 
 #include "GameEvent.hpp"
 #include "PlayerResult.hpp"
-#include "Time.hpp"
+#include "Utils/Time.hpp"
 
 // PlayerResult defining which player obtained the current auctioned card
 class GetCard final : public PlayerResult {

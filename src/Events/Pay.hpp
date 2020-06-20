@@ -4,7 +4,7 @@
 
 #include "GameEvent.hpp"
 #include "PlayerResult.hpp"
-#include "Time.hpp"
+#include "Utils/Time.hpp"
 
 // PlayerResult representing the amount of gold paid for the current card
 class Pay final : public PlayerResult {

@@ -12,7 +12,6 @@ add_library(Events
     PlayerAction.hpp
     PlayerEvent.hpp
     PlayerResult.hpp
-    Time.hpp
     Winner.hpp
 )
 
