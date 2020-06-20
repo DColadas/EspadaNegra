@@ -14,8 +14,13 @@
 
 class Match {
    private:
+    int currentAttack = 0;  // Max attack used for the current card
+    int currentOffer = 0;   // Max gold offered for the current card
+
     // Get player index by nickname
     unsigned int getPlayerIndex(const std::string& nickname) const;
+    // Sets every player's auction winner flag to false
+    void resetAuctionWinners();
     // Change the ${currentAuctioneer} index
     void nextAuctioneer();
     // True if some player has ${amount} or more attack and can attack

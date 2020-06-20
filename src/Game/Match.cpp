@@ -1,7 +1,11 @@
 #include "Match.hpp"
 
 #include <algorithm>
+#include <iostream>
 
+#include "Events/Attack.hpp"
+#include "Events/Offer.hpp"
+#include "Events/Pass.hpp"
 #include "Utils/Random.hpp"
 
 Match::Match(const MatchConfig& config_, const Deck& deck_)
@@ -19,6 +23,12 @@ unsigned int Match::getPlayerIndex(const std::string& nickname) const {
         //TODO player not in the vector (should never happen)
     }
     abort();
+}
+
+void Match::resetAuctionWinners() {
+    std::for_each(players.begin(), players.end(), [](Player& p) {
+        p.isAuctionWinner = false;
+    });
 }
 
 void Match::nextAuctioneer() {
@@ -59,8 +69,70 @@ void Match::start() {
     }
 }
 
-std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction& action) {
-    //TODO implement
+std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* action) {
+    using GE = GameEvent::Type;
+    const unsigned int index = getPlayerIndex(action->nickname);
+    Player& p = players[index];
+    switch (action->getType()) {
+        case GE::Attack:
+            // Only valid on Attack phase
+            if (currentPhase != Phase::Attack) {
+                break;
+            }
+            {
+                const auto attack = static_cast<const Attack*>(action);
+                if (p.canAttack(currentAttack)) {
+                    const auto attackAmount = p.attack();
+                    if (currentAttack < attackAmount) {
+                        resetAuctionWinners();
+                        currentAttack = attackAmount;
+                    }
+                    p.isAuctionWinner = true;
+                    return std::make_unique<const Attack>(attack->nickname);
+                }
+            }
+            break;
+
+        case GE::Offer:
+            // Only valid on Auction phase
+            if (currentPhase != Phase::Auction) {
+                break;
+            }
+            {
+                const auto offer = static_cast<const Offer*>(action);
+                const auto gold = offer->gold;
+                if (currentOffer <= gold && p.canOffer(gold)) {
+                    // If the new offer is higher, the current player is the new current winner
+                    if (currentOffer < gold) {
+                        resetAuctionWinners();
+                        currentOffer = gold;
+                    }
+                    p.isAuctionWinner = true;
+                    return std::make_unique<const Offer>(offer->nickname, offer->gold);
+                }
+            }
+            break;
+
+        case GE::Pass:
+            // Only valid on Attack and Auction phases
+            if (currentPhase != Phase::Attack && currentPhase != Phase::Auction) {
+                break;
+            }
+            {
+                const auto pass = static_cast<const Pass*>(action);
+                p.pass();
+                return std::make_unique<const Pass>(pass->nickname);
+            }
+            break;
+
+        case GE::Invalid:
+        default:
+            std::cerr << "Invalid event received\n";
+            //TODO panic
+            break;
+    }
+    // Invalid action, so return invalid event
+    return std::make_unique<GameEvent>();
 }
 
 void Match::onGameStartPhase() {
