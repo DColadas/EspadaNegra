@@ -97,9 +97,6 @@ void Match::onTurnStartPhase() {
         p.earn(p.getTotalProduction());
     });
 
-    // Change auctioneer
-    nextAuctioneer();
-
     currentPhase = Phase::Attack;
 }
 
@@ -115,6 +112,9 @@ void Match::onAuctionPhase() {
 
 void Match::onTurnEndPhase() {
     cardsInAuction.clear();
+
+    // Change auctioneer
+    nextAuctioneer();
 }
 
 void Match::onGameEndPhase() {
