@@ -108,4 +108,8 @@ void Logger::print(Timestamp ts, std::string_view file, int line, LogLevel level
     } else {
         std::cerr << strTime << " [" << strLevel << "] " << file << ":" << std::to_string(line) << ": " << message << '\n';
     }
+    // Terminate program if there is a panic
+    if (level == LogLevel::Panic) {
+        abort();
+    }
 }
