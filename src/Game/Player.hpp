@@ -11,6 +11,7 @@ class Player {
     int gold = 0;  // Set when match starts, with the MatchConfig value
     bool hasAttacked = false;
     bool hasPassed = false;
+    bool isAuctionWinner = false;  // True if will get the current card
     std::vector<Card> activeCards{};
     std::vector<Card> purchasedThisTurnCards{};
 
