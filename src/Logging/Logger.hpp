@@ -6,6 +6,11 @@
 #include "Utils/Time.hpp"
 
 #define LOG(level, message) Logger::get().print(Clock::now(), __FILE__, __LINE__, level, message)
+#define LOG_PANIC(message) LOG(Logger::LogLevel::Panic, message)
+#define LOG_ERROR(message) LOG(Logger::LogLevel::Error, message)
+#define LOG_INFO(message) LOG(Logger::LogLevel::Info, message)
+#define LOG_DEBUG(message) LOG(Logger::LogLevel::Debug, message)
+#define LOG_TRACE(message) LOG(Logger::LogLevel::Trace, message)
 
 class Logger {
    public:
