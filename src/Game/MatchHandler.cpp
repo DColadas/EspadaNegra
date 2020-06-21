@@ -1,7 +1,6 @@
 #include "MatchHandler.hpp"
 
 #include <algorithm>
-#include <iostream>
 
 #include "IO/IOHandler.hpp"
 #include "MatchConfig.hpp"
