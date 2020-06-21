@@ -19,9 +19,11 @@ unsigned int Match::getPlayerIndex(const std::string& nickname) const {
     const unsigned int index = static_cast<unsigned int>(std::distance(players.begin(), it));
     if (index < players.size()) {
         return index;
-    } else {
-        LOG_PANIC("Player of nickname " + nickname + " does not exist in match");
     }
+    LOG_PANIC("Player of nickname " + nickname + " does not exist in match");
+    // Although a panic prevents the function from getting here, there is
+    // still a -Wreturn-type warning (so the return 0; is necessary)
+    return 0;
 }
 
 void Match::resetAuctionWinners() {
