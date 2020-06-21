@@ -21,7 +21,7 @@ bool MatchHandler::addPlayer(IOHandler* client, const std::string& name) {
     if (isFull() || isRunning()) {
         return false;
     }
-    const auto [it, inserted] = handlers.emplace(name, client);
+    const auto inserted = handlers.emplace(name, client).second;
     if (!inserted) {
         // The nickname existed already
         return false;
