@@ -1,4 +1,3 @@
-#include <iostream>
 #include <map>
 #include <numeric>
 #include <vector>
@@ -7,13 +6,18 @@
 #include "Game/CardModel.hpp"
 #include "Game/Deck.hpp"
 #include "IO/Server.hpp"
+#include "Logging/Logger.hpp"
 
 int main(int argc, char** argv) {
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " [ADDRESS] [PORT]\n"
-                  << "Example:\n\t" << argv[0] << " 127.0.0.1 8080\n";
+        LOG_ERROR(
+            "Usage: server [ADDRESS] [PORT]\n"
+            "Example:\n\tserver 127.0.0.1 8080\n");
         return EXIT_FAILURE;
     }
+
+    // Set Logger severity
+    Logger::get().setLevel(Logger::LogLevel::Trace);
 
     // Initialise the CardModel database
     // TODO move this to an actual database or file

@@ -5,7 +5,6 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <exception>
-#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -15,6 +14,7 @@
 #include "GameEvent.hpp"
 #include "GetCard.hpp"
 #include "JoinMatchRequest.hpp"
+#include "Logging/Logger.hpp"
 #include "Offer.hpp"
 #include "Pass.hpp"
 #include "Pay.hpp"
@@ -44,7 +44,7 @@ boost::property_tree::ptree parseJSON(const std::string& json) {
     try {
         boost::property_tree::read_json(stream, pt);
     } catch (const boost::property_tree::json_parser_error& e) {
-        std::cerr << e.what() << std::endl;
+        LOG_DEBUG(e.what());
     }
     return pt;
 }
@@ -82,14 +82,14 @@ std::unique_ptr<GameEvent> JSONParser::messageToGameEvent(Timestamp time, const 
             } break;
             case GE::Invalid:
                 //TODO logger
-                std::cerr << "Invalid message: " << message << std::endl;
+                LOG_DEBUG("Invalid message: " + message);
                 break;
             default:
                 //TODO panic
-                std::cerr << "Invalid message: " << message << std::endl;
+                LOG_PANIC("Not implemented: " + message);
         }
     } catch (const boost::property_tree::ptree_error& e) {
-        std::cerr << e.what() << std::endl;
+        LOG_DEBUG(e.what());
     }
     return std::make_unique<GameEvent>();
 }
@@ -126,12 +126,15 @@ std::unique_ptr<const std::string> JSONParser::gameEventToMessage(const GameEven
                 pt.put("nickname", earn->nickname);
                 pt.put("gold", earn->gold);
             } break;
+            case GE::Invalid:
+                LOG_ERROR("Invalid GameEvent");
+                return nullptr;
             default:
-                std::cerr << "Invalid event!" << std::endl;
+                LOG_PANIC("Not implemented GameEvent");
                 return nullptr;
         }
     } catch (const boost::property_tree::ptree_bad_data& e) {
-        std::cerr << "put: invalid data: " << e.what() << std::endl;
+        LOG_ERROR(e.what());
     }
 
     // Once the tree is created, convert to JSON string
@@ -139,7 +142,7 @@ std::unique_ptr<const std::string> JSONParser::gameEventToMessage(const GameEven
     try {
         boost::property_tree::json_parser::write_json(ss, pt);
     } catch (const boost::property_tree::json_parser_error& e) {
-        std::cerr << "write_json: " << e.what() << std::endl;
+        LOG_ERROR(e.what());
     }
     return std::make_unique<const std::string>(ss.str());
 }
