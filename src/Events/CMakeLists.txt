@@ -17,4 +17,4 @@ add_library(Events
 
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
-target_link_libraries(Events PRIVATE ${Boost_LIBRARIES})
+target_link_libraries(Events PRIVATE ${Boost_LIBRARIES} Logging)

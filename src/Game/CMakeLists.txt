@@ -20,4 +20,4 @@ add_library(Game
   Player.hpp
 )
 
-target_link_libraries(Game PRIVATE Utils)
+target_link_libraries(Game PRIVATE Utils Logging)
