@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-#include <iostream>
+#include "Logging/Logger.hpp"
 Server::Server(const char* address,
                unsigned short port) {
     listener = std::make_shared<Listener>(
@@ -13,7 +13,7 @@ Server::Server(const char* address,
             wsHandler->setSession(wsSession.get());
             wsSession->setHandler(wsHandler);
             wsSession->run();
-            std::cout << "Created new session" << std::endl;
+            LOG_TRACE("Created new session");
         });
 }
 

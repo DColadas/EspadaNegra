@@ -1,6 +1,8 @@
 #include "Listener.hpp"
 
-#include <iostream>
+#include <string>
+
+#include "Logging/Logger.hpp"
 
 Listener::Listener(asio::io_context& ioc,
                    tcp::endpoint endpoint,
@@ -57,11 +59,12 @@ void Listener::doAccept() {
 
 // Report a failure
 void Listener::fail(error_code ec, char const* what) {
-    // Don't report canceled operations
     if (ec == asio::error::operation_aborted) {
+        // Purposefully cancelled operation
+        LOG_TRACE(what + std::string(": ") + ec.message());
         return;
     }
-    std::cerr << what << ": " << ec.message() << "\n";
+    LOG_ERROR(what + std::string(": ") + ec.message());
 }
 
 // Handle a connection
