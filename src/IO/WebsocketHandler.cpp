@@ -1,8 +1,7 @@
 #include "WebsocketHandler.hpp"
 
-#include <iostream>
-
 #include "Events/JSONParser.hpp"
+#include "Logging/Logger.hpp"
 #include "WebsocketSession.hpp"
 
 WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches_)
@@ -38,7 +37,7 @@ void WebsocketHandler::leave() {
 
 void WebsocketHandler::joinMatch(const JoinMatchRequest& req) {
     if (currentMatch) {
-        std::cout << "Already in match!" << std::endl;
+        LOG_DEBUG(nickname + " already was in match");
         return;
     }
     currentMatch = matches->joinMatch(*this, req);
@@ -69,23 +68,27 @@ void WebsocketHandler::dispatchMessage(const std::string& message) {
         // Not in match
         switch (event->getType()) {
             case GE::JoinMatchRequest:
+                LOG_TRACE("JoinMatchRequest received");
                 joinMatch(*static_cast<JoinMatchRequest*>(event.get()));
                 break;
             default:
-                std::cerr << "Event not implemented, not in match" << std::endl;
+                LOG_ERROR("Event not implemented when not in match");
         }
     } else {
         // In match
         switch (event->getType()) {
             case GE::Attack:
+                LOG_TRACE("Attack received");
+                break;
             case GE::Pass:
+                LOG_TRACE("Pass received");
+                break;
             case GE::Offer:
                 //TODO Do something
-                std::cout << "Event of type " << static_cast<int>(event->getType()) << " received." << std::endl;
+                LOG_TRACE("Offer received");
                 break;
             default:
-                std::cerr << "Event not implemented, in match" << std::endl;
-                break;
+                LOG_ERROR("Event not implemented when in match");
         }
     }
 }

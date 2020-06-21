@@ -1,6 +1,6 @@
 #include "WebsocketSession.hpp"
 
-#include <iostream>
+#include "Logging/Logger.hpp"
 
 WebsocketSession::WebsocketSession(tcp::socket socket)
     : ws(std::move(socket)) {
@@ -20,11 +20,10 @@ void WebsocketSession::fail(error_code ec, char const* what) {
     // Errors only reported for debugging purposes
     if (ec == asio::error::operation_aborted ||
         ec == websocket::error::closed) {
-        std::cerr << what << ": " << ec.message() << "\n";
+        LOG_TRACE(what + std::string(": ") + ec.message());
         return;
     }
-
-    std::cerr << what << ": " << ec.message() << "\n";
+    LOG_ERROR(what + std::string(": ") + ec.message());
 }
 
 void WebsocketSession::doAccept() {
@@ -57,7 +56,7 @@ void WebsocketSession::doRead() {
 }
 
 void WebsocketSession::doWrite(const std::string& message) {
-    std::cout << "doWrite: " << message << std::endl;
+    LOG_TRACE("doWrite: " + message);
     ws.async_write(
         asio::buffer(message),
         [sp = shared_from_this()](
@@ -71,7 +70,7 @@ void WebsocketSession::onRead(error_code ec, std::size_t) {
         return fail(ec, "onRead");
     }
 
-    std::cout << "onRead: " << beast::buffers_to_string(buffer.data()) << std::endl;
+    LOG_TRACE("onRead: " + beast::buffers_to_string(buffer.data()));
     // Notifies the handler about the new message
     handler->dispatchMessage(beast::buffers_to_string(buffer.data()));
 
