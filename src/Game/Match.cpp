@@ -1,11 +1,11 @@
 #include "Match.hpp"
 
 #include <algorithm>
-#include <iostream>
 
 #include "Events/Attack.hpp"
 #include "Events/Offer.hpp"
 #include "Events/Pass.hpp"
+#include "Logging/Logger.hpp"
 #include "Utils/Random.hpp"
 
 Match::Match(const MatchConfig& config_, const Deck& deck_)
@@ -20,9 +20,8 @@ unsigned int Match::getPlayerIndex(const std::string& nickname) const {
     if (index < players.size()) {
         return index;
     } else {
-        //TODO player not in the vector (should never happen)
+        LOG_PANIC("Player of nickname " + nickname + " does not exist in match");
     }
-    abort();
 }
 
 void Match::resetAuctionWinners() {
@@ -57,8 +56,7 @@ void Match::removePlayer(const std::string& nickname) {
     if (p != players.end()) {
         players.erase(p);
     } else {
-        //Should never happen
-        //TODO panic
+        LOG_PANIC("Player of nickname " + nickname + " does not exist in match");
     }
 }
 
@@ -126,10 +124,10 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
             break;
 
         case GE::Invalid:
-        default:
-            std::cerr << "Invalid event received\n";
-            //TODO panic
+            LOG_ERROR("Invalid PlayerAction");
             break;
+        default:
+            LOG_PANIC("Unimplemented PlayerAction");
     }
     // Invalid action, so return invalid event
     return std::make_unique<GameEvent>();
