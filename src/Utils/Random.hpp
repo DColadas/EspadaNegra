@@ -6,11 +6,8 @@
 
 // Utilities to generate random numbers
 namespace Random {
-namespace {
-//TODO I think this is incorrect in a header file
-std::random_device rd;  //Seed
-std::mt19937 rng{rd()};
-}  // namespace
+inline static std::random_device rd;  //Seed
+inline static std::mt19937 rng{rd()};
 
 // Generate random integer between two given ones (included)
 int randInt(int min, int max);
