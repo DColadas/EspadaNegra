@@ -1,4 +1,5 @@
-const URI = "ws://localhost:8080";
+const wsPrefix = "ws://";
+const defaultURL = "localhost:8080";
 
 const sleep = async (time) => {
     return new Promise(r => setTimeout(r, time));
@@ -6,8 +7,12 @@ const sleep = async (time) => {
 
 export class ClientWS {
 
-    constructor() {
-        this.ws = new WebSocket(URI);
+    constructor(serverURL) {
+        if (!serverURL) {
+            serverURL = defaultURL;
+        }
+        serverURL = wsPrefix + serverURL;
+        this.ws = new WebSocket(serverURL);
         this.ws.onopen = (ev) => {
             console.log("OPEN");
         };
