@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "Logging/Logger.hpp"
 #include "Utils/Random.hpp"
 
 std::map<int, Deck> Deck::decks;
@@ -15,7 +16,7 @@ Deck::Deck(const std::vector<int>& cardIds) {
 Deck::Deck(const std::vector<Card>& cards_) : cards(cards_) {}
 
 Card Deck::draw() {
-    //TODO panic if no cards left
+    LOG_PANIC_IF(isEmpty(), "Deck is empty");
     const auto c = cards[cards.size() - 1];
     cards.pop_back();
     return c;
@@ -34,20 +35,19 @@ void Deck::shuffle() {
 }
 
 void Deck::add(int id, const std::vector<int>& cardIds) {
-    //TODO check decks[id] does not exist already (shouldn't happen)
+    LOG_PANIC_IF(decks.find(id) != decks.end(),
+                 "Deck " + std::to_string(id) + " already exists");
     decks.emplace(id, Deck(std::move(cardIds)));
 }
 
 void Deck::add(int id, const std::vector<Card>& cards_) {
-    //TODO check decks[id] does not exist already (shouldn't happen)
+    LOG_PANIC_IF(decks.find(id) != decks.end(),
+                 "Deck " + std::to_string(id) + " already exists");
     decks.emplace(id, Deck(std::move(cards_)));
 }
 
 Deck Deck::getById(int id) {
     const auto it = decks.find(id);
-    if (it != decks.end()) {
-        return it->second;
-    }
-    //TODO panic
-    return decks.begin()->second;
+    LOG_PANIC_IF(it == decks.end(), "Deck " + std::to_string(id) + " does not exist");
+    return it->second;
 }

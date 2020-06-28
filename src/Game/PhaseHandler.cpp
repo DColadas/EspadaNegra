@@ -1,5 +1,6 @@
 #include "PhaseHandler.hpp"
 
+#include "Logging/Logger.hpp"
 #include "Match.hpp"
 
 PhaseHandler::PhaseHandler(Match& match_)
@@ -7,11 +8,6 @@ PhaseHandler::PhaseHandler(Match& match_)
 
 void PhaseHandler::processPhase() {
     switch (match.currentPhase) {
-        case Phase::WaitForStart:
-        case Phase::Finished:
-            // Do nothing (this method shouldn't even be called)
-            //TODO add panic
-            break;
         case Phase::GameStart:
             match.onGameStartPhase();
             break;
@@ -30,8 +26,12 @@ void PhaseHandler::processPhase() {
         case Phase::GameEnd:
             match.onGameEndPhase();
             break;
+        case Phase::WaitForStart:
+        case Phase::Finished:
+            LOG_PANIC("PhaseHandler called on Phase with no associated action");
+            break;
         default:
-            //TODO add panic
+            LOG_PANIC("Unsupported Phase");
             break;
     }
 }

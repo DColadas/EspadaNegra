@@ -1,5 +1,7 @@
 #include "CardModel.hpp"
 
+#include "Logging/Logger.hpp"
+
 std::map<int, CardModel> CardModel::models;
 
 CardModel::CardModel(const std::string& name_,
@@ -18,7 +20,8 @@ void CardModel::add(int id,
                     int production,
                     int victory,
                     bool isBerserk) {
-    //TODO check models[id] does not exist already (shouldn't happen)
+    LOG_PANIC_IF(models.find(id) != models.end(),
+                 "CardModel " + std::to_string(id) + " already exists");
     models.emplace(id, CardModel(name, attack, production, victory, isBerserk));
 }
 
@@ -27,7 +30,8 @@ const CardModel* CardModel::getById(int id) {
     if (it != models.end()) {
         return &it->second;
     }
-    // If the id does not exist, return nothing
-    // Because it should not happen, TODO panic
+    LOG_PANIC("CardModel " + std::to_string(id) + " does not exist");
+    // Although a panic prevents the function from getting here, there is
+    // still a -Wreturn-type warning (so the return 0; is necessary)
     return nullptr;
 }

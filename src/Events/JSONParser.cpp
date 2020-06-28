@@ -81,11 +81,9 @@ std::unique_ptr<GameEvent> JSONParser::messageToGameEvent(Timestamp time, const 
                 return std::make_unique<Offer>(time, nickname, gold);
             } break;
             case GE::Invalid:
-                //TODO logger
                 LOG_DEBUG("Invalid message: " + message);
                 break;
             default:
-                //TODO panic
                 LOG_PANIC("Not implemented: " + message);
         }
     } catch (const boost::property_tree::ptree_error& e) {

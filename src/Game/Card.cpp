@@ -1,5 +1,7 @@
 #include "Card.hpp"
 
+#include "Logging/Logger.hpp"
+
 std::map<int, Card> Card::cards;
 
 Card::Card(const CardModel* baseModel_,
@@ -30,28 +32,21 @@ bool Card::isBerserk() const {
 
 void Card::add(int id,
                const GameModifier& initialCondition,
-               int modelId) {
-    const auto model = CardModel::getById(modelId);
-    if (model) {
-        //TODO check cards[id] does not exist already (shouldn't happen)
-        cards.emplace(id, Card(model, id, std::move(initialCondition)));
-    } else {
-        //TODO panic
-    }
+               const CardModel* model) {
+    LOG_PANIC_IF(cards.find(id) != cards.end(),
+                 "Card " + std::to_string(id) + " already exists");
+    cards.emplace(id, Card(model, id, std::move(initialCondition)));
 }
 
 void Card::add(int id,
                const GameModifier& initialCondition,
-               const CardModel* model) {
-    //TODO check cards[id] does not exist already (shouldn't happen)
-    cards.emplace(id, Card(model, id, std::move(initialCondition)));
+               int modelId) {
+    const auto model = CardModel::getById(modelId);
+    add(id, initialCondition, model);
 }
 
 Card Card::getById(int id) {
     const auto it = cards.find(id);
-    if (it != cards.end()) {
-        return it->second;
-    }
-    //TODO panic
-    return cards.begin()->second;
+    LOG_PANIC_IF(it == cards.end(), "Card " + std::to_string(id) + " does not exist");
+    return it->second;
 }

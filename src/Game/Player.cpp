@@ -3,6 +3,8 @@
 #include <iterator>
 #include <numeric>
 
+#include "Logging/Logger.hpp"
+
 Player::Player(const std::string& name_)
     : name(std::move(name_)) {
 }
@@ -83,7 +85,7 @@ bool Player::canAttack() const {
 }
 
 void Player::pay(int amount) {
-    //TODO add panic if amount > gold
+    LOG_PANIC_IF(!canOffer(amount), name + " cannot offer " + std::to_string(amount) + " gold");
     gold -= amount;
 }
 
