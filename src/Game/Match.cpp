@@ -138,7 +138,7 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
             {
                 const auto offer = static_cast<const Offer*>(action);
                 const auto gold = offer->gold;
-                if (currentOffer <= gold && p.canOffer(gold)) {
+                if (gold > 0 && currentOffer <= gold && p.canOffer(gold)) {
                     // If the new offer is higher, the current player is the new current winner
                     if (currentOffer < gold) {
                         resetAuctionWinners();
@@ -315,6 +315,9 @@ void Match::onTurnEndPhase() {
 
     // Change auctioneer
     nextAuctioneer();
+
+    currentPhase = Phase::TurnStart;
+    processPhase();
 }
 
 void Match::onGameEndPhase() {
