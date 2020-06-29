@@ -196,6 +196,7 @@ void Match::onTurnStartPhase() {
     // Put cards in the auction
     // If there are not enough cards left, end game
     if (!deck.canDraw(config.cardsPerTurn)) {
+        LOG_TRACE("Not enough cards for last turn: switch to GameEnd");
         currentPhase = Phase::GameEnd;
         return;
     }
@@ -203,6 +204,13 @@ void Match::onTurnStartPhase() {
     // Set cards in auction
     for (unsigned int i = 0; i < config.cardsPerTurn; ++i) {
         table.add(deck.draw());
+    }
+
+    // Inform about current cards
+    const auto auctionCards = table.getCards();
+    for (const auto& c : auctionCards) {
+        // TODO create event to inform the client about the cards
+        LOG_TRACE("Card " + std::to_string(c.id) + ", " + c.getName());
     }
 
     // Every player earns their production
@@ -227,13 +235,18 @@ void Match::onAttackPhase() {
             // There is a winner: give them the card
             auto& player = players[index.value()];
             player.addCard(table.pop());
+            LOG_TRACE(player.name + " gets the card on AttackPhase with attack " +
+                      std::to_string(currentAttack));
             currentPhase = table.isEmpty() ? Phase::TurnEnd : Phase::Attack;
         } else {
             // There is a tie: auction the card
+            LOG_TRACE("Tie for the card on AttackPhase (attack " +
+                      std::to_string(currentAttack) + "): switch to AuctionPhase");
             currentPhase = Phase::Auction;
         }
     } else {
         // Nobody attacked: auction the card
+        LOG_TRACE("No attacks on AttackPhase: switch to AuctionPhase");
         currentPhase = Phase::Auction;
     }
 
@@ -260,6 +273,9 @@ void Match::onAuctionPhase() {
             auto& player = players[index.value()];
             player.addCard(table.pop());
             player.pay(currentOffer);
+            LOG_TRACE(player.name + " gets the card on AuctionPhase with offer " +
+                      std::to_string(currentOffer));
+
         } else {
             // There is a tie
             // TODO normally, untying is done by the decision of an auctioneer
@@ -268,9 +284,12 @@ void Match::onAuctionPhase() {
             // The game should, instead, get into a Phase::AuctioneerDecision
             // and only process AuctioneerDecisions from the current one
             table.discard();
+            LOG_TRACE("Tie for the card on AuctionPhase (offer " +
+                      std::to_string(currentOffer) + "): switch to next card");
         }
     } else {
         // Nobody offered: discard
+        LOG_TRACE("No offers on AuctionPhase: switch to next card");
         table.discard();
     }
 
@@ -285,6 +304,8 @@ void Match::onAuctionPhase() {
 }
 
 void Match::onTurnEndPhase() {
+    LOG_TRACE("Entered TurnEnd");
+
     applyToPlayers([&](Player& p) {
         p.onTurnEnd();
     });
