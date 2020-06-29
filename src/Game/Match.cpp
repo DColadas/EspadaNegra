@@ -192,7 +192,7 @@ void Match::onTurnStartPhase() {
 
     // Set cards in auction
     for (unsigned int i = 0; i < config.cardsPerTurn; ++i) {
-        cardsInAuction.push_back(deck.draw());
+        table.add(deck.draw());
     }
 
     // Every player earns their production
@@ -230,8 +230,6 @@ void Match::onAuctionPhase() {
 }
 
 void Match::onTurnEndPhase() {
-    cardsInAuction.clear();
-
     // Change auctioneer
     nextAuctioneer();
 }

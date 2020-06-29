@@ -12,6 +12,7 @@
 #include "Phase.hpp"
 #include "PhaseHandler.hpp"
 #include "Player.hpp"
+#include "Table.hpp"
 
 class Match {
    private:
@@ -43,8 +44,7 @@ class Match {
    public:
     Phase currentPhase = Phase::WaitForStart;
     PhaseHandler phaseHandler = PhaseHandler(*this);
-    std::vector<Card> cardsInAuction{};
-    std::vector<Card> discarded{};
+    Table table{};
     MatchConfig config;
     Deck deck;
     std::vector<Player> players{};
