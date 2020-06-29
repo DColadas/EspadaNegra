@@ -186,6 +186,9 @@ void Match::onGameStartPhase() {
     });
     players[static_cast<std::size_t>(currentAuctioneer)].gold -= config.auctioneerGoldDisadvantage;
 
+    //Shuffle the deck
+    deck.shuffle();
+
     //TODO draw 3 conditions and apply them
 
     currentPhase = Phase::TurnStart;
