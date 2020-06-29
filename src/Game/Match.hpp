@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -21,6 +22,9 @@ class Match {
 
     // Get player index by nickname
     unsigned int getPlayerIndex(const std::string& nickname) const;
+
+    // Applies ${func} to every player
+    void applyToPlayers(std::function<void(Player&)> func);
 
     // Sets every player's auction winner flag to false
     void resetAuctionWinners();

@@ -26,6 +26,10 @@ unsigned int Match::getPlayerIndex(const std::string& nickname) const {
     return 0;
 }
 
+void Match::applyToPlayers(std::function<void(Player&)> func) {
+    std::for_each(players.begin(), players.end(), func);
+}
+
 void Match::resetAuctionWinners() {
     std::for_each(players.begin(), players.end(), [](Player& p) {
         p.isAuctionWinner = false;
