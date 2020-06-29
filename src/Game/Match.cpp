@@ -114,6 +114,7 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
         case GE::Attack:
             // Only valid on Attack phase
             if (currentPhase != Phase::Attack) {
+                LOG_DEBUG("Attack on non-attack phase (" + p.name + ")");
                 break;
             }
             {
@@ -126,6 +127,9 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
                     }
                     p.isAuctionWinner = true;
                     retEvent = std::make_unique<const Attack>(attack->nickname);
+                    LOG_TRACE(p.name + " attacks");
+                } else {
+                    LOG_DEBUG("Invalid Attack (" + p.name + ")");
                 }
             }
             break;
@@ -133,6 +137,7 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
         case GE::Offer:
             // Only valid on Auction phase
             if (currentPhase != Phase::Auction) {
+                LOG_DEBUG("Offer on non-offer phase (" + p.name + ")");
                 break;
             }
             {
@@ -146,6 +151,9 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
                     }
                     p.isAuctionWinner = true;
                     retEvent = std::make_unique<const Offer>(offer->nickname, offer->gold);
+                    LOG_TRACE(p.name + " offers " + std::to_string(gold));
+                } else {
+                    LOG_DEBUG("Invalid Offer (" + p.name + " offered " + std::to_string(gold) + ")");
                 }
             }
             break;
@@ -153,12 +161,14 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
         case GE::Pass:
             // Only valid on Attack and Auction phases
             if (currentPhase != Phase::Attack && currentPhase != Phase::Auction) {
+                LOG_DEBUG("Pass on invalid phase (" + p.name + ")");
                 break;
             }
             {
                 const auto pass = static_cast<const Pass*>(action);
                 p.pass();
                 retEvent = std::make_unique<const Pass>(pass->nickname);
+                LOG_TRACE(p.name + " passes");
             }
             break;
 

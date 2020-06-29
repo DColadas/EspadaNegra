@@ -78,14 +78,11 @@ void WebsocketHandler::dispatchMessage(const std::string& message) {
         // In match
         switch (event->getType()) {
             case GE::Attack:
-                LOG_TRACE("Attack received");
-                break;
             case GE::Pass:
-                LOG_TRACE("Pass received");
-                break;
             case GE::Offer:
-                //TODO Do something
-                LOG_TRACE("Offer received");
+                LOG_TRACE("User " + nickname + ": valid PlayerAction received");
+                currentMatch->handlePlayerAction(
+                    static_cast<PlayerAction*>(event.get()));
                 break;
             default:
                 LOG_ERROR("Event not implemented when in match");
