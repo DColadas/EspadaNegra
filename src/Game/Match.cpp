@@ -31,7 +31,7 @@ void Match::applyToPlayers(std::function<void(Player&)> func) {
 }
 
 void Match::resetAuctionWinners() {
-    std::for_each(players.begin(), players.end(), [](Player& p) {
+    applyToPlayers([](Player& p) {
         p.isAuctionWinner = false;
     });
 }
@@ -181,7 +181,7 @@ void Match::onGameStartPhase() {
     currentPlayer = currentAuctioneer;
 
     // Set initial gold
-    std::for_each(players.begin(), players.end(), [&](Player& p) {
+    applyToPlayers([&](Player& p) {
         p.gold = static_cast<int>(config.initialGold);
     });
     players[static_cast<std::size_t>(currentAuctioneer)].gold -= config.auctioneerGoldDisadvantage;
@@ -206,7 +206,7 @@ void Match::onTurnStartPhase() {
     }
 
     // Every player earns their production
-    std::for_each(players.begin(), players.end(), [&](Player& p) {
+    applyToPlayers([&](Player& p) {
         p.earn(p.getTotalProduction());
     });
 
@@ -236,6 +236,13 @@ void Match::onAttackPhase() {
         // Nobody attacked: auction the card
         currentPhase = Phase::Auction;
     }
+
+    // Reset control values
+    applyToPlayers([&](Player& p) {
+        p.hasPassed = false;
+        p.isAuctionWinner = false;
+    });
+    currentAttack = 0;
     processPhase();
 }
 
@@ -266,11 +273,22 @@ void Match::onAuctionPhase() {
         // Nobody offered: discard
         table.discard();
     }
+
+    // Reset control values
+    applyToPlayers([&](Player& p) {
+        p.hasPassed = false;
+        p.isAuctionWinner = false;
+    });
+    currentOffer = 0;
     currentPhase = table.isEmpty() ? Phase::TurnEnd : Phase::Attack;
     processPhase();
 }
 
 void Match::onTurnEndPhase() {
+    applyToPlayers([&](Player& p) {
+        p.onTurnEnd();
+    });
+
     // Change auctioneer
     nextAuctioneer();
 }
