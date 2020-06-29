@@ -46,6 +46,12 @@ bool Match::arePossibleAttacks(int amount) const {
     });
 }
 
+bool Match::arePossibleOffers(int amount) const {
+    return std::any_of(players.begin(), players.end(), [amount](const Player& p) {
+        return p.canOffer(amount);
+    });
+}
+
 void Match::processPhase() {
     phaseHandler.processPhase();
 }
@@ -230,6 +236,34 @@ void Match::onAttackPhase() {
 }
 
 void Match::onAuctionPhase() {
+    if (arePossibleOffers(currentOffer)) {
+        // Offers are still possible: wait until every player offered, passed
+        // or cannot do anything
+        return;
+    }
+    if (isThereWinner()) {
+        // Check the winner
+        auto index = getCurrentWinner();
+        if (index.has_value()) {
+            // There is a winner: give them the card
+            auto& player = players[index.value()];
+            player.addCard(table.pop());
+            player.pay(currentOffer);
+        } else {
+            // There is a tie
+            // TODO normally, untying is done by the decision of an auctioneer
+            // To reduce the complexity of the program for now, the card is
+            // discarded on a tie.
+            // The game should, instead, get into a Phase::AuctioneerDecision
+            // and only process AuctioneerDecisions from the current one
+            table.discard();
+        }
+    } else {
+        // Nobody offered: discard
+        table.discard();
+    }
+    currentPhase = table.isEmpty() ? Phase::TurnEnd : Phase::Attack;
+    processPhase();
 }
 
 void Match::onTurnEndPhase() {

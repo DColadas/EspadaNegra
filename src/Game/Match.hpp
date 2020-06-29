@@ -31,6 +31,9 @@ class Match {
     // True if some player has ${amount} or more attack and can attack
     bool arePossibleAttacks(int amount) const;
 
+    // True if some player has ${amount} or more gold and can offer
+    bool arePossibleOffers(int amount) const;
+
     // Carry out computations regarding the current state of the game
     void processPhase();
 
