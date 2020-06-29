@@ -11,7 +11,9 @@ class Player {
     int gold = 0;  // Set when match starts, with the MatchConfig value
     bool hasAttacked = false;
     bool hasPassed = false;
-    bool isAuctionWinner = false;  // True if will get the current card
+    // isAuctionWinner is set for every player that is winning or tying
+    // the current phase. Many players may have it at once.
+    bool isAuctionWinner = false;
     std::vector<Card> activeCards{};
     std::vector<Card> purchasedThisTurnCards{};
 
