@@ -206,7 +206,8 @@ void Match::onTurnStartPhase() {
 
 void Match::onAttackPhase() {
     if (arePossibleAttacks(currentAttack)) {
-        // Attacks are still possible: wait until every player attacked or passed
+        // Attacks are still possible: wait until every player attacked, passed
+        // or cannot do anything
         return;
     }
     if (isThereWinner()) {
