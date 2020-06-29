@@ -214,7 +214,9 @@ void Match::onAttackPhase() {
         auto index = getCurrentWinner();
         if (index.has_value()) {
             // There is a winner: give them the card
-            //giveCard(index.value());
+            auto& player = players[index.value()];
+            player.addCard(table.pop());
+            currentPhase = table.isEmpty() ? Phase::TurnEnd : Phase::Attack;
         } else {
             // There is a tie: auction the card
             currentPhase = Phase::Auction;
