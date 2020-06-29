@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "Card.hpp"
@@ -19,12 +20,25 @@ class Match {
 
     // Get player index by nickname
     unsigned int getPlayerIndex(const std::string& nickname) const;
+
     // Sets every player's auction winner flag to false
     void resetAuctionWinners();
+
     // Change the ${currentAuctioneer} index
     void nextAuctioneer();
+
     // True if some player has ${amount} or more attack and can attack
     bool arePossibleAttacks(int amount) const;
+
+    // Carry out computations regarding the current state of the game
+    void processPhase();
+
+    // True if some player offered or attacked the current card
+    bool isThereWinner() const;
+
+    // Determines the index of the current winner of the phase
+    // Returns std::nullopt if there is no winner
+    std::optional<unsigned int> getCurrentWinner() const;
 
    public:
     Phase currentPhase = Phase::WaitForStart;

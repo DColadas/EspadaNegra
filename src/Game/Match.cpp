@@ -46,6 +46,34 @@ bool Match::arePossibleAttacks(int amount) const {
     });
 }
 
+void Match::processPhase() {
+    phaseHandler.processPhase();
+}
+
+bool Match::isThereWinner() const {
+    return (currentPhase == Phase::Attack && currentAttack) ||
+           (currentPhase == Phase::Auction && currentOffer);
+}
+
+std::optional<unsigned int> Match::getCurrentWinner() const {
+    unsigned int index;
+    bool found = false;
+    for (unsigned int i = 0; i < players.size(); ++i) {
+        if (players[i].isAuctionWinner) {
+            if (found) {
+                // Two winners found, so no actual winner
+                return std::nullopt;
+            }
+            found = true;
+            index = i;
+        }
+    }
+    if (found) {
+        return index;
+    }
+    return std::nullopt;
+}
+
 void Match::addPlayer(const std::string& name) {
     players.emplace_back(name);
 }
@@ -64,13 +92,12 @@ void Match::removePlayer(const std::string& nickname) {
 
 void Match::start() {
     currentPhase = Phase::GameStart;
-    while (currentPhase != Phase::Finished) {
-        phaseHandler.processPhase();
-    }
+    processPhase();
 }
 
 std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* action) {
     using GE = GameEvent::Type;
+    auto retEvent = std::make_unique<const GameEvent>();
     const unsigned int index = getPlayerIndex(action->nickname);
     Player& p = players[index];
     switch (action->getType()) {
@@ -88,7 +115,7 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
                         currentAttack = attackAmount;
                     }
                     p.isAuctionWinner = true;
-                    return std::make_unique<const Attack>(attack->nickname);
+                    retEvent = std::make_unique<const Attack>(attack->nickname);
                 }
             }
             break;
@@ -108,7 +135,7 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
                         currentOffer = gold;
                     }
                     p.isAuctionWinner = true;
-                    return std::make_unique<const Offer>(offer->nickname, offer->gold);
+                    retEvent = std::make_unique<const Offer>(offer->nickname, offer->gold);
                 }
             }
             break;
@@ -121,7 +148,7 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
             {
                 const auto pass = static_cast<const Pass*>(action);
                 p.pass();
-                return std::make_unique<const Pass>(pass->nickname);
+                retEvent = std::make_unique<const Pass>(pass->nickname);
             }
             break;
 
@@ -131,8 +158,11 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
         default:
             LOG_PANIC("Unimplemented PlayerAction");
     }
-    // Invalid action, so return invalid event
-    return std::make_unique<GameEvent>();
+    // If the input action was valid, update the state of the game
+    if (retEvent->isValid()) {
+        processPhase();
+    }
+    return retEvent;
 }
 
 void Match::onGameStartPhase() {
@@ -149,6 +179,7 @@ void Match::onGameStartPhase() {
     //TODO draw 3 conditions and apply them
 
     currentPhase = Phase::TurnStart;
+    processPhase();
 }
 
 void Match::onTurnStartPhase() {
@@ -170,13 +201,29 @@ void Match::onTurnStartPhase() {
     });
 
     currentPhase = Phase::Attack;
+    processPhase();
 }
 
 void Match::onAttackPhase() {
-    // When any input arrived, update and reset the timer,
-    // If PASS is received, dont update
-    //while (arePossibleAttacks()) {
-    //}
+    if (arePossibleAttacks(currentAttack)) {
+        // Attacks are still possible: wait until every player attacked or passed
+        return;
+    }
+    if (isThereWinner()) {
+        // Check the winner
+        auto index = getCurrentWinner();
+        if (index.has_value()) {
+            // There is a winner: give them the card
+            //giveCard(index.value());
+        } else {
+            // There is a tie: auction the card
+            currentPhase = Phase::Auction;
+        }
+    } else {
+        // Nobody attacked: auction the card
+        currentPhase = Phase::Auction;
+    }
+    processPhase();
 }
 
 void Match::onAuctionPhase() {
