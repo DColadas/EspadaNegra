@@ -1,5 +1,8 @@
 #include "Table.hpp"
 
+#include <algorithm>
+#include <iterator>
+
 void Table::add(Card card) {
     cardsInAuction.push_back(std::move(card));
 }
@@ -17,4 +20,10 @@ bool Table::isEmpty() const {
 void Table::discard() {
     discarded.push_back(cardsInAuction.front());
     cardsInAuction.pop_front();
+}
+
+std::vector<Card> Table::getCards() const {
+    std::vector<Card> v;
+    std::copy(cardsInAuction.begin(), cardsInAuction.end(), std::back_inserter(v));
+    return v;
 }

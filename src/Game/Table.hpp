@@ -24,4 +24,7 @@ class Table {
 
     // Discards the current card
     void discard();
+
+    // Returns a vector with a view of the current cards
+    std::vector<Card> getCards() const;
 };
