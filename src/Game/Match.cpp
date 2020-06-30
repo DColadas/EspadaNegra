@@ -349,4 +349,26 @@ void Match::onTurnEndPhase() {
 }
 
 void Match::onGameEndPhase() {
+    // Check winner (or multiple winners)
+    std::vector<unsigned int> winners;
+    int maxVictory = players[0].getTotalVictory();
+    for (unsigned int i = 0; i < players.size(); ++i) {
+        const auto& p = players[i];
+        const auto pVictory = p.getTotalVictory();
+        if (pVictory >= maxVictory) {
+            if (pVictory > maxVictory) {
+                // Has more victory than everyone else: is only winner
+                winners.clear();
+            }
+            winners.push_back(i);
+        }
+    }
+    for (const auto& w : winners) {
+        LOG_DEBUG("Winner: " + players[w].name);
+    }
+
+    currentPhase = Phase::Finished;
+    // TODO delete finished games (add FinishedMatchEvent, send to every player)
+    // When every player has left the match, the MatchManager should automatically
+    // delete it
 }
