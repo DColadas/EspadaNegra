@@ -26,8 +26,11 @@ class Match {
     // Applies ${func} to every player
     void applyToPlayers(std::function<void(Player&)> func);
 
-    // Sets every player's auction winner flag to false
-    void resetAuctionWinners();
+    // Sets every auction winner to tying
+    void setNewAuctionTie(Player& newTying);
+
+    // Sets every auction winner or in tie to not winner or tiying
+    void setNewAuctionWinner(Player& auctionWinner);
 
     // Change the ${currentAuctioneer} index
     void nextAuctioneer();

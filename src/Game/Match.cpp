@@ -30,10 +30,22 @@ void Match::applyToPlayers(std::function<void(Player&)> func) {
     std::for_each(players.begin(), players.end(), func);
 }
 
-void Match::resetAuctionWinners() {
+void Match::setNewAuctionTie(Player& newTying) {
     applyToPlayers([](Player& p) {
-        p.isAuctionWinner = false;
+        if (p.isAuctionWinner()) {
+            p.setInAuctionTie();
+        }
     });
+    newTying.setInAuctionTie();
+}
+
+void Match::setNewAuctionWinner(Player& auctionWinner) {
+    applyToPlayers([](Player& p) {
+        if (p.isAuctionWinner() || p.isInAuctionTie()) {
+            p.resetAuctionState();
+        }
+    });
+    auctionWinner.setAuctionWinner();
 }
 
 void Match::nextAuctioneer() {
@@ -66,19 +78,11 @@ bool Match::isThereWinner() const {
 }
 
 std::optional<unsigned int> Match::getCurrentWinner() const {
-    unsigned int index;
-    bool found = false;
-    for (unsigned int i = 0; i < players.size(); ++i) {
-        if (players[i].isAuctionWinner) {
-            if (found) {
-                // Two winners found, so no actual winner
-                return std::nullopt;
-            }
-            found = true;
-            index = i;
-        }
-    }
-    if (found) {
+    const auto it = std::find_if(players.begin(), players.end(), [](const Player& p) {
+        return p.isAuctionWinner();
+    });
+    const unsigned int index = static_cast<unsigned int>(std::distance(players.begin(), it));
+    if (index < players.size()) {
         return index;
     }
     return std::nullopt;
@@ -122,12 +126,16 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
                 if (p.canAttack(currentAttack)) {
                     const auto attackAmount = p.attack();
                     if (currentAttack < attackAmount) {
-                        resetAuctionWinners();
+                        // If attacking with higher attack than everyone, it's the only winner
+                        setNewAuctionWinner(p);
                         currentAttack = attackAmount;
+                        LOG_TRACE(p.name + " attacks, is current winner");
+                    } else {
+                        // Same attack, sets new tie
+                        setNewAuctionTie(p);
+                        LOG_TRACE(p.name + " attacks, sets tie");
                     }
-                    p.isAuctionWinner = true;
                     retEvent = std::make_unique<const Attack>(attack->nickname);
-                    LOG_TRACE(p.name + " attacks");
                 } else {
                     LOG_DEBUG("Invalid Attack (" + p.name + ")");
                 }
@@ -144,14 +152,22 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
                 const auto offer = static_cast<const Offer*>(action);
                 const auto gold = offer->gold;
                 if (gold > 0 && currentOffer <= gold && p.canOffer(gold)) {
-                    // If the new offer is higher, the current player is the new current winner
                     if (currentOffer < gold) {
-                        resetAuctionWinners();
+                        // If the new offer is higher, the current player is the new current winner
+                        setNewAuctionWinner(p);
                         currentOffer = gold;
+                        LOG_TRACE(p.name + " offers " + std::to_string(gold) + ", is current winner");
+                    } else {
+                        if (p.isInAuctionTie()) {
+                            // Cannot offer if it is already in a tie
+                            LOG_DEBUG("Invalid Offer (" + p.name + " was already in a tie)");
+                            break;
+                        }
+                        // Same offer, sets new tie
+                        setNewAuctionTie(p);
+                        LOG_TRACE(p.name + " offers " + std::to_string(gold) + ", sets tie");
                     }
-                    p.isAuctionWinner = true;
                     retEvent = std::make_unique<const Offer>(offer->nickname, offer->gold);
-                    LOG_TRACE(p.name + " offers " + std::to_string(gold));
                 } else {
                     LOG_DEBUG("Invalid Offer (" + p.name + " offered " + std::to_string(gold) + ")");
                 }
@@ -166,9 +182,13 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
             }
             {
                 const auto pass = static_cast<const Pass*>(action);
-                p.pass();
-                retEvent = std::make_unique<const Pass>(pass->nickname);
-                LOG_TRACE(p.name + " passes");
+                if (p.canPass()) {
+                    p.pass();
+                    retEvent = std::make_unique<const Pass>(pass->nickname);
+                    LOG_TRACE(p.name + " passes");
+                } else {
+                    LOG_DEBUG("Invalid Pass (" + p.name + ")");
+                }
             }
             break;
 
@@ -227,7 +247,7 @@ void Match::onTurnStartPhase() {
     }
 
     // Every player earns their production
-    applyToPlayers([&](Player& p) {
+    applyToPlayers([](Player& p) {
         p.earn(p.getTotalProduction());
     });
 
@@ -264,9 +284,8 @@ void Match::onAttackPhase() {
     }
 
     // Reset control values
-    applyToPlayers([&](Player& p) {
-        p.hasPassed = false;
-        p.isAuctionWinner = false;
+    applyToPlayers([](Player& p) {
+        p.resetAuctionState();
     });
     currentAttack = 0;
     processPhase();
@@ -307,9 +326,8 @@ void Match::onAuctionPhase() {
     }
 
     // Reset control values
-    applyToPlayers([&](Player& p) {
-        p.hasPassed = false;
-        p.isAuctionWinner = false;
+    applyToPlayers([](Player& p) {
+        p.resetAuctionState();
     });
     currentOffer = 0;
     currentPhase = table.isEmpty() ? Phase::TurnEnd : Phase::Attack;
@@ -319,7 +337,7 @@ void Match::onAuctionPhase() {
 void Match::onTurnEndPhase() {
     LOG_TRACE("Entered TurnEnd");
 
-    applyToPlayers([&](Player& p) {
+    applyToPlayers([](Player& p) {
         p.onTurnEnd();
     });
 
