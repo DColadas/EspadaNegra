@@ -6,14 +6,15 @@
 #include "Card.hpp"
 
 class Player {
+   private:
+    bool isWinningAuction = false;
+    bool isTyingAuction = false;
+    bool hasPassed = false;
+    bool hasAttacked = false;
+
    public:
     std::string name;
     int gold = 0;  // Set when match starts, with the MatchConfig value
-    bool hasAttacked = false;
-    bool hasPassed = false;
-    // isAuctionWinner is set for every player that is winning or tying
-    // the current phase. Many players may have it at once.
-    bool isAuctionWinner = false;
     std::vector<Card> activeCards{};
     std::vector<Card> purchasedThisTurnCards{};
 
@@ -38,6 +39,9 @@ class Player {
     // Sets ${hasAttacked} to true and returns the available attack amount
     int attack();
 
+    // True if not ${isAuctionWinner}
+    bool canPass() const;
+
     // Sets ${hasPassed} to true (can't attack the current card or pay)
     void pass();
 
@@ -52,4 +56,16 @@ class Player {
     // Pay or earn ${amount} of gold
     void pay(int amount);
     void earn(int amount);
+
+    // Functions for the state in an auction
+    // Current player is the only winner of the auction
+    void setAuctionWinner();
+    // Current player is tying the auction
+    void setInAuctionTie();
+    // Reset state regarding the auctioned card
+    // Use on transition between Attack and Auction or cards
+    void resetAuctionState();
+
+    bool isAuctionWinner() const;
+    bool isInAuctionTie() const;
 };
