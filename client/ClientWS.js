@@ -30,6 +30,19 @@ export class ClientWS {
         "nickname": "${nickname}"}`);
     }
 
+    attack() {
+        this.ws.send(`{"type": "attack"}`);
+    }
+
+    offer(gold) {
+        this.ws.send(`{"type": "offer",
+        "gold": ${gold}}`);
+    }
+
+    pass() {
+        this.ws.send(`{"type": "pass"}`);
+    }
+
     close() {
         this.ws.close();
     }

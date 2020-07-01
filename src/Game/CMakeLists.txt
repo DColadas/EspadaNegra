@@ -18,6 +18,8 @@ add_library(Game
   PhaseHandler.hpp
   Player.cpp
   Player.hpp
+  Table.cpp
+  Table.hpp
 )
 
 target_link_libraries(Game PRIVATE Utils Logging)

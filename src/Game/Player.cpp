@@ -53,7 +53,6 @@ void Player::onTurnEnd() {
 
     // Reset attack flag and pass flag
     hasAttacked = false;
-    hasPassed = false;
 
     // Produce (should be carried out by Match)
     //earn(getTotalProduction());
@@ -68,12 +67,16 @@ int Player::attack() {
     return getTotalAttack();
 }
 
+bool Player::canPass() const {
+    return !isAuctionWinner() && !hasPassed;
+}
+
 void Player::pass() {
     hasPassed = true;
 }
 
 bool Player::canOffer(int amount) const {
-    return !hasPassed && amount <= gold;
+    return !isAuctionWinner() && !hasPassed && amount <= gold;
 }
 
 bool Player::canAttack(int amount) const {
@@ -85,10 +88,34 @@ bool Player::canAttack() const {
 }
 
 void Player::pay(int amount) {
-    LOG_PANIC_IF(!canOffer(amount), name + " cannot offer " + std::to_string(amount) + " gold");
+    LOG_PANIC_IF(amount > gold, name + " cannot offer " + std::to_string(amount) + " gold");
     gold -= amount;
 }
 
 void Player::earn(int amount) {
     gold += amount;
+}
+
+void Player::setAuctionWinner() {
+    isWinningAuction = true;
+    isTyingAuction = false;
+}
+
+void Player::setInAuctionTie() {
+    isTyingAuction = true;
+    isWinningAuction = false;
+}
+
+void Player::resetAuctionState() {
+    isWinningAuction = false;
+    isTyingAuction = false;
+    hasPassed = false;
+}
+
+bool Player::isAuctionWinner() const {
+    return isWinningAuction;
+}
+
+bool Player::isInAuctionTie() const {
+    return isTyingAuction;
 }

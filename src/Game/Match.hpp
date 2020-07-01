@@ -1,6 +1,8 @@
 #pragma once
 
+#include <functional>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "Card.hpp"
@@ -11,6 +13,7 @@
 #include "Phase.hpp"
 #include "PhaseHandler.hpp"
 #include "Player.hpp"
+#include "Table.hpp"
 
 class Match {
    private:
@@ -19,18 +22,39 @@ class Match {
 
     // Get player index by nickname
     unsigned int getPlayerIndex(const std::string& nickname) const;
-    // Sets every player's auction winner flag to false
-    void resetAuctionWinners();
+
+    // Applies ${func} to every player
+    void applyToPlayers(std::function<void(Player&)> func);
+
+    // Sets every auction winner to tying
+    void setNewAuctionTie(Player& newTying);
+
+    // Sets every auction winner or in tie to not winner or tiying
+    void setNewAuctionWinner(Player& auctionWinner);
+
     // Change the ${currentAuctioneer} index
     void nextAuctioneer();
+
     // True if some player has ${amount} or more attack and can attack
     bool arePossibleAttacks(int amount) const;
+
+    // True if some player has ${amount} or more gold and can offer
+    bool arePossibleOffers(int amount) const;
+
+    // Carry out computations regarding the current state of the game
+    void processPhase();
+
+    // True if some player offered or attacked the current card
+    bool isThereWinner() const;
+
+    // Determines the index of the current winner of the phase
+    // Returns std::nullopt if there is no winner
+    std::optional<unsigned int> getCurrentWinner() const;
 
    public:
     Phase currentPhase = Phase::WaitForStart;
     PhaseHandler phaseHandler = PhaseHandler(*this);
-    std::vector<Card> cardsInAuction{};
-    std::vector<Card> discarded{};
+    Table table{};
     MatchConfig config;
     Deck deck;
     std::vector<Player> players{};

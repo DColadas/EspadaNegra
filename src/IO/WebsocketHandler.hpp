@@ -29,7 +29,6 @@ class WebsocketHandler : public IOHandler, public std::enable_shared_from_this<W
     //Message latestMessage;
 
     void joinMatch(const JoinMatchRequest& req);
-    void receivePlayerAction();
 
    public:
     WebsocketHandler(const std::shared_ptr<MatchManager>& matches);
