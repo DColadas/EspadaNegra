@@ -1,8 +1,8 @@
 add_executable(catchTests 
   main.cpp
-  testJoinMatchRequest.cpp
-  testJSONParser.cpp
-  testInputEvent.cpp
+  #testJoinMatchRequest.cpp
+  #testJSONParser.cpp
+  #testInputEvent.cpp
 )
 
 find_package(Boost REQUIRED)
