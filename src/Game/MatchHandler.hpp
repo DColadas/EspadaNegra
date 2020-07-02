@@ -7,7 +7,7 @@
 
 class IOHandler;
 class GameEvent;
-class PlayerAction;
+class InputEvent;
 class MatchHandler {
    private:
     Match match;
@@ -40,8 +40,8 @@ class MatchHandler {
     // Start the game, process until the match ends
     void start();
 
-    // Receive a PlayerAction from a client
-    void handlePlayerAction(const PlayerAction* action);
+    // Receive a InputEvent from a client
+    void handleInputEvent(const InputEvent* action);
 
     // True if the match is running
     bool isRunning() const;

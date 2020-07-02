@@ -80,9 +80,9 @@ void WebsocketHandler::dispatchMessage(const std::string& message) {
             case GE::Attack:
             case GE::Pass:
             case GE::Offer:
-                LOG_TRACE("User " + nickname + ": valid PlayerAction received");
-                currentMatch->handlePlayerAction(
-                    static_cast<PlayerAction*>(event.get()));
+                LOG_TRACE("User " + nickname + ": valid InputEvent received");
+                currentMatch->handleInputEvent(
+                    static_cast<InputEvent*>(event.get()));
                 break;
             default:
                 LOG_ERROR("Event not implemented when in match");

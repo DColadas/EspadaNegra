@@ -6,8 +6,8 @@
 #include <string>
 
 #include "Events/GameEvent.hpp"
+#include "Events/InputEvent.hpp"
 #include "Events/JoinMatchRequest.hpp"
-#include "Events/PlayerAction.hpp"
 
 class IOHandler {
    public:

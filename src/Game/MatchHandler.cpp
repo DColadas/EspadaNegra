@@ -49,9 +49,9 @@ void MatchHandler::notifyPlayers(const std::shared_ptr<const GameEvent>& event) 
     }
 }
 
-// Receive a PlayerAction from a client
-void MatchHandler::handlePlayerAction(const PlayerAction* action) {
-    auto event = match.handlePlayerAction(action);
+// Receive a InputEvent from a client
+void MatchHandler::handleInputEvent(const InputEvent* action) {
+    auto event = match.handleInputEvent(action);
     // If there is an update in the state of match, broadcast it
     if (event->isValid()) {
         std::shared_ptr<const GameEvent> s = std::move(event);

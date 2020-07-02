@@ -109,7 +109,7 @@ void Match::start() {
     processPhase();
 }
 
-std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* action) {
+std::unique_ptr<const GameEvent> Match::handleInputEvent(const InputEvent* action) {
     using GE = GameEvent::Type;
     auto retEvent = std::make_unique<const GameEvent>();
     const unsigned int index = getPlayerIndex(action->nickname);
@@ -193,10 +193,10 @@ std::unique_ptr<const GameEvent> Match::handlePlayerAction(const PlayerAction* a
             break;
 
         case GE::Invalid:
-            LOG_ERROR("Invalid PlayerAction");
+            LOG_ERROR("Invalid InputEvent");
             break;
         default:
-            LOG_PANIC("Unimplemented PlayerAction");
+            LOG_PANIC("Unimplemented InputEvent");
     }
     // If the input action was valid, update the state of the game
     if (retEvent->isValid()) {

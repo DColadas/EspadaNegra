@@ -2,15 +2,15 @@
 #include <memory>
 
 #include "Events/Attack.hpp"
+#include "Events/InputEvent.hpp"
 #include "Events/Offer.hpp"
 #include "Events/Pass.hpp"
-#include "Events/PlayerAction.hpp"
 
-TEST_CASE("Test error prevention between PlayerAction hierarchy", "[events]") {
+TEST_CASE("Test error prevention between InputEvent hierarchy", "[events]") {
     Attack a1 = Attack("P1");
     Pass p1 = Pass("P1");
     Offer o1 = Offer("P1", 10);
-    std::unique_ptr<PlayerAction> a2 = std::make_unique<Attack>(a1);
+    std::unique_ptr<InputEvent> a2 = std::make_unique<Attack>(a1);
     //std::unique_ptr<GameEvent> j3 = std::make_unique<GameEvent>();
 
     SECTION("operator== and !=") {
@@ -51,7 +51,7 @@ TEST_CASE("Test error prevention between PlayerAction hierarchy", "[events]") {
     }
 
     SECTION("Compare equal base classes") {
-        // Only difference between a1 and p1 is the type 
+        // Only difference between a1 and p1 is the type
         a1.time = p1.time;
         REQUIRE_FALSE(a1 == p1);
     }
