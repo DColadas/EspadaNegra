@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 // Event generated as a result of an OutputEvent (update on game state)

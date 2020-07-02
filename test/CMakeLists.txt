@@ -1,5 +1,6 @@
 add_executable(catchTests 
   main.cpp
+  testComplex.cpp
   testJSONParser.cpp
 )
 
