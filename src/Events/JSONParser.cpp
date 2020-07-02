@@ -9,32 +9,34 @@
 #include <memory>
 #include <string>
 
-#include "Attack.hpp"
+#include "AttackRequest.hpp"
 #include "Earn.hpp"
-#include "GameEvent.hpp"
 #include "GetCard.hpp"
+#include "InputEvent.hpp"
 #include "JoinMatchRequest.hpp"
 #include "Logging/Logger.hpp"
-#include "Offer.hpp"
-#include "Pass.hpp"
+#include "OfferRequest.hpp"
+#include "OutputEvent.hpp"
+#include "PassRequest.hpp"
 #include "Pay.hpp"
 #include "Utils/Time.hpp"
 #include "Winner.hpp"
 
+using IT = InputEvent::Type;
+using OT = OutputEvent::Type;
 namespace {
-using GE = GameEvent::Type;
-const std::map<std::string, GE> stringToType{
-    {"joinMatchRequest", GE::JoinMatchRequest},
-    {"attack", GE::Attack},
-    {"offer", GE::Offer},
-    {"pass", GE::Pass},
+const std::map<std::string, IT> stringToType{
+    {"joinMatchRequest", IT::JoinMatchRequest},
+    {"attack", IT::AttackRequest},
+    {"offer", IT::OfferRequest},
+    {"pass", IT::PassRequest},
 };
 
-const std::map<GE, std::string> typeToString{
-    {GE::Pay, "pay"},
-    {GE::Earn, "earn"},
-    {GE::Winner, "winner"},
-    {GE::GetCard, "getCard"},
+const std::map<OT, std::string> typeToString{
+    {OT::Pay, "pay"},
+    {OT::Earn, "earn"},
+    {OT::Winner, "winner"},
+    {OT::GetCard, "getCard"},
 };
 
 boost::property_tree::ptree parseJSON(const std::string& json) {
@@ -52,17 +54,18 @@ boost::property_tree::ptree parseJSON(const std::string& json) {
 
 //TODO implement as visitor pattern (maybe not?)
 //Cool C++17 way! https://www.youtube.com/watch?v=MdtYi0vvct0x
-std::unique_ptr<GameEvent> JSONParser::messageToGameEvent(Timestamp time, const std::string& nickname, const std::string& message) {
-    using GE = GameEvent::Type;
+std::unique_ptr<InputEvent> JSONParser::messageToInputEvent(Timestamp time,
+                                                            const std::string& nickname,
+                                                            const std::string& message) {
     auto pt = parseJSON(message);
     try {
         const auto typeString = pt.get<std::string>("type");
         const auto typeIter = stringToType.find(typeString);
         // If the received type does not exist, set type as invalid
-        const auto type = (typeIter != stringToType.end()) ? typeIter->second : GE::Invalid;
+        const auto type = (typeIter != stringToType.end()) ? typeIter->second : IT::Invalid;
 
         switch (type) {
-            case GE::JoinMatchRequest: {
+            case IT::JoinMatchRequest: {
                 const auto matchID = pt.get<std::string>("matchID");
                 const auto jsonNickname = pt.get<std::string>("nickname");  //TODO change nickname for id of the handler
 
@@ -70,17 +73,17 @@ std::unique_ptr<GameEvent> JSONParser::messageToGameEvent(Timestamp time, const 
                 return std::make_unique<JoinMatchRequest>(time, jsonNickname, matchID);
                 //}
             } break;
-            case GE::Attack:
-                return std::make_unique<Attack>(time, nickname);
+            case IT::AttackRequest:
+                return std::make_unique<AttackRequest>(time, nickname);
                 break;
-            case GE::Pass:
-                return std::make_unique<Pass>(time, nickname);
+            case IT::PassRequest:
+                return std::make_unique<PassRequest>(time, nickname);
                 break;
-            case GE::Offer: {
+            case IT::OfferRequest: {
                 const auto gold = pt.get<int>("gold");
-                return std::make_unique<Offer>(time, nickname, gold);
+                return std::make_unique<OfferRequest>(time, nickname, gold);
             } break;
-            case GE::Invalid:
+            case IT::Invalid:
                 LOG_DEBUG("Invalid message: " + message);
                 break;
             default:
@@ -89,14 +92,10 @@ std::unique_ptr<GameEvent> JSONParser::messageToGameEvent(Timestamp time, const 
     } catch (const boost::property_tree::ptree_error& e) {
         LOG_DEBUG(e.what());
     }
-    return std::make_unique<GameEvent>();
+    return std::make_unique<InputEvent>();
 }
 
-std::unique_ptr<const std::string> JSONParser::gameEventToMessage(const GameEvent* event) {
-    using GE = GameEvent::Type;
-    if (!event->isValid()) {
-        return nullptr;
-    }
+std::unique_ptr<const std::string> JSONParser::outputEventToMessage(const OutputEvent* event) {
     const auto typeIter = typeToString.find(event->getType());
     // If the received type does not exist, set type as invalid
     const auto type = (typeIter != typeToString.end()) ? typeIter->second : "";
@@ -106,29 +105,26 @@ std::unique_ptr<const std::string> JSONParser::gameEventToMessage(const GameEven
     try {
         pt.put("type", type);
         switch (event->getType()) {
-            case GE::GetCard: {
+            case OT::GetCard: {
                 const auto getCard = static_cast<const GetCard*>(event);
                 pt.put("nickname", getCard->nickname);
             } break;
-            case GE::Winner: {
+            case OT::Winner: {
                 const auto winner = static_cast<const Winner*>(event);
                 pt.put("nickname", winner->nickname);
             } break;
-            case GE::Pay: {
+            case OT::Pay: {
                 const auto pay = static_cast<const Pay*>(event);
                 pt.put("nickname", pay->nickname);
                 pt.put("gold", pay->gold);
             } break;
-            case GE::Earn: {
+            case OT::Earn: {
                 const auto earn = static_cast<const Earn*>(event);
                 pt.put("nickname", earn->nickname);
                 pt.put("gold", earn->gold);
             } break;
-            case GE::Invalid:
-                LOG_ERROR("Invalid GameEvent");
-                return nullptr;
             default:
-                LOG_PANIC("Not implemented GameEvent");
+                LOG_PANIC("Not implemented OutputEvent");
                 return nullptr;
         }
     } catch (const boost::property_tree::ptree_bad_data& e) {

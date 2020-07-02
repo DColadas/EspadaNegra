@@ -36,7 +36,7 @@ class OutputEvent {
     OutputEvent(OutputEvent&&) = default;
     OutputEvent& operator=(OutputEvent&&) = default;
 
-    virtual bool isEqual(const OutputEvent& o) const {
+    virtual bool isEqual(const OutputEvent&) const {
         // Although there are no attributes, this isEqual should still be called in
         // derived isEqual, in case attributes (like timestamp) are added.
         // Therefore, this is not a pure virtual function
@@ -46,8 +46,14 @@ class OutputEvent {
    public:
     virtual ~OutputEvent() = default;
 
+    // True if the OutputEvent is an error (only information for the sending
+    // client, not a game state update)
+    constexpr bool isError() const {
+        return type == Type::Error;
+    }
+
     // Returns the type of the current OutputEvent (makes it read-only)
-    inline Type getType() const {
+    constexpr Type getType() const {
         return type;
     }
 

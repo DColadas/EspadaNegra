@@ -2,9 +2,12 @@
 
 #include <algorithm>
 
-#include "Events/Attack.hpp"
-#include "Events/Offer.hpp"
-#include "Events/Pass.hpp"
+#include "Events/AttackRequest.hpp"
+#include "Events/AttackResult.hpp"
+#include "Events/OfferRequest.hpp"
+#include "Events/OfferResult.hpp"
+#include "Events/PassRequest.hpp"
+#include "Events/PassResult.hpp"
 #include "Logging/Logger.hpp"
 #include "Utils/Random.hpp"
 
@@ -109,20 +112,20 @@ void Match::start() {
     processPhase();
 }
 
-std::unique_ptr<const GameEvent> Match::handleInputEvent(const InputEvent* action) {
-    using GE = GameEvent::Type;
-    auto retEvent = std::make_unique<const GameEvent>();
+std::unique_ptr<const OutputEvent> Match::handleInputEvent(const InputEvent* action) {
+    using ET = InputEvent::Type;
+    std::unique_ptr<const OutputEvent> retEvent = nullptr;
     const unsigned int index = getPlayerIndex(action->nickname);
     Player& p = players[index];
     switch (action->getType()) {
-        case GE::Attack:
+        case ET::AttackRequest:
             // Only valid on Attack phase
             if (currentPhase != Phase::Attack) {
                 LOG_DEBUG("Attack on non-attack phase (" + p.name + ")");
                 break;
             }
             {
-                const auto attack = static_cast<const Attack*>(action);
+                const auto attack = static_cast<const AttackRequest*>(action);
                 if (p.canAttack(currentAttack)) {
                     const auto attackAmount = p.attack();
                     if (currentAttack < attackAmount) {
@@ -135,21 +138,21 @@ std::unique_ptr<const GameEvent> Match::handleInputEvent(const InputEvent* actio
                         setNewAuctionTie(p);
                         LOG_TRACE(p.name + " attacks, sets tie");
                     }
-                    retEvent = std::make_unique<const Attack>(attack->nickname);
+                    retEvent = std::make_unique<const AttackResult>(*attack);
                 } else {
                     LOG_DEBUG("Invalid Attack (" + p.name + ")");
                 }
             }
             break;
 
-        case GE::Offer:
+        case ET::OfferRequest:
             // Only valid on Auction phase
             if (currentPhase != Phase::Auction) {
                 LOG_DEBUG("Offer on non-offer phase (" + p.name + ")");
                 break;
             }
             {
-                const auto offer = static_cast<const Offer*>(action);
+                const auto offer = static_cast<const OfferRequest*>(action);
                 const auto gold = offer->gold;
                 if (gold > 0 && currentOffer <= gold && p.canOffer(gold)) {
                     if (currentOffer < gold) {
@@ -167,24 +170,24 @@ std::unique_ptr<const GameEvent> Match::handleInputEvent(const InputEvent* actio
                         setNewAuctionTie(p);
                         LOG_TRACE(p.name + " offers " + std::to_string(gold) + ", sets tie");
                     }
-                    retEvent = std::make_unique<const Offer>(offer->nickname, offer->gold);
+                    retEvent = std::make_unique<const OfferResult>(*offer);
                 } else {
                     LOG_DEBUG("Invalid Offer (" + p.name + " offered " + std::to_string(gold) + ")");
                 }
             }
             break;
 
-        case GE::Pass:
+        case ET::PassRequest:
             // Only valid on Attack and Auction phases
             if (currentPhase != Phase::Attack && currentPhase != Phase::Auction) {
                 LOG_DEBUG("Pass on invalid phase (" + p.name + ")");
                 break;
             }
             {
-                const auto pass = static_cast<const Pass*>(action);
+                const auto pass = static_cast<const PassRequest*>(action);
                 if (p.canPass()) {
                     p.pass();
-                    retEvent = std::make_unique<const Pass>(pass->nickname);
+                    retEvent = std::make_unique<const PassResult>(*pass);
                     LOG_TRACE(p.name + " passes");
                 } else {
                     LOG_DEBUG("Invalid Pass (" + p.name + ")");
@@ -192,14 +195,14 @@ std::unique_ptr<const GameEvent> Match::handleInputEvent(const InputEvent* actio
             }
             break;
 
-        case GE::Invalid:
+        case ET::Invalid:
             LOG_ERROR("Invalid InputEvent");
             break;
         default:
             LOG_PANIC("Unimplemented InputEvent");
     }
     // If the input action was valid, update the state of the game
-    if (retEvent->isValid()) {
+    if (!retEvent->isError()) {
         processPhase();
     }
     return retEvent;

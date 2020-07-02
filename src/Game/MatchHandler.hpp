@@ -6,16 +6,16 @@
 #include "Match.hpp"
 
 class IOHandler;
-class GameEvent;
 class InputEvent;
+class OutputEvent;
 class MatchHandler {
    private:
     Match match;
     std::map<std::string, IOHandler*> handlers;  //nickname, handler
     unsigned int maxPlayers;
 
-    // Inform every player about the GameEvent
-    void notifyPlayers(const std::shared_ptr<const GameEvent>& event);
+    // Inform every player about the OutputEvent
+    void notifyPlayers(const std::shared_ptr<const OutputEvent>& event);
 
    public:
     //TODO consider making private and using a factory to create Match

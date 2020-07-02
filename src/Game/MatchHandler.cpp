@@ -43,19 +43,22 @@ void MatchHandler::start() {
     match.start();
 }
 
-void MatchHandler::notifyPlayers(const std::shared_ptr<const GameEvent>& event) {
+void MatchHandler::notifyPlayers(const std::shared_ptr<const OutputEvent>& event) {
     for (auto& h : handlers) {
         h.second->sendEvent(event);
     }
 }
 
-// Receive a InputEvent from a client
+// Receive an InputEvent from a client
 void MatchHandler::handleInputEvent(const InputEvent* action) {
     auto event = match.handleInputEvent(action);
     // If there is an update in the state of match, broadcast it
-    if (event->isValid()) {
-        std::shared_ptr<const GameEvent> s = std::move(event);
+    if (!event->isError()) {
+        std::shared_ptr<const OutputEvent> s = std::move(event);
         notifyPlayers(std::move(s));
+    } else {
+        // If the input was invalid, send the error to the client who sent it
+        //TODO
     }
 }
 

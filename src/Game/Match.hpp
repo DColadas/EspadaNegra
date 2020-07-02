@@ -7,8 +7,8 @@
 
 #include "Card.hpp"
 #include "Deck.hpp"
-#include "Events/GameEvent.hpp"
 #include "Events/InputEvent.hpp"
+#include "Events/OutputEvent.hpp"
 #include "MatchConfig.hpp"
 #include "Phase.hpp"
 #include "PhaseHandler.hpp"
@@ -73,9 +73,9 @@ class Match {
     // Start the game, process until the match ends
     void start();
 
-    // Process InputEvent and return GameEvent with update of the Match's state
+    // Process InputEvent and return OutputEvent with update of the Match's state
     // Returns invalid event if there is no valid update in the state
-    std::unique_ptr<const GameEvent> handleInputEvent(const InputEvent* action);
+    std::unique_ptr<const OutputEvent> handleInputEvent(const InputEvent* action);
 
     // Methods for each Phase in the game
     void onGameStartPhase();
