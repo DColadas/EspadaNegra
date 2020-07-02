@@ -50,3 +50,10 @@ Card Card::getById(int id) {
     LOG_PANIC_IF(it == cards.end(), "Card " + std::to_string(id) + " does not exist");
     return it->second;
 }
+
+bool Card::operator==(const Card& rhs) const {
+    return id == rhs.id;
+}
+bool Card::operator!=(const Card& rhs) const {
+    return !(*this == rhs);
+}

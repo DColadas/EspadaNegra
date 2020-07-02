@@ -10,15 +10,29 @@
 #include <string>
 
 #include "AttackRequest.hpp"
+#include "AttackResult.hpp"
+#include "Draw.hpp"
 #include "Earn.hpp"
+#include "Error.hpp"
+#include "Game/Card.hpp"
+#include "Game/Deck.hpp"
+#include "Game/MatchConfig.hpp"
+#include "Game/Player.hpp"
 #include "GetCard.hpp"
 #include "InputEvent.hpp"
+#include "IsAuctioneer.hpp"
 #include "JoinMatchRequest.hpp"
+#include "JoinMatchResult.hpp"
+#include "Leave.hpp"
 #include "Logging/Logger.hpp"
+#include "MatchInfo.hpp"
 #include "OfferRequest.hpp"
+#include "OfferResult.hpp"
 #include "OutputEvent.hpp"
 #include "PassRequest.hpp"
+#include "PassResult.hpp"
 #include "Pay.hpp"
+#include "SetGold.hpp"
 #include "Utils/Time.hpp"
 #include "Winner.hpp"
 
@@ -33,10 +47,20 @@ const std::map<std::string, IT> stringToType{
 };
 
 const std::map<OT, std::string> typeToString{
+    {OT::JoinMatchResult, "joinMatch"},
+    {OT::AttackResult, "attack"},
+    {OT::OfferResult, "offer"},
+    {OT::PassResult, "pass"},
+    {OT::Error, "error"},
     {OT::Pay, "pay"},
+    {OT::Draw, "draw"},
     {OT::Earn, "earn"},
     {OT::Winner, "winner"},
     {OT::GetCard, "getCard"},
+    {OT::IsAuctioneer, "isAuctioneer"},
+    {OT::Leave, "leave"},
+    {OT::MatchInfo, "matchInfo"},
+    {OT::SetGold, "setGold"},
 };
 
 boost::property_tree::ptree parseJSON(const std::string& json) {
@@ -47,6 +71,81 @@ boost::property_tree::ptree parseJSON(const std::string& json) {
         boost::property_tree::read_json(stream, pt);
     } catch (const boost::property_tree::json_parser_error& e) {
         LOG_DEBUG(e.what());
+    }
+    return pt;
+}
+
+std::string treeToString(const boost::property_tree::ptree& pt) {
+    std::stringstream ss;
+    try {
+        boost::property_tree::json_parser::write_json(ss, pt);
+    } catch (const boost::property_tree::json_parser_error& e) {
+        LOG_ERROR(e.what());
+    }
+    return ss.str();
+}
+
+boost::property_tree::ptree cardToTree(const Card& card) {
+    boost::property_tree::ptree pt;
+    try {
+        pt.put("id", card.id);
+        pt.put("name", card.getName());
+        pt.put("attack", card.getAttack());
+        pt.put("production", card.getProduction());
+        pt.put("victory", card.getVictory());
+        pt.put("isBerserk", card.isBerserk());
+    } catch (const boost::property_tree::ptree_bad_data& e) {
+        LOG_ERROR(e.what());
+    }
+    return pt;
+}
+
+boost::property_tree::ptree deckToTree(const Deck& deck) {
+    boost::property_tree::ptree pt, children;
+    const auto& cards = deck.getCards();
+    try {
+        for (const auto& c : cards) {
+            const auto& parsedCard = cardToTree(c);
+            children.push_back(std::make_pair("", parsedCard));
+        }
+        pt.add_child("cards", children);
+    } catch (const boost::property_tree::ptree_bad_data& e) {
+        LOG_ERROR(e.what());
+    }
+    return pt;
+}
+
+boost::property_tree::ptree playerToTree(const Player& player) {
+    boost::property_tree::ptree pt;
+    try {
+        pt.put("nickname", player.name);
+    } catch (const boost::property_tree::ptree_bad_data& e) {
+        LOG_ERROR(e.what());
+    }
+    return pt;
+}
+
+// Returns array of players without name
+boost::property_tree::ptree playerVectorToTree(const std::vector<Player>& players) {
+    boost::property_tree::ptree children;
+    try {
+        for (const auto& p : players) {
+            const auto& parsedPlayer = playerToTree(p);
+            children.push_back(std::make_pair("", parsedPlayer));
+        }
+    } catch (const boost::property_tree::ptree_bad_data& e) {
+        LOG_ERROR(e.what());
+    }
+    return children;
+}
+
+boost::property_tree::ptree matchConfigToTree(const MatchConfig& config) {
+    boost::property_tree::ptree pt;
+    try {
+        pt.put("numPlayers", config.numPlayers);
+        //TODO this is a placeholder. For now the config is not used at all
+    } catch (const boost::property_tree::ptree_bad_data& e) {
+        LOG_ERROR(e.what());
     }
     return pt;
 }
@@ -105,6 +204,24 @@ std::unique_ptr<const std::string> JSONParser::outputEventToMessage(const Output
     try {
         pt.put("type", type);
         switch (event->getType()) {
+            case OT::JoinMatchResult: {
+                const auto joinMatchResult = static_cast<const JoinMatchResult*>(event);
+                pt.put("nickname", joinMatchResult->nickname);
+                pt.put("matchID", joinMatchResult->matchID);
+            } break;
+            case OT::AttackResult: {
+                const auto attackResult = static_cast<const AttackResult*>(event);
+                pt.put("nickname", attackResult->nickname);
+            } break;
+            case OT::OfferResult: {
+                const auto offerResult = static_cast<const OfferResult*>(event);
+                pt.put("nickname", offerResult->nickname);
+                pt.put("gold", offerResult->gold);
+            } break;
+            case OT::PassResult: {
+                const auto passResult = static_cast<const PassResult*>(event);
+                pt.put("nickname", passResult->nickname);
+            } break;
             case OT::GetCard: {
                 const auto getCard = static_cast<const GetCard*>(event);
                 pt.put("nickname", getCard->nickname);
@@ -123,6 +240,33 @@ std::unique_ptr<const std::string> JSONParser::outputEventToMessage(const Output
                 pt.put("nickname", earn->nickname);
                 pt.put("gold", earn->gold);
             } break;
+            case OT::Error: {
+                const auto error = static_cast<const Error*>(event);
+                pt.put("message", error->message);
+            } break;
+            case OT::IsAuctioneer: {
+                const auto isAuctioneer = static_cast<const IsAuctioneer*>(event);
+                pt.put("nickname", isAuctioneer->nickname);
+            } break;
+            case OT::Leave: {
+                const auto leave = static_cast<const Leave*>(event);
+                pt.put("nickname", leave->nickname);
+            } break;
+            case OT::SetGold: {
+                const auto setGold = static_cast<const SetGold*>(event);
+                pt.put("nickname", setGold->nickname);
+                pt.put("gold", setGold->gold);
+            } break;
+            case OT::MatchInfo: {
+                const auto matchInfo = static_cast<const MatchInfo*>(event);
+                pt.add_child("deck", deckToTree(matchInfo->deck));
+                pt.add_child("players", playerVectorToTree(matchInfo->players));
+                pt.add_child("matchConfig", matchConfigToTree(matchInfo->config));
+            } break;
+            case OT::Draw: {
+                const auto draw = static_cast<const Draw*>(event);
+                pt.add_child("card", cardToTree(draw->card));
+            } break;
             default:
                 LOG_PANIC("Not implemented OutputEvent");
                 return nullptr;
@@ -132,11 +276,6 @@ std::unique_ptr<const std::string> JSONParser::outputEventToMessage(const Output
     }
 
     // Once the tree is created, convert to JSON string
-    std::stringstream ss;
-    try {
-        boost::property_tree::json_parser::write_json(ss, pt);
-    } catch (const boost::property_tree::json_parser_error& e) {
-        LOG_ERROR(e.what());
-    }
-    return std::make_unique<const std::string>(ss.str());
+    auto str = treeToString(pt);
+    return std::make_unique<const std::string>(std::move(str));
 }

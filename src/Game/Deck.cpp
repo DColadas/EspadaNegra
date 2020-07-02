@@ -15,6 +15,10 @@ Deck::Deck(const std::vector<int>& cardIds) {
 
 Deck::Deck(const std::vector<Card>& cards_) : cards(cards_) {}
 
+const std::vector<Card>& Deck::getCards() const {
+    return cards;
+}
+
 Card Deck::draw() {
     LOG_PANIC_IF(isEmpty(), "Deck is empty");
     const auto c = cards[cards.size() - 1];
@@ -50,4 +54,12 @@ Deck Deck::getById(int id) {
     const auto it = decks.find(id);
     LOG_PANIC_IF(it == decks.end(), "Deck " + std::to_string(id) + " does not exist");
     return it->second;
+}
+
+bool Deck::operator==(const Deck& rhs) const {
+    return cards == rhs.cards;
+}
+
+bool Deck::operator!=(const Deck& rhs) const {
+    return !(*this == rhs);
 }

@@ -119,3 +119,11 @@ bool Player::isAuctionWinner() const {
 bool Player::isInAuctionTie() const {
     return isTyingAuction;
 }
+
+bool Player::operator==(const Player& rhs) const {
+    return name == rhs.name;
+}
+
+bool Player::operator!=(const Player& rhs) const {
+    return !(*this == rhs);
+}

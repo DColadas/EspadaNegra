@@ -3,11 +3,11 @@
 #include <string>
 #include <vector>
 
+#include "Game/Deck.hpp"
+#include "Game/MatchConfig.hpp"
+#include "Game/Player.hpp"
 #include "OutputEvent.hpp"
 
-class MatchConfig;
-class Player;
-class Deck;
 // OutputEvent sent to every player who just joined the match
 class MatchInfo final : public OutputEvent {
    protected:

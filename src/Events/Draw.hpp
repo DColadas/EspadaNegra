@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Game/Card.hpp"
 #include "OutputEvent.hpp"
 
-class Card;
 // OutputEvent that informs about a new card in the auction
 class Draw final : public OutputEvent {
    protected:

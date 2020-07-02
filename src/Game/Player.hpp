@@ -68,4 +68,7 @@ class Player {
 
     bool isAuctionWinner() const;
     bool isInAuctionTie() const;
+
+    bool operator==(const Player&) const;
+    bool operator!=(const Player&) const;
 };
