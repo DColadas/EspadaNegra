@@ -2,25 +2,17 @@
 
 #include <string>
 
-#include "GameEvent.hpp"
 #include "PlayerResult.hpp"
-#include "Utils/Time.hpp"
 
 // PlayerResult defining a player who won the match
 class Winner final : public PlayerResult {
    protected:
-    bool isEqual(const GameEvent& obj) const final {
+    bool isEqual(const OutputEvent& obj) const final {
         auto v = static_cast<const Winner&>(obj);
         return PlayerResult::isEqual(obj);
     }
 
    public:
-    Winner() : PlayerResult(){};
-
     Winner(const std::string& nickname_)
-        : PlayerResult(Type::Winner, nickname_){};
-
-    Winner(Timestamp time_,
-           const std::string& nickname_)
-        : PlayerResult(Type::Winner, time_, nickname_){};
+        : PlayerResult(Type::Winner, nickname_){}
 };

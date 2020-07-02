@@ -1,17 +1,26 @@
 add_library(Events
     AttackRequest.hpp
+    AttackResult.hpp
+    Draw.hpp
     Earn.hpp
-    GameEvent.hpp
+    Error.hpp
     GetCard.hpp
+    IsAuctioneer.hpp
     JoinMatchRequest.hpp
+    JoinMatchResult.hpp
     JSONParser.cpp
     JSONParser.hpp
+    Leave.hpp
+    MatchInfo.hpp
     OfferRequest.hpp
+    OfferResult.hpp
+    OutputEvent.hpp
     PassRequest.hpp
+    PassResult.hpp
     Pay.hpp
     InputEvent.hpp
-    PlayerEvent.hpp
     PlayerResult.hpp
+    SetGold.hpp
     Winner.hpp
 )
 

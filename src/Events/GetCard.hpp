@@ -2,25 +2,17 @@
 
 #include <string>
 
-#include "GameEvent.hpp"
 #include "PlayerResult.hpp"
-#include "Utils/Time.hpp"
 
 // PlayerResult defining which player obtained the current auctioned card
 class GetCard final : public PlayerResult {
    protected:
-    bool isEqual(const GameEvent& obj) const final {
+    bool isEqual(const OutputEvent& obj) const final {
         auto v = static_cast<const GetCard&>(obj);
         return PlayerResult::isEqual(obj);
     }
 
    public:
-    GetCard() : PlayerResult(){};
-
     GetCard(const std::string& nickname_)
-        : PlayerResult(Type::GetCard, nickname_){};
-
-    GetCard(Timestamp time_,
-            const std::string& nickname_)
-        : PlayerResult(Type::GetCard, time_, nickname_){};
+        : PlayerResult(Type::GetCard, nickname_) {}
 };
