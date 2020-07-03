@@ -8,8 +8,6 @@ add_library(Events
     IsAuctioneer.hpp
     JoinMatchRequest.hpp
     JoinMatchResult.hpp
-    JSONParser.cpp
-    JSONParser.hpp
     Leave.hpp
     MatchInfo.hpp
     OfferRequest.hpp
@@ -24,6 +22,8 @@ add_library(Events
     Winner.hpp
 )
 
-find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
-target_link_libraries(Events PRIVATE ${Boost_LIBRARIES} Logging Utils Game)
+target_link_libraries(Events 
+PRIVATE 
+  Utils 
+  Game
+)

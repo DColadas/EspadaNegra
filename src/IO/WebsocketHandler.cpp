@@ -1,9 +1,9 @@
 #include "WebsocketHandler.hpp"
 
 #include "Events/InputEvent.hpp"
-#include "Events/JSONParser.hpp"
 #include "Events/JoinMatchRequest.hpp"
 #include "Logging/Logger.hpp"
+#include "Parsing/JSONParser.hpp"
 #include "WebsocketSession.hpp"
 
 WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches_)
