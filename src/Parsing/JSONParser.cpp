@@ -252,6 +252,7 @@ std::unique_ptr<const std::string> JSONParser::outputEventToMessage(const Output
             case OT::Leave: {
                 const auto leave = static_cast<const Leave*>(event);
                 pt.put("nickname", leave->nickname);
+                pt.put("reason", leave->reason);
             } break;
             case OT::SetGold: {
                 const auto setGold = static_cast<const SetGold*>(event);

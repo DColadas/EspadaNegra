@@ -32,7 +32,7 @@ namespace JSONParser {
 //  {"type": "winner", "nickname": "XXX"}
 //  {"type": "getCard", "nickname": "XXX"}
 //  {"type": "isAuctioneer", "nickname": "XXX"}
-//  {"type": "leave", "nickname": "XXX"}
+//  {"type": "leave", "nickname": "XXX", "reason": "XXX"}
 //  {"type": "setGold", "nickname": "XXX", "gold": int}
 //  {"type": "matchInfo", "deck": Deck, "players": [Player], "matchConfig": MatchConfig}
 //  {"type": "draw", "card": Card}
