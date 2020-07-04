@@ -195,6 +195,7 @@ std::unique_ptr<InputEvent> JSONParser::messageToInputEvent(Timestamp time,
 }
 
 std::unique_ptr<const std::string> JSONParser::outputEventToMessage(const OutputEvent* event) {
+    LOG_PANIC_IF(!event, "nullptr received");
     const auto typeIter = typeToString.find(event->getType());
     // If the received type does not exist, set type as invalid
     const auto type = (typeIter != typeToString.end()) ? typeIter->second : "";
