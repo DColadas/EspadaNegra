@@ -36,6 +36,7 @@ namespace JSONParser {
 //  {"type": "setGold", "nickname": "XXX", "gold": int}
 //  {"type": "matchInfo", "deck": Deck, "players": [Player], "matchConfig": MatchConfig}
 //  {"type": "draw", "card": Card}
+//  {"type": "complex", "events": [Event]}
 // where:
 //  Card: {"id": int,
 //         "name": "XXX",
@@ -46,6 +47,7 @@ namespace JSONParser {
 //  Deck: {"cards": [Card]}
 //  Player: {"nickname": "XXX"}
 //  MatchConfig: {"numPlayers": int}
+//  Event: any other event object
 [[nodiscard]] std::unique_ptr<const std::string> outputEventToMessage(const OutputEvent* event);
 
 }  // namespace JSONParser

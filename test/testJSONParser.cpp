@@ -10,6 +10,7 @@
 
 #include "Events/AttackRequest.hpp"
 #include "Events/AttackResult.hpp"
+#include "Events/Complex.hpp"
 #include "Events/Draw.hpp"
 #include "Events/Earn.hpp"
 #include "Events/Error.hpp"
@@ -327,5 +328,32 @@ TEST_CASE("Test JSONParser::outputEventToMessage", "[parser]") {
         // Check MatchConfig
         const auto configTree = pt.get_child("matchConfig");
         checkMatchConfigTree(config, configTree);
+    }
+
+    SECTION("Complex") {
+        Complex complex;
+        complex.add(std::make_unique<AttackResult>("Player1"));
+        complex.add(std::make_unique<SetGold>("Player2", 10));
+        const auto message = JSONParser::outputEventToMessage(&complex);
+        const auto pt = parseJSON(*message);
+        const auto eventsTree = pt.get_child("events");
+        const auto& events = complex.getEvents();
+        const auto& attack = static_cast<AttackResult*>(events[0].get());
+        const auto& setGold = static_cast<SetGold*>(events[1].get());
+
+        REQUIRE(eventsTree.size() == events.size());
+        std::size_t i = 0;
+        for (const auto& kv : eventsTree) {
+            const auto& value = kv.second;
+            if (i == 0) {
+                REQUIRE(value.get<std::string>("type") == "attack");
+                REQUIRE(value.get<std::string>("nickname") == attack->nickname);
+            } else {
+                REQUIRE(value.get<std::string>("type") == "setGold");
+                REQUIRE(value.get<std::string>("nickname") == setGold->nickname);
+                REQUIRE(value.get<int>("gold") == setGold->gold);
+            }
+            ++i;
+        }
     }
 }

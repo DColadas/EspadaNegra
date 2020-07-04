@@ -11,6 +11,7 @@
 
 #include "Events/AttackRequest.hpp"
 #include "Events/AttackResult.hpp"
+#include "Events/Complex.hpp"
 #include "Events/Draw.hpp"
 #include "Events/Earn.hpp"
 #include "Events/Error.hpp"
@@ -61,6 +62,7 @@ const std::map<OT, std::string> typeToString{
     {OT::Leave, "leave"},
     {OT::MatchInfo, "matchInfo"},
     {OT::SetGold, "setGold"},
+    {OT::Complex, "complex"},
 };
 
 boost::property_tree::ptree parseJSON(const std::string& json) {
@@ -149,53 +151,8 @@ boost::property_tree::ptree matchConfigToTree(const MatchConfig& config) {
     }
     return pt;
 }
-}  // namespace
 
-//TODO implement as visitor pattern (maybe not?)
-//Cool C++17 way! https://www.youtube.com/watch?v=MdtYi0vvct0x
-std::unique_ptr<InputEvent> JSONParser::messageToInputEvent(Timestamp time,
-                                                            const std::string& nickname,
-                                                            const std::string& message) {
-    auto pt = parseJSON(message);
-    try {
-        const auto typeString = pt.get<std::string>("type");
-        const auto typeIter = stringToType.find(typeString);
-        // If the received type does not exist, set type as invalid
-        const auto type = (typeIter != stringToType.end()) ? typeIter->second : IT::Invalid;
-
-        switch (type) {
-            case IT::JoinMatchRequest: {
-                const auto matchID = pt.get<std::string>("matchID");
-                const auto jsonNickname = pt.get<std::string>("nickname");  //TODO change nickname for id of the handler
-
-                //if (!matchID.empty() && !nickname.empty()) {
-                return std::make_unique<JoinMatchRequest>(time, jsonNickname, matchID);
-                //}
-            } break;
-            case IT::AttackRequest:
-                return std::make_unique<AttackRequest>(time, nickname);
-                break;
-            case IT::PassRequest:
-                return std::make_unique<PassRequest>(time, nickname);
-                break;
-            case IT::OfferRequest: {
-                const auto gold = pt.get<int>("gold");
-                return std::make_unique<OfferRequest>(time, nickname, gold);
-            } break;
-            case IT::Invalid:
-                LOG_DEBUG("Invalid message: " + message);
-                break;
-            default:
-                LOG_PANIC("Not implemented: " + message);
-        }
-    } catch (const boost::property_tree::ptree_error& e) {
-        LOG_DEBUG(e.what());
-    }
-    return std::make_unique<InputEvent>();
-}
-
-std::unique_ptr<const std::string> JSONParser::outputEventToMessage(const OutputEvent* event) {
-    LOG_PANIC_IF(!event, "nullptr received");
+boost::property_tree::ptree outputEventToTree(const OutputEvent* event) {
     const auto typeIter = typeToString.find(event->getType());
     // If the received type does not exist, set type as invalid
     const auto type = (typeIter != typeToString.end()) ? typeIter->second : "";
@@ -269,13 +226,74 @@ std::unique_ptr<const std::string> JSONParser::outputEventToMessage(const Output
                 const auto draw = static_cast<const Draw*>(event);
                 pt.add_child("card", cardToTree(draw->card));
             } break;
+            case OT::Complex: {
+                const auto complex = static_cast<const Complex*>(event);
+                const auto& events = complex->getEvents();
+                boost::property_tree::ptree children;
+                // Parse every event into its own tree, add to array
+                for (const auto& e : events) {
+                    children.push_back({"", outputEventToTree(e.get())});
+                }
+                pt.add_child("events", children);
+            } break;
             default:
                 LOG_PANIC("Not implemented OutputEvent");
-                return nullptr;
+                return {};
         }
     } catch (const boost::property_tree::ptree_bad_data& e) {
         LOG_ERROR(e.what());
     }
+    return pt;
+}
+
+}  // namespace
+
+//TODO implement as visitor pattern (maybe not?)
+//Cool C++17 way! https://www.youtube.com/watch?v=MdtYi0vvct0x
+std::unique_ptr<InputEvent> JSONParser::messageToInputEvent(Timestamp time,
+                                                            const std::string& nickname,
+                                                            const std::string& message) {
+    auto pt = parseJSON(message);
+    try {
+        const auto typeString = pt.get<std::string>("type");
+        const auto typeIter = stringToType.find(typeString);
+        // If the received type does not exist, set type as invalid
+        const auto type = (typeIter != stringToType.end()) ? typeIter->second : IT::Invalid;
+
+        switch (type) {
+            case IT::JoinMatchRequest: {
+                const auto matchID = pt.get<std::string>("matchID");
+                const auto jsonNickname = pt.get<std::string>("nickname");  //TODO change nickname for id of the handler
+
+                //if (!matchID.empty() && !nickname.empty()) {
+                return std::make_unique<JoinMatchRequest>(time, jsonNickname, matchID);
+                //}
+            } break;
+            case IT::AttackRequest:
+                return std::make_unique<AttackRequest>(time, nickname);
+                break;
+            case IT::PassRequest:
+                return std::make_unique<PassRequest>(time, nickname);
+                break;
+            case IT::OfferRequest: {
+                const auto gold = pt.get<int>("gold");
+                return std::make_unique<OfferRequest>(time, nickname, gold);
+            } break;
+            case IT::Invalid:
+                LOG_DEBUG("Invalid message: " + message);
+                break;
+            default:
+                LOG_PANIC("Not implemented: " + message);
+        }
+    } catch (const boost::property_tree::ptree_error& e) {
+        LOG_DEBUG(e.what());
+    }
+    return std::make_unique<InputEvent>();
+}
+
+std::unique_ptr<const std::string> JSONParser::outputEventToMessage(const OutputEvent* event) {
+    LOG_PANIC_IF(!event, "nullptr received");
+    const auto pt = outputEventToTree(event);
 
     // Once the tree is created, convert to JSON string
     auto str = treeToString(pt);
