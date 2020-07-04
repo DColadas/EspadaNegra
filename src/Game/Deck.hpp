@@ -15,6 +15,9 @@ class Deck {
     Deck(const std::vector<Card>& cards);
 
    public:
+    // Gets a view to the cards in the deck
+    const std::vector<Card>& getCards() const;
+
     // Get the top card from the deck
     Card draw();
 
@@ -33,4 +36,7 @@ class Deck {
 
     // Create a predefined deck by its ID
     static Deck getById(int id);
+
+    bool operator==(const Deck& rhs) const;
+    bool operator!=(const Deck& rhs) const;
 };

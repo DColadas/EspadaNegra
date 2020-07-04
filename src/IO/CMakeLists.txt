@@ -19,4 +19,12 @@ include_directories(${Boost_INCLUDE_DIR})
 
 find_package(Threads REQUIRED)
 
-target_link_libraries(IO PRIVATE ${Boost_LIBRARIES} Threads::Threads Events Game Logging)
+target_link_libraries(IO 
+PRIVATE 
+  ${Boost_LIBRARIES} 
+  Threads::Threads 
+  Events 
+  Game 
+  Logging
+  Parsing
+)

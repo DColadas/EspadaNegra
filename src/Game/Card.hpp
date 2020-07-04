@@ -36,4 +36,7 @@ class Card {
 
     // Returns first card if the id doesn't exist (should never happen)
     static Card getById(int id);
+
+    bool operator==(const Card&) const;
+    bool operator!=(const Card&) const;
 };

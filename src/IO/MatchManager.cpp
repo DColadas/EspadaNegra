@@ -4,6 +4,7 @@
 
 #include "Events/JoinMatchRequest.hpp"
 #include "Game/MatchHandler.hpp"
+#include "IOHandler.hpp"
 #include "Logging/Logger.hpp"
 
 MatchManager::MatchManager() {

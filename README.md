@@ -23,9 +23,10 @@ You can add your number of available threads to the command `make` to make the c
 - `client`: the web client that connects to the server to play the game.
 - `cmake`: relevant CMake scripts and utilities to keep the root `CMakeLists.txt` more modular and clean. 
 - `src`: the main C++ game server.
-  - `Events`: defines the `GameEvent` hierarchy -classes with information about valid received player actions and output game state updates-. There is also a `JSONParser` to serialize and deserialize these events to and from JSON format in order to communicate with the client.
+  - `Events`: defines the event hierarchies (`InputEvent` and `OutputEvent`) -classes with information about valid received player actions and output game state updates-.
   - `Game`: main game logic.
   - `IO`: main server. Manages client connections to it and the existing matches. 
   - `Logging`: simple module used to log relevant messages. Apart from the usual logging levels (`Error`, `Info`, `Debug` and `Trace` -a more in-depth debug level-) it also defines `Panic`, which aborts the program whenever an impossible critical state is reached.
+  - `Parsing`: utilities to serialize and deserialize the events (`Events` module) to and from JSON format in order to communicate with the client.
   - `Utils`: helper libraries with useful functions use wherever in the rest of the codebase (random number generation, time libraries, text coloring...).
 - `test`: relevant unit tests for the rest of the code.

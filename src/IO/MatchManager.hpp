@@ -5,9 +5,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "IOHandler.hpp"
-
+class IOHandler;
 class MatchHandler;
+class JoinMatchRequest;
 // Represents the shared server state
 class MatchManager {
    private:

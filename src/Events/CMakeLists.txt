@@ -1,20 +1,30 @@
 add_library(Events
-    Attack.hpp
+    AttackRequest.hpp
+    AttackResult.hpp
+    Complex.hpp
+    Draw.hpp
     Earn.hpp
-    GameEvent.hpp
+    Error.hpp
     GetCard.hpp
+    IsAuctioneer.hpp
     JoinMatchRequest.hpp
-    JSONParser.cpp
-    JSONParser.hpp
-    Offer.hpp
-    Pass.hpp
+    JoinMatchResult.hpp
+    Leave.hpp
+    MatchInfo.hpp
+    OfferRequest.hpp
+    OfferResult.hpp
+    OutputEvent.hpp
+    PassRequest.hpp
+    PassResult.hpp
     Pay.hpp
-    PlayerAction.hpp
-    PlayerEvent.hpp
+    InputEvent.hpp
     PlayerResult.hpp
+    SetGold.hpp
     Winner.hpp
 )
 
-find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
-target_link_libraries(Events PRIVATE ${Boost_LIBRARIES} Logging)
+target_link_libraries(Events 
+PRIVATE 
+  Utils 
+  Game
+)

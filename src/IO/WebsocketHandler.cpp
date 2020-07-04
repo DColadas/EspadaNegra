@@ -1,7 +1,9 @@
 #include "WebsocketHandler.hpp"
 
-#include "Events/JSONParser.hpp"
+#include "Events/InputEvent.hpp"
+#include "Events/JoinMatchRequest.hpp"
 #include "Logging/Logger.hpp"
+#include "Parsing/JSONParser.hpp"
 #include "WebsocketSession.hpp"
 
 WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches_)
@@ -21,7 +23,7 @@ WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches_
     ws->run();
 }
 
-void WebsocketHandler::sendEvent(const std::shared_ptr<const GameEvent>& /*event*/) {
+void WebsocketHandler::sendEvent(const std::shared_ptr<const OutputEvent>& /*event*/) {
 }
 
 void WebsocketHandler::join() {
@@ -60,14 +62,14 @@ void WebsocketHandler::setSession(WebsocketSession* session) {
 }
 
 void WebsocketHandler::dispatchMessage(const std::string& message) {
-    using GE = GameEvent::Type;
+    using ET = InputEvent::Type;
     const auto now = std::chrono::system_clock::now();
-    auto event = JSONParser::messageToGameEvent(now, nickname, message);
+    auto event = JSONParser::messageToInputEvent(now, nickname, message);
     // TODO nickname check disable until a login action is implemented
     if (/*!nickname.empty() && */ !currentMatch) {
         // Not in match
         switch (event->getType()) {
-            case GE::JoinMatchRequest:
+            case ET::JoinMatchRequest:
                 LOG_TRACE("JoinMatchRequest received");
                 joinMatch(*static_cast<JoinMatchRequest*>(event.get()));
                 break;
@@ -77,12 +79,11 @@ void WebsocketHandler::dispatchMessage(const std::string& message) {
     } else {
         // In match
         switch (event->getType()) {
-            case GE::Attack:
-            case GE::Pass:
-            case GE::Offer:
-                LOG_TRACE("User " + nickname + ": valid PlayerAction received");
-                currentMatch->handlePlayerAction(
-                    static_cast<PlayerAction*>(event.get()));
+            case ET::AttackRequest:
+            case ET::PassRequest:
+            case ET::OfferRequest:
+                LOG_TRACE("User " + nickname + ": valid InputEvent received");
+                currentMatch->handleInputEvent(event.get());
                 break;
             default:
                 LOG_ERROR("Event not implemented when in match");

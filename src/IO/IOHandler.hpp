@@ -5,13 +5,10 @@
 #include <memory>
 #include <string>
 
-#include "Events/GameEvent.hpp"
-#include "Events/JoinMatchRequest.hpp"
-#include "Events/PlayerAction.hpp"
-
+class OutputEvent;
 class IOHandler {
    public:
-    virtual void sendEvent(const std::shared_ptr<const GameEvent>& event) = 0;
+    virtual void sendEvent(const std::shared_ptr<const OutputEvent>& event) = 0;
     virtual void receiveMessage(const std::string& message) = 0;
     virtual void sendMessage(const std::shared_ptr<const std::string>& ss) = 0;
 

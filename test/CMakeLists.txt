@@ -1,8 +1,7 @@
 add_executable(catchTests 
   main.cpp
-  testJoinMatchRequest.cpp
+  testComplex.cpp
   testJSONParser.cpp
-  testPlayerAction.cpp
 )
 
 find_package(Boost REQUIRED)
@@ -13,6 +12,8 @@ target_link_libraries(catchTests
   Catch2::Catch2 
   ${Boost_LIBRARIES}
   Events
+  Game
+  Parsing
 )
 
 include(CTest)

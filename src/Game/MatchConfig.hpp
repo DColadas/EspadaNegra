@@ -13,4 +13,7 @@ class MatchConfig {
 
     // Changes current parameters according to the modifier
     void applyModifier(const GameModifier& modifier);
+
+    bool operator==(const MatchConfig&) const;
+    bool operator!=(const MatchConfig&) const;
 };
