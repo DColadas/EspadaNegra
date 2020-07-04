@@ -4,6 +4,8 @@
 
 #include "Events/AttackRequest.hpp"
 #include "Events/AttackResult.hpp"
+#include "Events/Complex.hpp"
+#include "Events/Error.hpp"
 #include "Events/OfferRequest.hpp"
 #include "Events/OfferResult.hpp"
 #include "Events/PassRequest.hpp"
@@ -11,8 +13,34 @@
 #include "Logging/Logger.hpp"
 #include "Utils/Random.hpp"
 
+using IT = InputEvent::Type;
+using OT = OutputEvent::Type;
+
 Match::Match(const MatchConfig& config_, const Deck& deck_)
     : config(std::move(config_)), deck(std::move(deck_)) {
+}
+
+void Match::addEvent(std::unique_ptr<const OutputEvent> event) {
+    if (!updateEvent) {
+        // No event: just move the new one
+        updateEvent = std::move(event);
+    } else if (updateEvent->getType() != OT::Complex) {
+        // There was a simple event: create a complex one and add both to it
+        auto complex = std::make_unique<Complex>();
+        complex->add(std::move(updateEvent));
+        complex->add(std::move(event));
+        updateEvent = std::move(complex);
+    } else {
+        // The event is already Complex: just add the new one
+        auto c = static_cast<Complex*>(updateEvent.get());
+        c->add(std::move(event));
+    }
+}
+
+void Match::setError(const std::string& message) {
+    // If the InputEvent is invalid, there is no other game state update
+    // Therefore, delete the old update
+    updateEvent = std::make_unique<Error>(message);
 }
 
 unsigned int Match::getPlayerIndex(const std::string& nickname) const {
