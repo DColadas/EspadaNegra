@@ -24,7 +24,7 @@ class Match {
     int currentOffer = 0;   // Max gold offered for the current card
 
     // Adds ${event} to th current &{updateEvent}
-    void addEvent(std::unique_ptr<const OutputEvent> event);
+    void addEvent(std::unique_ptr<OutputEvent> event);
 
     // Sets &{updateEvent} to an error state
     void setError(const std::string& message);
