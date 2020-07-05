@@ -20,9 +20,9 @@ class MatchInfo final : public OutputEvent {
     }
 
    public:
-    const MatchConfig& config;
-    const std::vector<Player>& players;
-    const Deck& deck;
+    const MatchConfig config;
+    const std::vector<Player> players;
+    const Deck deck;
 
     MatchInfo(const MatchConfig& config_,
               const std::vector<Player>& players_,
