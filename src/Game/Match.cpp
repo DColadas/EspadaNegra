@@ -5,11 +5,18 @@
 #include "Events/AttackRequest.hpp"
 #include "Events/AttackResult.hpp"
 #include "Events/Complex.hpp"
+#include "Events/Draw.hpp"
+#include "Events/Earn.hpp"
 #include "Events/Error.hpp"
+#include "Events/GetCard.hpp"
+#include "Events/IsAuctioneer.hpp"
 #include "Events/OfferRequest.hpp"
 #include "Events/OfferResult.hpp"
 #include "Events/PassRequest.hpp"
 #include "Events/PassResult.hpp"
+#include "Events/Pay.hpp"
+#include "Events/SetGold.hpp"
+#include "Events/Winner.hpp"
 #include "Logging/Logger.hpp"
 #include "Utils/Random.hpp"
 
@@ -85,6 +92,9 @@ void Match::nextAuctioneer() {
         currentAuctioneer = 0;
     }
     currentPlayer = currentAuctioneer;
+    const auto& name = players[static_cast<std::size_t>(currentAuctioneer)].name;
+    addEvent(std::make_unique<IsAuctioneer>(name));
+    LOG_TRACE(name + " is the auctioneer");
 }
 
 bool Match::arePossibleAttacks(int amount) const {
@@ -255,12 +265,19 @@ void Match::onGameStartPhase() {
     // Decide a random auctioneer
     currentAuctioneer = Random::randInt(0, static_cast<int>(players.size()) - 1);
     currentPlayer = currentAuctioneer;
+    const auto& name = players[static_cast<std::size_t>(currentAuctioneer)].name;
+    addEvent(std::make_unique<IsAuctioneer>(name));
+    LOG_TRACE(name + " is the auctioneer");
 
     // Set initial gold
     applyToPlayers([&](Player& p) {
         p.gold = static_cast<int>(config.initialGold);
     });
     players[static_cast<std::size_t>(currentAuctioneer)].gold -= config.auctioneerGoldDisadvantage;
+    for (const auto& p : players) {
+        addEvent(std::make_unique<SetGold>(p.name, p.gold));
+        LOG_TRACE(p.name + " has " + std::to_string(p.gold) + " gold");
+    }
 
     //Shuffle the deck
     deck.shuffle();
@@ -277,6 +294,7 @@ void Match::onTurnStartPhase() {
     if (!deck.canDraw(config.cardsPerTurn)) {
         LOG_TRACE("Not enough cards for last turn: switch to GameEnd");
         currentPhase = Phase::GameEnd;
+        processPhase();
         return;
     }
 
@@ -288,14 +306,9 @@ void Match::onTurnStartPhase() {
     // Inform about current cards
     const auto auctionCards = table.getCards();
     for (const auto& c : auctionCards) {
-        // TODO create event to inform the client about the cards
+        addEvent(std::make_unique<Draw>(c));
         LOG_TRACE("Card " + std::to_string(c.id) + ", " + c.getName());
     }
-
-    // Every player earns their production
-    applyToPlayers([](Player& p) {
-        p.earn(p.getTotalProduction());
-    });
 
     currentPhase = Phase::Attack;
     processPhase();
@@ -314,17 +327,21 @@ void Match::onAttackPhase() {
             // There is a winner: give them the card
             auto& player = players[index.value()];
             player.addCard(table.pop());
+            currentPhase = table.isEmpty() ? Phase::TurnEnd : Phase::Attack;
+            // Notify the players
+            addEvent(std::make_unique<GetCard>(player.name));
             LOG_TRACE(player.name + " gets the card on AttackPhase with attack " +
                       std::to_string(currentAttack));
-            currentPhase = table.isEmpty() ? Phase::TurnEnd : Phase::Attack;
         } else {
             // There is a tie: auction the card
+            // TODO add event
             LOG_TRACE("Tie for the card on AttackPhase (attack " +
                       std::to_string(currentAttack) + "): switch to AuctionPhase");
             currentPhase = Phase::Auction;
         }
     } else {
         // Nobody attacked: auction the card
+        // TODO add event
         LOG_TRACE("No attacks on AttackPhase: switch to AuctionPhase");
         currentPhase = Phase::Auction;
     }
@@ -351,9 +368,11 @@ void Match::onAuctionPhase() {
             auto& player = players[index.value()];
             player.addCard(table.pop());
             player.pay(currentOffer);
+            // Notify the players
+            addEvent(std::make_unique<Pay>(player.name, currentOffer));
+            addEvent(std::make_unique<GetCard>(player.name));
             LOG_TRACE(player.name + " gets the card on AuctionPhase with offer " +
                       std::to_string(currentOffer));
-
         } else {
             // There is a tie
             // TODO normally, untying is done by the decision of an auctioneer
@@ -361,12 +380,14 @@ void Match::onAuctionPhase() {
             // discarded on a tie.
             // The game should, instead, get into a Phase::AuctioneerDecision
             // and only process AuctioneerDecisions from the current one
+            // TODO add event
             table.discard();
             LOG_TRACE("Tie for the card on AuctionPhase (offer " +
                       std::to_string(currentOffer) + "): switch to next card");
         }
     } else {
         // Nobody offered: discard
+        // TODO add event
         LOG_TRACE("No offers on AuctionPhase: switch to next card");
         table.discard();
     }
@@ -381,13 +402,15 @@ void Match::onAuctionPhase() {
 }
 
 void Match::onTurnEndPhase() {
-    LOG_TRACE("Entered TurnEnd");
-
     applyToPlayers([](Player& p) {
         p.onTurnEnd();
+        p.earn(p.getTotalProduction());
     });
+    for (const auto& p : players) {
+        addEvent(std::make_unique<Earn>(p.name, p.getTotalProduction()));
+    }
 
-    // Change auctioneer
+    // Change auctioneer (notified to players in the function)
     nextAuctioneer();
 
     currentPhase = Phase::TurnStart;
@@ -410,6 +433,7 @@ void Match::onGameEndPhase() {
         }
     }
     for (const auto& w : winners) {
+        addEvent(std::make_unique<Winner>(players[w].name));
         LOG_DEBUG("Winner: " + players[w].name);
     }
 
