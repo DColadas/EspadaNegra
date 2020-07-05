@@ -1,13 +1,13 @@
 #pragma once
 
 #include <cstdlib>
+#include <deque>
 #include <memory>
 #include <string>
-#include <deque>
 
-#include "WebsocketHandler.hpp"
-#include "Beast.hpp"
 #include "Asio.hpp"
+#include "Beast.hpp"
+#include "WebsocketHandler.hpp"
 
 //TODO implement BaseWebsocket using template method to define what to do when a message is received
 class WebsocketSession : public std::enable_shared_from_this<WebsocketSession> {
@@ -40,5 +40,5 @@ class WebsocketSession : public std::enable_shared_from_this<WebsocketSession> {
     bool isOpen() const;
 
     // Send a message
-    void send(std::shared_ptr<std::string const> const& ss);
+    void send(const std::shared_ptr<const std::string>& ss);
 };

@@ -81,7 +81,7 @@ void WebsocketSession::onRead(error_code ec, std::size_t) {
     doRead();
 }
 
-void WebsocketSession::send(std::shared_ptr<std::string const> const& ss) {
+void WebsocketSession::send(const std::shared_ptr<const std::string>& ss) {
     // Add message to queue
     queue.push_back(ss);
 

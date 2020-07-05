@@ -49,17 +49,16 @@ void MatchHandler::notifyPlayers(const std::shared_ptr<const OutputEvent>& event
     }
 }
 
-// Receive an InputEvent from a client
-void MatchHandler::handleInputEvent(const InputEvent* action) {
+std::unique_ptr<const OutputEvent> MatchHandler::handleInputEvent(const InputEvent* action) {
     auto event = match.handleInputEvent(action);
-    // If there is an update in the state of match, broadcast it
-    if (!event->isError()) {
-        std::shared_ptr<const OutputEvent> s = std::move(event);
-        notifyPlayers(std::move(s));
-    } else {
-        // If the input was invalid, send the error to the client who sent it
-        //TODO
+    // If the input was invalid, send the error to the client who sent it
+    if (event->isError()) {
+        return std::move(event);
     }
+    // If there is an update in the state of match, broadcast it
+    std::shared_ptr<const OutputEvent> s = std::move(event);
+    notifyPlayers(std::move(s));
+    return nullptr;
 }
 
 bool MatchHandler::isRunning() const {

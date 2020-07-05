@@ -41,7 +41,9 @@ class MatchHandler {
     void start();
 
     // Receive a InputEvent from a client
-    void handleInputEvent(const InputEvent* action);
+    // If there is a valid state update, returns nullptr
+    // If the InputEvent is invalid, returns a pointer with Error
+    std::unique_ptr<const OutputEvent> handleInputEvent(const InputEvent* action);
 
     // True if the match is running
     bool isRunning() const;
