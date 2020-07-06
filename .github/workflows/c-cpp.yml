@@ -18,6 +18,12 @@ jobs:
         sudo add-apt-repository ppa:mhier/libboost-latest -y
         sudo apt-get update
         sudo apt-get install libboost1.70 libboost1.70-dev -y
+    - name: Install Catch2
+      run: |
+        git clone https://github.com/catchorg/Catch2.git
+        cd Catch2
+        cmake -Bbuild -H. -DBUILD_TESTING=OFF
+        sudo cmake --build build/ --target install
     - name: configure
       run: |
         mkdir build 
