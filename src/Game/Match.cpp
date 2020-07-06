@@ -145,9 +145,10 @@ void Match::removePlayer(const std::string& nickname) {
     }
 }
 
-void Match::start() {
+std::unique_ptr<const OutputEvent> Match::start() {
     currentPhase = Phase::GameStart;
     processPhase();
+    return std::move(updateEvent);
 }
 
 std::unique_ptr<const OutputEvent> Match::handleInputEvent(const InputEvent* action) {

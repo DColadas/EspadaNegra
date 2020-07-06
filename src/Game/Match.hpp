@@ -79,8 +79,9 @@ class Match {
     // Remove player from the match
     void removePlayer(const std::string& nickname);
 
-    // Start the game, process until the match ends
-    void start();
+    // Start the game
+    // Returns OutputEvent with the game state changes during the start
+    std::unique_ptr<const OutputEvent> start();
 
     // Process InputEvent and return OutputEvent with update of the Match's state
     // Returns Error if there is no valid update in the state

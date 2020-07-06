@@ -42,18 +42,20 @@ MatchHandler* MatchManager::joinMatch(IOHandler& client, const JoinMatchRequest&
     } else {
         //Match found, join
     }
-    if (!it->second->addPlayer(&client, nickname)) {
-        // Couldn't join the match (full or existing username)
+    const auto& match = it->second;  // Alias
+    auto response = match->addPlayer(&client, nickname);
+    if (response->isError()) {
+        // Couldn't join the match (notify the error)
         LOG_DEBUG("Couldn't join " + matchID + " by " + nickname + " (full or existing username)");
+        client.sendEvent(std::move(response));
         return nullptr;
     }
-
-    LOG_DEBUG(nickname + " joins " + it->first + ", players " + std::to_string(it->second->getPlayerCount()));
-    if (it->second->isFull()) {
+    client.sendEvent(std::move(response));  // Send MatchInfo
+    LOG_DEBUG(nickname + " joins " + it->first + ", players " + std::to_string(match->getPlayerCount()));
+    if (match->isFull()) {
         // If the match became full after joining, start it!
         LOG_INFO("Start match " + matchID);
-        it->second->start();
+        match->start();
     }
-
-    return it->second.get();
+    return match.get();
 }

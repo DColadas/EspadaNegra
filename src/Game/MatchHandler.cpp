@@ -2,7 +2,11 @@
 
 #include <algorithm>
 
+#include "Events/Error.hpp"
+#include "Events/JoinMatchResult.hpp"
+#include "Events/MatchInfo.hpp"
 #include "IO/IOHandler.hpp"
+#include "Logging/Logger.hpp"
 #include "MatchConfig.hpp"
 #include "Phase.hpp"
 #include "Utils/Random.hpp"
@@ -17,17 +21,33 @@ MatchHandler::MatchHandler(const MatchConfig& config, const Deck& deck)
       maxPlayers(match.config.numPlayers) {
 }
 
-bool MatchHandler::addPlayer(IOHandler* client, const std::string& name) {
-    if (isFull() || isRunning()) {
-        return false;
+std::unique_ptr<const MatchInfo> MatchHandler::getMatchInfo() const {
+    return std::make_unique<MatchInfo>(match.config,
+                                       match.players,
+                                       match.deck);
+}
+
+std::unique_ptr<const OutputEvent> MatchHandler::addPlayer(IOHandler* client,
+                                                           const std::string& name) {
+    if (isFull()) {
+        const auto message = "Cannot join the match (full)";
+        LOG_DEBUG(message);
+        return std::make_unique<const Error>(message);
+    } else if (isRunning()) {
+        const auto message = "Cannot join the match (already running)";
+        LOG_DEBUG(message);
+        return std::make_unique<const Error>(message);
     }
     const auto inserted = handlers.emplace(name, client).second;
     if (!inserted) {
         // The nickname existed already
-        return false;
+        const auto message = "Cannot join the match (nickname " + name + " already exists)";
+        LOG_DEBUG(message);
+        return std::make_unique<const Error>(message);
     }
     match.addPlayer(name);
-    return true;
+    notifyPlayers(std::make_shared<const JoinMatchResult>(name));
+    return getMatchInfo();
 }
 
 void MatchHandler::removePlayer(const std::string& nickname) {
@@ -40,7 +60,7 @@ std::size_t MatchHandler::getPlayerCount() const {
 }
 
 void MatchHandler::start() {
-    match.start();
+    notifyPlayers(match.start());
 }
 
 void MatchHandler::notifyPlayers(const std::shared_ptr<const OutputEvent>& event) {
