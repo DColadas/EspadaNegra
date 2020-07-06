@@ -8,7 +8,7 @@ Based on the real [*Espada Negra: juego de mesa*](https://espadanegra.net/jdm.ph
   - Tested with `gcc 7.5.0`.
 - At least `CMake 3.11`.
 - At least [`Boost 1.66`](https://www.boost.org/users/download/) (needs the `Asio`, `Beast` and `Property Tree` libraries).
-- [`Catch2`](https://github.com/catchorg/Catch2). There is a CMake script that downloads it automatically if it is not found.
+- [`Catch2`](https://github.com/catchorg/Catch2). The `PrepareCatch2.cmake` script downloads it automatically if not found, if the `INSTALL_CATCH2` option is set.
 
 ## Compile
 ```
