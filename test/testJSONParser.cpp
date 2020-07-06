@@ -176,12 +176,11 @@ TEST_CASE("Test JSONParser::outputEventToMessage", "[parser]") {
     };
 
     SECTION("JoinMatch") {
-        JoinMatchResult joinMatch("Player1", "Match123");
+        JoinMatchResult joinMatch("Player1");
         const auto message = JSONParser::outputEventToMessage(&joinMatch);
         const auto pt = parseJSON(*message);
         REQUIRE(pt.get<std::string>("type") == "joinMatch");
         REQUIRE(pt.get<std::string>("nickname") == "Player1");
-        REQUIRE(pt.get<std::string>("matchID") == "Match123");
     }
 
     SECTION("Attack") {

@@ -23,7 +23,9 @@ WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches_
     ws->run();
 }
 
-void WebsocketHandler::sendEvent(const std::shared_ptr<const OutputEvent>& /*event*/) {
+void WebsocketHandler::sendEvent(const std::shared_ptr<const OutputEvent>& event) {
+    std::shared_ptr<const std::string> message = JSONParser::outputEventToMessage(event.get());
+    sendMessage(std::move(message));
 }
 
 void WebsocketHandler::join() {
@@ -53,7 +55,7 @@ void WebsocketHandler::receiveMessage(const std::string& message) {
     matches->send(message);
 }
 
-void WebsocketHandler::sendMessage(std::shared_ptr<std::string const> const& ss) {
+void WebsocketHandler::sendMessage(const std::shared_ptr<const std::string>& ss) {
     ws->send(ss);
 }
 
@@ -81,10 +83,14 @@ void WebsocketHandler::dispatchMessage(const std::string& message) {
         switch (event->getType()) {
             case ET::AttackRequest:
             case ET::PassRequest:
-            case ET::OfferRequest:
+            case ET::OfferRequest: {
                 LOG_TRACE("User " + nickname + ": valid InputEvent received");
-                currentMatch->handleInputEvent(event.get());
-                break;
+                auto response = currentMatch->handleInputEvent(event.get());
+                // There is a specific message for this client (an Error)
+                if (response) {
+                    sendEvent(std::move(response));
+                }
+            } break;
             default:
                 LOG_ERROR("Event not implemented when in match");
         }

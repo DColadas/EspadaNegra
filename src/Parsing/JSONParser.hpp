@@ -22,7 +22,7 @@ namespace JSONParser {
 
 // Returns unique_ptr with the event in JSON
 // Output messages:
-//  {"type": "joinMatch", "nickname": "XXX", "matchID": "XXX"}
+//  {"type": "joinMatch", "nickname": "XXX"}
 //  {"type": "attack", "nickname": "XXX"}
 //  {"type": "offer", "nickname": "XXX", "gold": int}
 //  {"type": "pass", "nickname": "XXX"}

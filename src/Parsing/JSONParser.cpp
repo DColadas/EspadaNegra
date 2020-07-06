@@ -165,7 +165,6 @@ boost::property_tree::ptree outputEventToTree(const OutputEvent* event) {
             case OT::JoinMatchResult: {
                 const auto joinMatchResult = static_cast<const JoinMatchResult*>(event);
                 pt.put("nickname", joinMatchResult->nickname);
-                pt.put("matchID", joinMatchResult->matchID);
             } break;
             case OT::AttackResult: {
                 const auto attackResult = static_cast<const AttackResult*>(event);

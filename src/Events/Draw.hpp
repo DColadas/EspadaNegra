@@ -13,7 +13,7 @@ class Draw final : public OutputEvent {
     }
 
    public:
-    const Card& card;
+    const Card card;
 
     Draw(const Card& card_)
         : OutputEvent(Type::Draw),

@@ -17,8 +17,17 @@
 
 class Match {
    private:
+    // Contains updates caused by an InputEvent
+    // After processing the InputEvent, ${updateEvent} gets sent to the clients
+    std::unique_ptr<OutputEvent> updateEvent = nullptr;
     int currentAttack = 0;  // Max attack used for the current card
     int currentOffer = 0;   // Max gold offered for the current card
+
+    // Adds ${event} to th current &{updateEvent}
+    void addEvent(std::unique_ptr<OutputEvent> event);
+
+    // Sets &{updateEvent} to an error state
+    void setError(const std::string& message);
 
     // Get player index by nickname
     unsigned int getPlayerIndex(const std::string& nickname) const;
@@ -70,11 +79,12 @@ class Match {
     // Remove player from the match
     void removePlayer(const std::string& nickname);
 
-    // Start the game, process until the match ends
-    void start();
+    // Start the game
+    // Returns OutputEvent with the game state changes during the start
+    std::unique_ptr<const OutputEvent> start();
 
     // Process InputEvent and return OutputEvent with update of the Match's state
-    // Returns invalid event if there is no valid update in the state
+    // Returns Error if there is no valid update in the state
     std::unique_ptr<const OutputEvent> handleInputEvent(const InputEvent* action);
 
     // Methods for each Phase in the game
