@@ -8,31 +8,36 @@
 </head>
 
 <body>
-    <div>
+    <div id="server-data">
         <label>Server URL
             <input type="text" id="serverURL" />
         </label>
     </div>
-    <div>
-        <label>Nickname
-            <input type="text" id="nickname" />
-        </label>
-        <label>Match ID
-            <input type="text" id="matchID" />
-        </label>
-        <button id="joinMatch">Join match</button>
+    <div id="error-panel">
+        <span id="error"></span>
     </div>
-    <div>
-        <button id="attack">Attack</button>
-    </div>
-    <div>
-        <label>Offered gold
-            <input type="number" id="offeredGold" />
-        </label>
-        <button id="offer">Offer</button>
-    </div>
-    <div>
-        <button id="pass">Pass</button>
+    <div id="match-actions">
+        <div>
+            <label>Nickname
+                <input type="text" id="nickname" />
+            </label>
+            <label>Match ID
+                <input type="text" id="matchID" />
+            </label>
+            <button id="joinMatch">Join match</button>
+        </div>
+        <div>
+            <button id="attack">Attack</button>
+        </div>
+        <div>
+            <label>Offered gold
+                <input type="number" id="offeredGold" />
+            </label>
+            <button id="offer">Offer</button>
+        </div>
+        <div>
+            <button id="pass">Pass</button>
+        </div>
     </div>
     <script type="module" src="app.js"></script>
 </body>
