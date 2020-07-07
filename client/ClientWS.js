@@ -1,3 +1,5 @@
+import { EventDispatcher } from "./EventDispatcher.js"
+
 const wsPrefix = "ws://";
 const defaultURL = "localhost:8080";
 
@@ -12,12 +14,14 @@ export class ClientWS {
             serverURL = defaultURL;
         }
         serverURL = wsPrefix + serverURL;
+        this.dispatcher = new EventDispatcher();
         this.ws = new WebSocket(serverURL);
         this.ws.onopen = (ev) => {
             console.log("OPEN");
         };
         this.ws.onmessage = (ev) => {
             console.log(ev.data);
+            this.dispatcher.dispatchEvent(JSON.parse(ev.data));
         };
     }
 
