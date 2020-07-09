@@ -107,3 +107,10 @@ dispatcher.onError = (message) => {
     error.innerHTML = message;
 };
 
+// God, I hate JavaScript
+dispatcher._dispatchEvent = dispatcher.dispatchEvent;
+dispatcher.dispatchEvent = (event) => {
+    error.innerHTML = "";
+    dispatcher._dispatchEvent(event);
+};
+
