@@ -1,0 +1,45 @@
+#match-gui {
+    /*border-width: 2px;
+    border-style: solid;
+    border-color: red;*/
+
+    margin-right: auto;
+    margin-left: auto;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+}
+
+#cards-in-play {
+    /*border-width: 2px;
+    border-style: solid;
+    border-color: red;*/
+
+    margin-right: auto;
+    margin-left: auto;
+    /*width: 80%;*/
+    display: flex;
+    justify-content: center;
+}
+
+#cards-in-play > img {
+    max-width: 100%;
+    max-height: 100%;
+    margin: 1%;
+}
+
+.current-card {
+    border-width: 2px;
+    border-style: solid;
+    border-color: red;
+}
+
+.future-card {
+
+}
+
+.removed-card {
+    filter: gray;
+    -webkit-filter: grayscale(1);
+    filter: grayscale(1);
+}
