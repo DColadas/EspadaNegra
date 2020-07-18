@@ -13,10 +13,13 @@ const offeredGold = document.getElementById("offeredGold");
 const offerButton = document.getElementById("offer");
 const passButton = document.getElementById("pass");
 const errorTag = document.getElementById("error");
+const cardsInPlayList = document.getElementById("cards-in-play");
 
 let match = new Match()
 let dispatcher = new EventDispatcher();
 let ws;
+
+const PLACEHOLDER_IMAGE = "https://espadanegra.net/gal.php?id=444";
 
 // Bind local events callbacks
 joinMatchButton.addEventListener("click", () => {
@@ -47,6 +50,15 @@ dispatcher.onAttack = (nickname) => {
 
 dispatcher.onDraw = (cardID) => {
     match.draw(cardID);
+    let newCard = document.createElement("img");
+    newCard.src = match.deck[cardID].image;
+    // If it's the only card in the auction, set as current card
+    if (!cardsInPlayList.getElementsByClassName("current-card").length) {
+        newCard.className = "current-card";
+    } else {
+        newCard.className = "future-card";
+    }
+    cardsInPlayList.appendChild(newCard);
 };
 
 dispatcher.onEarn = (nickname, gold) => {
@@ -55,6 +67,17 @@ dispatcher.onEarn = (nickname, gold) => {
 
 dispatcher.onGetCard = (nickname) => {
     match.getCard(nickname);
+    cardsInPlayList.getElementsByClassName("current-card")[0].className = "removed-card";
+    // If there are more cards, set the next one as current
+    let futures = cardsInPlayList.getElementsByClassName("future-card");
+    if (futures.length > 0) {
+        futures[0].className = "current-card";
+    } else {
+        // No more cards left: delete everything from auction
+        while (cardsInPlayList.lastChild) {
+            cardsInPlayList.removeChild(cardsInPlayList.lastChild);
+        }
+    }
 };
 
 dispatcher.onIsAuctioneer = (nickname) => {
@@ -78,6 +101,7 @@ dispatcher.onMatchInfo = (config, players, deck) => {
         dictPlayers[p.nickname] = new Player(p.nickname);
     });
     deck.cards.forEach(c => {
+        c.image = PLACEHOLDER_IMAGE;
         dictDeck[c.id] = c;
     });
     match = new Match(config, dictPlayers, dictDeck);
