@@ -14,12 +14,22 @@ const offerButton = document.getElementById("offer");
 const passButton = document.getElementById("pass");
 const errorTag = document.getElementById("error");
 const cardsInPlayList = document.getElementById("cards-in-play");
+const playerList = document.getElementById("players");
+const clientPlayer = document.getElementById("client-player");
 
-let match = new Match()
+let match = new Match();
 let dispatcher = new EventDispatcher();
 let ws;
+let currentNickname;
 
 const PLACEHOLDER_IMAGE = "https://espadanegra.net/gal.php?id=444";
+
+const createDiv = (cls, content) => {
+    let div = document.createElement("div");
+    div.className = cls;
+    div.innerHTML = content;
+    return div;
+};
 
 // Bind local events callbacks
 joinMatchButton.addEventListener("click", () => {
@@ -29,6 +39,7 @@ joinMatchButton.addEventListener("click", () => {
     ws = new ClientWS(serverURL.value);
     ws.dispatcher = dispatcher;
     ws.joinMatch(matchID.value, nickname.value);
+    currentNickname = nickname.value;
 });
 
 attackButton.addEventListener("click", () => {
@@ -86,6 +97,10 @@ dispatcher.onIsAuctioneer = (nickname) => {
 
 dispatcher.onJoinMatch = (nickname) => {
     match.addPlayer(nickname);
+
+    let divPlayer = createDiv("player", "");
+    divPlayer.appendChild(createDiv("nickname", nickname));
+    playerList.appendChild(divPlayer);
 };
 
 dispatcher.onLeave = (nickname, reason) => {
@@ -105,6 +120,26 @@ dispatcher.onMatchInfo = (config, players, deck) => {
         dictDeck[c.id] = c;
     });
     match = new Match(config, dictPlayers, dictDeck);
+
+    // Adds players (removes existing ones)
+    while (playerList.lastChild) {
+        playerList.removeChild(playerList.lastChild);
+    }
+    for (let p of Object.values(dictPlayers)) {
+        // Don't add the client to the other players list
+        if (p.nickname === currentNickname) {
+            continue;
+        }
+        let divPlayer = createDiv("player", "");
+        divPlayer.appendChild(createDiv("nickname", p.nickname));
+        playerList.appendChild(divPlayer);
+    }
+
+    // Sets client player
+    while (clientPlayer.lastChild) {
+        clientPlayer.removeChild(clientPlayer.lastChild);
+    }
+    clientPlayer.appendChild(createDiv("nickname", currentNickname));
 };
 
 dispatcher.onOffer = (nickname, gold) => {

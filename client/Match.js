@@ -1,7 +1,7 @@
 import { Player } from "./Player.js";
 
 export class Match {
-    constructor(config, players, deck) {
+    constructor(config, players = {}, deck = {}) {
         this.config = config;
         this.players = players; // {nickname: Player}
         this.deck = deck; // {cardID: Card}
