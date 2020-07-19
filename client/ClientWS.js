@@ -20,7 +20,7 @@ export class ClientWS {
             console.log("OPEN");
         };
         this.ws.onmessage = (ev) => {
-            console.log(ev.data);
+            //console.log(ev.data);
             this.dispatcher.dispatchEvent(JSON.parse(ev.data));
         };
     }

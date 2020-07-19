@@ -51,7 +51,7 @@ void WebsocketSession::doRead() {
 }
 
 void WebsocketSession::doWrite(const std::string& message) {
-    LOG_TRACE("doWrite: " + message);
+    //LOG_TRACE("doWrite: " + message);
     ws.async_write(
         asio::buffer(message),
         [sp = shared_from_this()](
@@ -65,7 +65,7 @@ void WebsocketSession::onRead(error_code ec, std::size_t) {
         return fail(ec, "onRead");
     }
 
-    LOG_TRACE("onRead: " + beast::buffers_to_string(buffer.data()));
+    //LOG_TRACE("onRead: " + beast::buffers_to_string(buffer.data()));
     // Notifies the handler about the new message
     manager->dispatchMessage(*this, beast::buffers_to_string(buffer.data()));
 
