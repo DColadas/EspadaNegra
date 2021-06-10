@@ -1,69 +1,33 @@
 #pragma once
 
 #include <string>
+#include <string_view>
+#include <variant>
 
 #include "Utils/Time.hpp"
 
-// Action sent by a player (not yet executed)
-class InputEvent {
-   public:
-    // To allow fast dispatch and parsing of events, Type contains a value
-    // for every final InputEvent subclass
-    enum class Type {
-        Invalid,
-        JoinMatchRequest,
-        AttackRequest,
-        PassRequest,
-        OfferRequest,
-    };
-
-   protected:
-    Type type;
-
-    InputEvent(Type type_,
-               const std::string& nickname_)
-        : type(type_), time(Clock::now()), nickname(nickname_) {}
-
-    InputEvent(Type type_,
-               Timestamp time_,
-               const std::string& nickname_)
-        : type(type_), time(time_), nickname(nickname_) {}
-
-    InputEvent(const InputEvent&) = default;
-    InputEvent& operator=(const InputEvent&) = default;
-    InputEvent(InputEvent&&) = default;
-    InputEvent& operator=(InputEvent&&) = default;
-
-    virtual bool isEqual(const InputEvent& o) const {
-        return time == o.time &&
-               nickname == o.nickname;
-    }
-
-   public:
-    Timestamp time;
+// Input event that contains necessary information to join a match
+struct JoinMatchRequest {
+    Timestamp time{Clock::now()};
     std::string nickname;
+    std::string matchID;
+};
 
-    InputEvent() : type(Type::Invalid){};  //Only used when creating an invalid object
-    virtual ~InputEvent() = default;
+// Input event representing the amount of gold offered for the current card
+struct OfferRequest {
+    Timestamp time{Clock::now()};
+    std::string nickname;
+    int gold;
+};
 
-    // True if the object was created correctly
-    inline bool isValid() const {
-        return type != Type::Invalid;
-    };
+// Input event by which the player is not interested in the current attack/auction phase
+struct PassRequest {
+    Timestamp time{Clock::now()};
+    std::string nickname;
+};
 
-    // Returns the type of the current InputEvent (makes it read-only)
-    inline Type getType() const {
-        return type;
-    }
-
-    inline friend bool operator==(const InputEvent& lhs, const InputEvent& rhs) {
-        return lhs.type != Type::Invalid &&
-               rhs.type != Type::Invalid &&
-               lhs.type == rhs.type &&
-               lhs.isEqual(rhs);
-    }
-
-    inline friend bool operator!=(const InputEvent& lhs, const InputEvent& rhs) {
-        return !(lhs == rhs);
-    }
+// Input event by which the player intents to attack the current card
+struct AttackRequest {
+    Timestamp time{Clock::now()};
+    std::string nickname;
 };
