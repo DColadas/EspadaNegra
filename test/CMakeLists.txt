@@ -5,7 +5,7 @@ add_executable(catchTests
 )
 
 find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
+target_include_directories(catchTests SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 
 target_include_directories(catchTests PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(catchTests 
@@ -17,4 +17,3 @@ target_link_libraries(catchTests
 )
 
 include(CTest)
-catch_discover_tests(catchTests)

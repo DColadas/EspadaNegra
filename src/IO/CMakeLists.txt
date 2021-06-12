@@ -15,12 +15,11 @@ add_library(IO
 )
 
 find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
-
 find_package(Threads REQUIRED)
+target_include_directories(IO SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 
 target_link_libraries(IO 
-PRIVATE 
+  PRIVATE 
   ${Boost_LIBRARIES} 
   Threads::Threads 
   Events 

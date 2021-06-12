@@ -3,6 +3,7 @@
 #include "Logging/Logger.hpp"
 Server::Server(const char* address,
                unsigned short port) {
+    LOG_INFO("Creating server at " + std::string(address) + ":" + std::to_string(port));
     listener = std::make_shared<Listener>(
         ioc,
         tcp::endpoint{asio::ip::make_address(address), port},
@@ -18,6 +19,7 @@ Server::Server(const char* address,
 }
 
 void Server::run() {
+    LOG_INFO("Starting server");
     listener->run();
     // If the defined signals are received, stop the io_context
     signals.async_wait(

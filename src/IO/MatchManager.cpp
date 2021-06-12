@@ -1,7 +1,5 @@
 #include "MatchManager.hpp"
 
-#include <thread>
-
 #include "Events/JoinMatchRequest.hpp"
 #include "Game/MatchHandler.hpp"
 #include "IOHandler.hpp"

@@ -5,7 +5,7 @@ include(cmake/StandardProjectSettings.cmake)
 add_library(project_options INTERFACE)
 
 # Set used C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 # These option gives an error with Boost
@@ -32,8 +32,7 @@ option(ENABLE_TESTING "Enable Test Builds" ON)
 add_subdirectory(src)
 
 if(ENABLE_TESTING)
-  # Find Catch2 in the system, or download otherwise
-  include(cmake/PrepareCatch2.cmake)
+  find_package(Catch2 CONFIG REQUIRED)
   enable_testing()
   add_subdirectory(test)
 endif()

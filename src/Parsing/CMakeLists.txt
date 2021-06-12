@@ -4,9 +4,9 @@ add_library(Parsing
 )
 
 find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
+target_include_directories(Parsing SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(Parsing 
-PRIVATE 
+  PRIVATE 
   ${Boost_LIBRARIES} 
   Logging 
   Utils 
