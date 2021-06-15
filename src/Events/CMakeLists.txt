@@ -1,5 +1,4 @@
 add_library(Events
-    AttackRequest.hpp
     AttackResult.hpp
     Complex.hpp
     Draw.hpp
@@ -7,14 +6,11 @@ add_library(Events
     Error.hpp
     GetCard.hpp
     IsAuctioneer.hpp
-    JoinMatchRequest.hpp
     JoinMatchResult.hpp
     Leave.hpp
     MatchInfo.hpp
-    OfferRequest.hpp
     OfferResult.hpp
     OutputEvent.hpp
-    PassRequest.hpp
     PassResult.hpp
     Pay.hpp
     InputEvent.hpp
@@ -23,8 +19,10 @@ add_library(Events
     Winner.hpp
 )
 
+find_package(nlohmann_json CONFIG REQUIRED)
+
 target_link_libraries(Events 
 PRIVATE 
   Utils 
-  Game
+  nlohmann_json::nlohmann_json
 )
