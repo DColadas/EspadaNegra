@@ -26,8 +26,10 @@ struct PassRequest : public TimedEvent, public PlayerEvent {};
 // Input event by which the player intents to attack the current card.
 struct AttackRequest : public TimedEvent, public PlayerEvent {};
 
+// Event received from the players.
 using InputEvent = std::variant<
     std::monostate,
+    Error,
     JoinMatchRequest,
     OfferRequest,
     PassRequest,
@@ -37,8 +39,7 @@ using InputEvent = std::variant<
 void from_json(const nlohmann::json& j, InputEvent& event);
 
 // Parse InputEvent from $message and bind $nickname to it if PlayerEvent.
-// Throws nlohmann::json::exception on malformed $message.
-// Returns std::monostate on wrong type messages.
+// Returns Error on wrong type messages.
 // Valid input messages:
 //  {"type": "joinMatchRequest", "matchID": "XXX", "nickname": "XXX"}
 //  {"type": "attack"}

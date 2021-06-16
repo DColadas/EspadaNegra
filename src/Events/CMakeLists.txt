@@ -22,9 +22,11 @@ add_library(Events
 )
 
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 
 target_link_libraries(Events 
 PRIVATE 
   Utils 
+  fmt::fmt
   nlohmann_json::nlohmann_json
 )

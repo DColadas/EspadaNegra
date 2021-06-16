@@ -21,4 +21,9 @@ struct PlayerEvent {
     std::string nickname;
 };
 
+// Event representing an invalid action (malformed InputEvent, logic error...).
+struct Error {
+    std::string message;
+};
+
 }  // namespace Events

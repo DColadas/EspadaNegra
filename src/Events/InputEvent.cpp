@@ -1,5 +1,7 @@
 #include "InputEvent.hpp"
 
+#include <fmt/format.h>
+
 #include "Utils/Visitor.hpp"
 
 namespace Events {
@@ -27,24 +29,35 @@ void from_json(const nlohmann::json& j, InputEvent& event) {
             return Invalid;
     };
 
-    switch (toType(j.at("type").get<std::string_view>())) {
-        case JoinMatchRequest_:
-            event = JoinMatchRequest{
-                .nickname = j.at("nickname"),
-                .matchID = j.at("matchID")};
-            break;
-        case OfferRequest_:
-            event = OfferRequest{{}, {.nickname = {}}, j.at("gold")};
-            break;
-        case PassRequest_:
-            event = PassRequest{};
-            break;
-        case AttackRequest_:
-            event = AttackRequest{};
-            break;
-        case Invalid:
-            event = {};
-            break;
+    try {
+        switch (toType(j.at("type").get<std::string_view>())) {
+            case JoinMatchRequest_:
+                event = JoinMatchRequest{
+                    .nickname = j.at("nickname"),
+                    .matchID = j.at("matchID")};
+                break;
+            case OfferRequest_:
+                event = OfferRequest{{}, {.nickname = {}}, j.at("gold")};
+                break;
+            case PassRequest_:
+                event = PassRequest{};
+                break;
+            case AttackRequest_:
+                event = AttackRequest{};
+                break;
+            case Invalid:
+                event = Error{fmt::format("{} is not a valid input type", j.at("type").get<std::string_view>())};
+                break;
+        }
+    } catch (const nlohmann::json::out_of_range& ex) {
+        // Missing key
+        event = Error{"Missing necessary event key-value"};
+    } catch (const nlohmann::json::parse_error& ex) {
+        // Malformed JSON
+        event = Error{"Malformed JSON received"};
+    } catch (const std::exception& ex) {
+        // Anything I'm missing :)
+        event = Error{"Error in received message"};
     }
 }
 

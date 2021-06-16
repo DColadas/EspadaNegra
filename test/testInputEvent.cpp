@@ -51,18 +51,19 @@ TEST_CASE("Test deserialization of InputEvent", "[events]") {
         const auto j = R"({"type": "doesntExist", "nickname": "n1"})"_json;
         const Events::InputEvent event = j;
         try {
-            std::get<std::monostate>(event);
+            std::get<Events::Error>(event);
         } catch (const std::bad_variant_access& ex) {
-            FAIL("Invalid event not parsed to std::monostate");
+            FAIL("Invalid event not parsed to Error");
         }
     }
 
     SECTION("Missing key") {
         const auto j = R"({"type": "offer", "noknem": "n1"})"_json;
+        const Events::InputEvent event = j;
         try {
-            const Events::InputEvent event = j;
+            std::get<Events::Error>(event);
         } catch (const nlohmann::json::out_of_range& ex) {
-            SUCCEED("Invalid event threw");
+            FAIL("Invalid event not parsed to Error");
         }
     }
 }
