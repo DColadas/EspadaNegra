@@ -7,7 +7,9 @@
 
 class IOHandler;
 class MatchHandler;
-class JoinMatchRequest;
+namespace Events {
+    class JoinMatchRequest;
+}
 // Represents the shared server state
 class MatchManager {
    private:
@@ -27,5 +29,5 @@ class MatchManager {
 
     // Returns pointer to the Match where accepted
     // Returns nullptr if not accepted to the match
-    MatchHandler* joinMatch(IOHandler& client, const JoinMatchRequest& req);
+    MatchHandler* joinMatch(IOHandler& client, const Events::JoinMatchRequest& req);
 };

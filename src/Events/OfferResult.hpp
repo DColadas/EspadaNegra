@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "OfferRequest.hpp"
+#include "InputEvent.hpp"
 #include "PlayerResult.hpp"
 
 // PlayerResult broadcasted when a valid OfferRequest is received
@@ -23,7 +23,7 @@ class OfferResult final : public PlayerResult {
           gold(gold_) {}
 
     // Does not check if the OfferRequest is valid
-    explicit OfferResult(const OfferRequest& o)
+    explicit OfferResult(const Events::OfferRequest& o)
         : PlayerResult(Type::OfferResult, o.nickname),
           gold(o.gold) {}
 };

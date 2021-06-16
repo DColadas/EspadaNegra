@@ -5,6 +5,8 @@ add_library(Events
     Earn.hpp
     Error.hpp
     GetCard.hpp
+    InputEvent.cpp
+    InputEvent.hpp
     IsAuctioneer.hpp
     JoinMatchResult.hpp
     Leave.hpp
@@ -13,7 +15,6 @@ add_library(Events
     OutputEvent.hpp
     PassResult.hpp
     Pay.hpp
-    InputEvent.hpp
     PlayerResult.hpp
     SetGold.hpp
     Winner.hpp

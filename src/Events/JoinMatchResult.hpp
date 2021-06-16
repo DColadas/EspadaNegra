@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "JoinMatchRequest.hpp"
+#include "InputEvent.hpp"
 #include "PlayerResult.hpp"
 
 // PlayerResult broadcasted when a valid JoinMatchRequest is received
@@ -21,6 +21,6 @@ class JoinMatchResult final : public PlayerResult {
         : PlayerResult(Type::JoinMatchResult, nickname_) {}
 
     // Does not check if the JoinMatchRequest is valid
-    explicit JoinMatchResult(const JoinMatchRequest& o)
+    explicit JoinMatchResult(const Events::JoinMatchRequest& o)
         : PlayerResult(Type::JoinMatchResult, o.nickname) {}
 };

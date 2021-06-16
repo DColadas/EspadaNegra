@@ -21,5 +21,7 @@ add_library(Game
   Table.cpp
   Table.hpp
 )
+find_package(nlohmann_json CONFIG REQUIRED)
 
-target_link_libraries(Game PRIVATE Utils Logging)
+
+target_link_libraries(Game PRIVATE Utils Logging nlohmann_json::nlohmann_json)

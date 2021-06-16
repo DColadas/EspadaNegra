@@ -69,7 +69,7 @@ void MatchHandler::notifyPlayers(const std::shared_ptr<const OutputEvent>& event
     }
 }
 
-std::unique_ptr<const OutputEvent> MatchHandler::handleInputEvent(const InputEvent* action) {
+std::unique_ptr<const OutputEvent> MatchHandler::handleInputEvent(const Events::InputEvent& action) {
     auto event = match.handleInputEvent(action);
     // If the input was invalid, send the error to the client who sent it
     if (event->isError()) {

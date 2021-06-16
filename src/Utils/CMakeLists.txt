@@ -5,4 +5,5 @@ add_library(Utils
   Random.hpp
   Time.cpp
   Time.hpp
+  Visitor.hpp
 )

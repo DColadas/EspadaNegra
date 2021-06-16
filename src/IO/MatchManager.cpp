@@ -1,6 +1,6 @@
 #include "MatchManager.hpp"
 
-#include "Events/JoinMatchRequest.hpp"
+#include "Events/InputEvent.hpp"
 #include "Game/MatchHandler.hpp"
 #include "IOHandler.hpp"
 #include "Logging/Logger.hpp"
@@ -23,11 +23,7 @@ void MatchManager::send(const std::string& message) {
         handler->sendMessage(ss);
 }
 
-MatchHandler* MatchManager::joinMatch(IOHandler& client, const JoinMatchRequest& req) {
-    if (!req.isValid()) {
-        return nullptr;
-    }
-
+MatchHandler* MatchManager::joinMatch(IOHandler& client, const Events::JoinMatchRequest& req) {
     const auto& matchID = req.matchID;
     const auto& nickname = req.nickname;
     auto it = matches.find(matchID);

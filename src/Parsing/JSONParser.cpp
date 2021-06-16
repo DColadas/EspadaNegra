@@ -9,23 +9,18 @@
 #include <memory>
 #include <string>
 
-#include "Events/AttackRequest.hpp"
 #include "Events/AttackResult.hpp"
 #include "Events/Complex.hpp"
 #include "Events/Draw.hpp"
 #include "Events/Earn.hpp"
 #include "Events/Error.hpp"
 #include "Events/GetCard.hpp"
-#include "Events/InputEvent.hpp"
 #include "Events/IsAuctioneer.hpp"
-#include "Events/JoinMatchRequest.hpp"
 #include "Events/JoinMatchResult.hpp"
 #include "Events/Leave.hpp"
 #include "Events/MatchInfo.hpp"
-#include "Events/OfferRequest.hpp"
 #include "Events/OfferResult.hpp"
 #include "Events/OutputEvent.hpp"
-#include "Events/PassRequest.hpp"
 #include "Events/PassResult.hpp"
 #include "Events/Pay.hpp"
 #include "Events/SetGold.hpp"
@@ -37,16 +32,8 @@
 #include "Logging/Logger.hpp"
 #include "Utils/Time.hpp"
 
-using IT = InputEvent::Type;
 using OT = OutputEvent::Type;
 namespace {
-const std::map<std::string, IT> stringToType{
-    {"joinMatchRequest", IT::JoinMatchRequest},
-    {"attack", IT::AttackRequest},
-    {"offer", IT::OfferRequest},
-    {"pass", IT::PassRequest},
-};
-
 const std::map<OT, std::string> typeToString{
     {OT::JoinMatchResult, "joinMatch"},
     {OT::AttackResult, "attack"},
@@ -64,18 +51,6 @@ const std::map<OT, std::string> typeToString{
     {OT::SetGold, "setGold"},
     {OT::Complex, "complex"},
 };
-
-boost::property_tree::ptree parseJSON(const std::string& json) {
-    boost::iostreams::stream<boost::iostreams::array_source> stream(json.c_str(), json.size());
-
-    boost::property_tree::ptree pt;
-    try {
-        boost::property_tree::read_json(stream, pt);
-    } catch (const boost::property_tree::json_parser_error& e) {
-        LOG_DEBUG(e.what());
-    }
-    return pt;
-}
 
 std::string treeToString(const boost::property_tree::ptree& pt) {
     std::stringstream ss;
@@ -246,49 +221,6 @@ boost::property_tree::ptree outputEventToTree(const OutputEvent* event) {
 }
 
 }  // namespace
-
-//TODO implement as visitor pattern (maybe not?)
-//Cool C++17 way! https://www.youtube.com/watch?v=MdtYi0vvct0x
-std::unique_ptr<InputEvent> JSONParser::messageToInputEvent(Timestamp time,
-                                                            const std::string& nickname,
-                                                            const std::string& message) {
-    auto pt = parseJSON(message);
-    try {
-        const auto typeString = pt.get<std::string>("type");
-        const auto typeIter = stringToType.find(typeString);
-        // If the received type does not exist, set type as invalid
-        const auto type = (typeIter != stringToType.end()) ? typeIter->second : IT::Invalid;
-
-        switch (type) {
-            case IT::JoinMatchRequest: {
-                const auto matchID = pt.get<std::string>("matchID");
-                const auto jsonNickname = pt.get<std::string>("nickname");  //TODO change nickname for id of the handler
-
-                //if (!matchID.empty() && !nickname.empty()) {
-                return std::make_unique<JoinMatchRequest>(time, jsonNickname, matchID);
-                //}
-            } break;
-            case IT::AttackRequest:
-                return std::make_unique<AttackRequest>(time, nickname);
-                break;
-            case IT::PassRequest:
-                return std::make_unique<PassRequest>(time, nickname);
-                break;
-            case IT::OfferRequest: {
-                const auto gold = pt.get<int>("gold");
-                return std::make_unique<OfferRequest>(time, nickname, gold);
-            } break;
-            case IT::Invalid:
-                LOG_DEBUG("Invalid message: " + message);
-                break;
-            default:
-                LOG_PANIC("Not implemented: " + message);
-        }
-    } catch (const boost::property_tree::ptree_error& e) {
-        LOG_DEBUG(e.what());
-    }
-    return std::make_unique<InputEvent>();
-}
 
 std::unique_ptr<const std::string> JSONParser::outputEventToMessage(const OutputEvent* event) {
     LOG_PANIC_IF(!event, "nullptr received");

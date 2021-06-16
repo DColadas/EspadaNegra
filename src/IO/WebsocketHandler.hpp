@@ -12,8 +12,10 @@
 #include "Utils/Time.hpp"
 
 class WebsocketSession;
-class JoinMatchRequest;
 class OutputEvent;
+namespace Events {
+    class JoinMatchRequest;
+}
 class WebsocketHandler : public IOHandler, public std::enable_shared_from_this<WebsocketHandler> {
    private:
     MatchHandler* currentMatch = nullptr;  //int for debug, should be Match*
@@ -27,7 +29,7 @@ class WebsocketHandler : public IOHandler, public std::enable_shared_from_this<W
     //bool messageListening = false;
     //Message latestMessage;
 
-    void joinMatch(const JoinMatchRequest& req);
+    void joinMatch(const Events::JoinMatchRequest& req);
 
    public:
     WebsocketHandler(const std::shared_ptr<MatchManager>& matches);

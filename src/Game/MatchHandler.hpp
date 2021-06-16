@@ -3,11 +3,11 @@
 #include <map>
 #include <string>
 
+#include "Events/InputEvent.hpp"
 #include "Events/MatchInfo.hpp"
 #include "Match.hpp"
 
 class IOHandler;
-class InputEvent;
 class OutputEvent;
 class MatchHandler {
    private:
@@ -45,10 +45,10 @@ class MatchHandler {
     // Notifies the players of the game state changes
     void start();
 
-    // Receive a InputEvent from a client
+    // Receive an input event from a client
     // If there is a valid state update, returns nullptr
-    // If the InputEvent is invalid, returns a pointer with Error
-    std::unique_ptr<const OutputEvent> handleInputEvent(const InputEvent* action);
+    // If the input event is invalid, returns a pointer with Error
+    std::unique_ptr<const OutputEvent> handleInputEvent(const Events::InputEvent& action);
 
     // True if the match is running
     bool isRunning() const;

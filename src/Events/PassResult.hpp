@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "PassRequest.hpp"
+#include "InputEvent.hpp"
 #include "PlayerResult.hpp"
 
 // PlayerResult broadcasted when a valid PassRequest is received
@@ -18,6 +18,6 @@ class PassResult final : public PlayerResult {
         : PlayerResult(Type::PassResult, nickname_) {}
 
     // Does not check if the PassRequest is valid
-    explicit PassResult(const PassRequest& o)
+    explicit PassResult(const Events::PassRequest& o)
         : PlayerResult(Type::PassResult, o.nickname) {}
 };

@@ -83,9 +83,9 @@ class Match {
     // Returns OutputEvent with the game state changes during the start
     std::unique_ptr<const OutputEvent> start();
 
-    // Process InputEvent and return OutputEvent with update of the Match's state
+    // Process the input event and return OutputEvent with update of the Match's state
     // Returns Error if there is no valid update in the state
-    std::unique_ptr<const OutputEvent> handleInputEvent(const InputEvent* action);
+    std::unique_ptr<const OutputEvent> handleInputEvent(const Events::InputEvent& action);
 
     // Methods for each Phase in the game
     void onGameStartPhase();

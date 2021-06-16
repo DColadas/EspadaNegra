@@ -1,9 +1,9 @@
 #include "WebsocketHandler.hpp"
 
 #include "Events/InputEvent.hpp"
-#include "Events/JoinMatchRequest.hpp"
 #include "Logging/Logger.hpp"
 #include "Parsing/JSONParser.hpp"
+#include "Utils/Visitor.hpp"
 #include "WebsocketSession.hpp"
 
 WebsocketHandler::WebsocketHandler(const std::shared_ptr<MatchManager>& matches_)
@@ -39,7 +39,7 @@ void WebsocketHandler::leave() {
     matches->leave(*this);
 }
 
-void WebsocketHandler::joinMatch(const JoinMatchRequest& req) {
+void WebsocketHandler::joinMatch(const Events::JoinMatchRequest& req) {
     if (currentMatch) {
         LOG_DEBUG(nickname + " already was in match");
         return;
@@ -64,35 +64,37 @@ void WebsocketHandler::setSession(WebsocketSession* session) {
 }
 
 void WebsocketHandler::dispatchMessage(const std::string& message) {
-    using ET = InputEvent::Type;
-    const auto now = std::chrono::system_clock::now();
-    auto event = JSONParser::messageToInputEvent(now, nickname, message);
+    auto event = Events::toInputEvent(nickname, message);
     // TODO nickname check disable until a login action is implemented
     if (/*!nickname.empty() && */ !currentMatch) {
         // Not in match
-        switch (event->getType()) {
-            case ET::JoinMatchRequest:
-                LOG_TRACE("JoinMatchRequest received");
-                joinMatch(*static_cast<JoinMatchRequest*>(event.get()));
-                break;
-            default:
-                LOG_ERROR("Event not implemented when not in match");
-        }
+        std::visit(
+            visitor{
+                [&](const Events::JoinMatchRequest& jmr) {
+                    LOG_TRACE("JoinMatchRequest received");
+                    joinMatch(jmr);
+                },
+                [&](const auto& /**/) {
+                    LOG_ERROR("Event not implemented when not in match");
+                },
+            },
+            event);
     } else {
         // In match
-        switch (event->getType()) {
-            case ET::AttackRequest:
-            case ET::PassRequest:
-            case ET::OfferRequest: {
-                LOG_TRACE("User " + nickname + ": valid InputEvent received");
-                auto response = currentMatch->handleInputEvent(event.get());
-                // There is a specific message for this client (an Error)
-                if (response) {
-                    sendEvent(std::move(response));
-                }
-            } break;
-            default:
-                LOG_ERROR("Event not implemented when in match");
-        }
+        std::visit(
+            visitor{
+                [&](const Events::InMatchInputEvent& ime) {
+                    LOG_TRACE("User " + ime.nickname + ": valid InputEvent received");
+                    auto response = currentMatch->handleInputEvent(event);
+                    // There is a specific message for this client (an Error)
+                    if (response) {
+                        sendEvent(std::move(response));
+                    }
+                },
+                [&](const auto& /**/) {
+                    LOG_ERROR("Event not implemented when in match");
+                },
+            },
+            event);
     }
 }

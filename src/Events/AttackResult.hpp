@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "AttackRequest.hpp"
+#include "InputEvent.hpp"
 #include "PlayerResult.hpp"
 
 // PlayerResult broadcasted when a valid AttackRequest is received
@@ -18,6 +18,6 @@ class AttackResult final : public PlayerResult {
         : PlayerResult(Type::AttackResult, nickname_) {}
 
     // Does not check if the AttackRequest is valid
-    explicit AttackResult(const AttackRequest& o)
+    explicit AttackResult(const Events::AttackRequest& o)
         : PlayerResult(Type::AttackResult, o.nickname) {}
 };
