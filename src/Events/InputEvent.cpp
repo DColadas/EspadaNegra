@@ -34,14 +34,13 @@ void from_json(const nlohmann::json& j, InputEvent& event) {
                 .matchID = j.at("matchID")};
             break;
         case OfferRequest_:
-            event = OfferRequest{{.nickname = {}},
-                                 j.at("gold")};
+            event = OfferRequest{{}, {.nickname = {}}, j.at("gold")};
             break;
         case PassRequest_:
-            event = PassRequest{{}};
+            event = PassRequest{};
             break;
         case AttackRequest_:
-            event = AttackRequest{{}};
+            event = AttackRequest{};
             break;
         case Invalid:
             event = {};
@@ -56,7 +55,7 @@ void from_json(const nlohmann::json& j, InputEvent& event) {
 
     // Assign nickname
     std::visit(visitor{
-                   [&](InMatchInputEvent& ime) { ime.nickname = nickname; },
+                   [&](PlayerEvent& ime) { ime.nickname = nickname; },
                    [&](const auto& /* do nothing */) {},
                },
                e);

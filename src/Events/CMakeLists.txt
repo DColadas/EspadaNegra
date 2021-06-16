@@ -1,5 +1,6 @@
 add_library(Events
     AttackResult.hpp
+    Common.hpp
     Complex.hpp
     Draw.hpp
     Earn.hpp

@@ -83,7 +83,7 @@ void WebsocketHandler::dispatchMessage(const std::string& message) {
         // In match
         std::visit(
             visitor{
-                [&](const Events::InMatchInputEvent& ime) {
+                [&](const Events::PlayerEvent& ime) {
                     LOG_TRACE("User " + ime.nickname + ": valid InputEvent received");
                     auto response = currentMatch->handleInputEvent(event);
                     // There is a specific message for this client (an Error)
