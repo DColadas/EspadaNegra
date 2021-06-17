@@ -3,4 +3,7 @@ add_library(Logging
   Logger.hpp
 )
 
-target_link_libraries(Logging PRIVATE Utils)
+target_link_libraries(Logging
+  PRIVATE
+  Utils
+)

@@ -5,26 +5,26 @@
 #include <optional>
 #include <vector>
 
-#include "Card.hpp"
-#include "Deck.hpp"
+#include "Model/Card.hpp"
+#include "Model/Deck.hpp"
 #include "Events/InputEvent.hpp"
 #include "Events/OutputEvent.hpp"
-#include "MatchConfig.hpp"
+#include "Model/MatchConfig.hpp"
 #include "Phase.hpp"
 #include "PhaseHandler.hpp"
-#include "Player.hpp"
+#include "Model/Player.hpp"
 #include "Table.hpp"
 
 class Match {
    private:
     // Contains updates caused by an InputEvent
     // After processing the InputEvent, ${updateEvent} gets sent to the clients
-    std::unique_ptr<OutputEvent> updateEvent = nullptr;
+    Events::OutputEvent updateEvent{};
     int currentAttack = 0;  // Max attack used for the current card
     int currentOffer = 0;   // Max gold offered for the current card
 
-    // Adds ${event} to th current &{updateEvent}
-    void addEvent(std::unique_ptr<OutputEvent> event);
+    // Adds ${event} to the current &{updateEvent}
+    void addEvent(const Events::OutputEvent& event);
 
     // Sets &{updateEvent} to an error state
     void setError(const std::string& message);
@@ -33,13 +33,13 @@ class Match {
     unsigned int getPlayerIndex(const std::string& nickname) const;
 
     // Applies ${func} to every player
-    void applyToPlayers(std::function<void(Player&)> func);
+    void applyToPlayers(std::function<void(Model::Player&)> func);
 
     // Sets every auction winner to tying
-    void setNewAuctionTie(Player& newTying);
+    void setNewAuctionTie(Model::Player& newTying);
 
     // Sets every auction winner or in tie to not winner or tiying
-    void setNewAuctionWinner(Player& auctionWinner);
+    void setNewAuctionWinner(Model::Player& auctionWinner);
 
     // Change the ${currentAuctioneer} index
     void nextAuctioneer();
@@ -64,14 +64,14 @@ class Match {
     Phase currentPhase = Phase::WaitForStart;
     PhaseHandler phaseHandler = PhaseHandler(*this);
     Table table{};
-    MatchConfig config;
-    Deck deck;
-    std::vector<Player> players{};
+    Model::MatchConfig config;
+    Model::Deck deck;
+    std::vector<Model::Player> players{};
     int currentAuctioneer = -1;  // index in ${players}
     int currentPlayer = -1;      // index in ${players}
 
     //TODO consider making private and using a factory
-    Match(const MatchConfig& config, const Deck& deck);
+    Match(const Model::MatchConfig& config, const Model::Deck& deck);
 
     // Add a new player to the match
     void addPlayer(const std::string& name);
@@ -81,11 +81,11 @@ class Match {
 
     // Start the game
     // Returns OutputEvent with the game state changes during the start
-    std::unique_ptr<const OutputEvent> start();
+    Events::OutputEvent start();
 
     // Process the input event and return OutputEvent with update of the Match's state
     // Returns Error if there is no valid update in the state
-    std::unique_ptr<const OutputEvent> handleInputEvent(const Events::InputEvent& action);
+    Events::OutputEvent handleInputEvent(const Events::InputEvent& action);
 
     // Methods for each Phase in the game
     void onGameStartPhase();

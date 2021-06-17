@@ -22,8 +22,11 @@ target_link_libraries(IO
   PRIVATE 
   ${Boost_LIBRARIES} 
   Threads::Threads 
-  Events 
   Game 
   Logging
-  Parsing
+)
+
+target_link_libraries(IO 
+  PUBLIC 
+  Events 
 )

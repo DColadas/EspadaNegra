@@ -10,9 +10,9 @@
 #include "IOHandler.hpp"
 #include "MatchManager.hpp"
 #include "Utils/Time.hpp"
+#include "Events/OutputEvent.hpp"
 
 class WebsocketSession;
-class OutputEvent;
 namespace Events {
     class JoinMatchRequest;
 }
@@ -35,7 +35,7 @@ class WebsocketHandler : public IOHandler, public std::enable_shared_from_this<W
     WebsocketHandler(const std::shared_ptr<MatchManager>& matches);
     WebsocketHandler(const std::shared_ptr<MatchManager>& matches,
                      tcp::socket socket);
-    void sendEvent(const std::shared_ptr<const OutputEvent>& event) override;
+    void sendEvent(const std::shared_ptr<const Events::OutputEvent>& event) override;
     void receiveMessage(const std::string& message) override;
     void sendMessage(const std::shared_ptr<const std::string>& ss) override;
     void setSession(WebsocketSession* session);

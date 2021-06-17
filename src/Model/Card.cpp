@@ -1,6 +1,10 @@
 #include "Card.hpp"
 
+#include <nlohmann/json.hpp>
+
 #include "Logging/Logger.hpp"
+
+namespace Model {
 
 std::map<int, Card> Card::cards;
 
@@ -57,3 +61,16 @@ bool Card::operator==(const Card& rhs) const {
 bool Card::operator!=(const Card& rhs) const {
     return !(*this == rhs);
 }
+
+void to_json(nlohmann::json& j, const Card& card) {
+    j = nlohmann::json{
+        {"id", card.id},
+        {"name", card.getName()},
+        {"attack", card.getAttack()},
+        {"production", card.getProduction()},
+        {"victory", card.getVictory()},
+        {"isBerserk", card.isBerserk()},
+    };
+}
+
+}  // namespace Model

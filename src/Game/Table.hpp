@@ -3,21 +3,21 @@
 #include <deque>
 #include <vector>
 
-#include "Card.hpp"
+#include "Model/Card.hpp"
 
 class Table {
    private:
-    std::deque<Card> cardsInAuction{};
-    std::vector<Card> discarded{};
+    std::deque<Model::Card> cardsInAuction{};
+    std::vector<Model::Card> discarded{};
 
    public:
     Table() = default;
 
     // Adds a new card to the auction
-    void add(Card card);
+    void add(Model::Card card);
 
     // Draw the current card from the table
-    Card pop();
+    Model::Card pop();
 
     // True if no cards are left to auction on the table
     bool isEmpty() const;
@@ -26,5 +26,5 @@ class Table {
     void discard();
 
     // Returns a vector with a view of the current cards
-    std::vector<Card> getCards() const;
+    std::vector<Model::Card> getCards() const;
 };

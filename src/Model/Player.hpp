@@ -1,9 +1,12 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
 #include "Card.hpp"
+
+namespace Model {
 
 class Player {
    private:
@@ -72,3 +75,7 @@ class Player {
     bool operator==(const Player&) const;
     bool operator!=(const Player&) const;
 };
+
+void to_json(nlohmann::json&, const Player&);
+
+}  // namespace Model

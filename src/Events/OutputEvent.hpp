@@ -1,69 +1,172 @@
 #pragma once
 
-#include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
+#include <variant>
+#include <vector>
 
-// Event generated as a result of an OutputEvent (update on game state)
-class OutputEvent {
-   public:
-    // To allow fast dispatch and parsing of events, Type contains a value
-    // for every final OutputEvent subclass
-    enum class Type {
-        Error,
-        Draw,
-        MatchInfo,
-        GetCard,
-        Winner,
-        Pay,
-        Earn,
-        JoinMatchResult,
-        PassResult,
-        AttackResult,
-        OfferResult,
-        IsAuctioneer,
-        Leave,
-        SetGold,
-        Complex,
-    };
+#include "Events/Common.hpp"
+#include "Events/InputEvent.hpp"
+#include "Model/Card.hpp"
+#include "Model/Deck.hpp"
+#include "Model/MatchConfig.hpp"
+#include "Model/Player.hpp"
 
-   protected:
-    Type type;
+namespace Events {
 
-    OutputEvent(Type type_)
-        : type(type_) {}
+// PlayerEvent broadcasted when a valid AttackRequest is received.
+struct AttackResult : public PlayerEvent {
+    explicit AttackResult(const std::string& nickname_)
+        : PlayerEvent{nickname_} {};
 
-    OutputEvent(const OutputEvent&) = default;
-    OutputEvent& operator=(const OutputEvent&) = default;
-    OutputEvent(OutputEvent&&) = default;
-    OutputEvent& operator=(OutputEvent&&) = default;
+    explicit AttackResult(const AttackRequest& o)
+        : PlayerEvent{o.nickname} {}
+};
 
-    virtual bool isEqual(const OutputEvent&) const {
-        // Although there are no attributes, this isEqual should still be called in
-        // derived isEqual, in case attributes (like timestamp) are added.
-        // Therefore, this is not a pure virtual function
-        return true;
-    }
+// Composite OutputEvent, formed by many others
+struct Complex;
 
-   public:
-    virtual ~OutputEvent() = default;
+// Event that informs about a new card in the auction.
+struct Draw {
+    Model::Card card;
+};
 
-    // True if the OutputEvent is an error (only information for the sending
-    // client, not a game state update)
-    constexpr bool isError() const {
-        return type == Type::Error;
-    }
+// PlayerEvent representing an amount of gold earned (for end of turn).
+struct Earn : public PlayerEvent {
+    int gold;
+};
 
-    // Returns the type of the current OutputEvent (makes it read-only)
-    constexpr Type getType() const {
-        return type;
-    }
+// PlayerEvent defining which player obtained the current auctioned card.
+struct GetCard : public PlayerEvent {};
 
-    inline friend bool operator==(const OutputEvent& lhs, const OutputEvent& rhs) {
-        return lhs.type == rhs.type &&
-               lhs.isEqual(rhs);
-    }
+// PlayerEvent informing about who is the current auctioneer.
+struct IsAuctioneer : public PlayerEvent {};
 
-    inline friend bool operator!=(const OutputEvent& lhs, const OutputEvent& rhs) {
-        return !(lhs == rhs);
+// PlayerEvent broadcasted when a valid JoinMatchRequest is received.
+struct JoinMatchResult : public PlayerEvent {
+    explicit JoinMatchResult(const std::string& nickname_)
+        : PlayerEvent{nickname_} {}
+
+    explicit JoinMatchResult(const JoinMatchRequest& o)
+        : PlayerEvent{o.nickname} {}
+};
+
+// PlayerEvent sent when a client leaves the Match.
+struct Leave : public PlayerEvent {
+    std::string reason;
+};
+
+// Event sent to every player who just joined the match.
+struct MatchInfo {
+    // TODO keep an eye on this: huge size!
+    // I think const& wouldn't work ($deck may change before it's parsed).
+    Model::MatchConfig config;
+    std::vector<Model::Player> players;
+    Model::Deck deck;
+};
+
+// PlayerEvent broadcasted when a valid OfferRequest is received.
+struct OfferResult : public PlayerEvent {
+    int gold;
+
+    explicit OfferResult(const OfferRequest& o)
+        : PlayerEvent{o.nickname}, gold{o.gold} {}
+};
+
+// PlayerEvent broadcasted when a valid PassRequest is received.
+struct PassResult : public PlayerEvent {
+    explicit PassResult(const PassRequest& o)
+        : PlayerEvent{o.nickname} {}
+};
+
+// PlayerEvent representing the amount of gold paid for the current card.
+struct Pay : public PlayerEvent {
+    int gold;
+};
+
+// PlayerEvent that sets a player's gold to a fixed amount.
+struct SetGold : public PlayerEvent {
+    int gold;
+};
+
+// PlayerEvent defining the player who won the match.
+struct Winner : public PlayerEvent {};
+
+// Event sent to the players to inform about the state of the Match.
+using OutputEvent = std::variant<
+    std::monostate,
+    Error,
+    AttackResult,
+    Complex,
+    Draw,
+    Earn,
+    GetCard,
+    IsAuctioneer,
+    JoinMatchResult,
+    Leave,
+    MatchInfo,
+    OfferResult,
+    PassResult,
+    Pay,
+    SetGold,
+    Winner>;
+
+// Definition of Complex (above).
+struct Complex {
+    std::vector<OutputEvent> events;
+
+    Complex& operator+=(const OutputEvent& rhs) {
+        events.push_back(rhs);
+        return *this;
     }
 };
+
+// Here comes a clusterduck of boilerplate! Could be improved with templates.
+void to_json(nlohmann::json& j, const AttackResult& event);
+void to_json(nlohmann::json& j, const Complex& event);
+void to_json(nlohmann::json& j, const Draw& event);
+void to_json(nlohmann::json& j, const Earn& event);
+void to_json(nlohmann::json& j, const Error& event);
+void to_json(nlohmann::json& j, const GetCard& event);
+void to_json(nlohmann::json& j, const IsAuctioneer& event);
+void to_json(nlohmann::json& j, const JoinMatchResult& event);
+void to_json(nlohmann::json& j, const Leave& event);
+void to_json(nlohmann::json& j, const MatchInfo& event);
+void to_json(nlohmann::json& j, const OfferResult& event);
+void to_json(nlohmann::json& j, const PassResult& event);
+void to_json(nlohmann::json& j, const Pay& event);
+void to_json(nlohmann::json& j, const SetGold& event);
+void to_json(nlohmann::json& j, const Winner& event);
+void to_json(nlohmann::json& j, const OutputEvent& event);
+
+// Returns $event in JSON.
+// Output messages:
+//  {"type": "joinMatch", "nickname": "XXX"}
+//  {"type": "attack", "nickname": "XXX"}
+//  {"type": "offer", "nickname": "XXX", "gold": int}
+//  {"type": "pass", "nickname": "XXX"}
+//  {"type": "error", "message": "XXX"}
+//  {"type": "pay", "nickname": "XXX", "gold": int}
+//  {"type": "earn", "nickname": "XXX", "gold": int}
+//  {"type": "winner", "nickname": "XXX"}
+//  {"type": "getCard", "nickname": "XXX"}
+//  {"type": "isAuctioneer", "nickname": "XXX"}
+//  {"type": "leave", "nickname": "XXX", "reason": "XXX"}
+//  {"type": "setGold", "nickname": "XXX", "gold": int}
+//  {"type": "matchInfo", "deck": Deck, "players": [Player], "matchConfig": MatchConfig}
+//  {"type": "draw", "card": Card}
+//  {"type": "complex", "events": [Event]}
+// where:
+//  Card: {"id": int,
+//         "name": "XXX",
+//         "attack": int,
+//         "production": int,
+//         "victory": int,
+//         "isBerserk": bool}
+//  Deck: {"cards": [Card]}
+//  Player: {"nickname": "XXX"}
+//  MatchConfig: {"numPlayers": int}
+//  Event: any other event object
+[[nodiscard]] std::string toMessage(const OutputEvent& event);
+
+}  // namespace Events

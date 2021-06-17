@@ -5,6 +5,8 @@
 
 #include "Logging/Logger.hpp"
 
+namespace Model {
+
 Player::Player(const std::string& name_)
     : name(std::move(name_)) {
 }
@@ -127,3 +129,9 @@ bool Player::operator==(const Player& rhs) const {
 bool Player::operator!=(const Player& rhs) const {
     return !(*this == rhs);
 }
+
+void to_json(nlohmann::json& j, const Player& player) {
+    j = nlohmann::json{{"nickname", player.name}};
+}
+
+}  // namespace Model

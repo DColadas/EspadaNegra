@@ -1,9 +1,13 @@
 #include "MatchManager.hpp"
 
+#include <variant>
+
 #include "Events/InputEvent.hpp"
+#include "Events/OutputEvent.hpp"
 #include "Game/MatchHandler.hpp"
 #include "IOHandler.hpp"
 #include "Logging/Logger.hpp"
+#include "Utils/Visitor.hpp"
 
 MatchManager::MatchManager() {
 }
@@ -38,18 +42,23 @@ MatchHandler* MatchManager::joinMatch(IOHandler& client, const Events::JoinMatch
     }
     const auto& match = it->second;  // Alias
     auto response = match->addPlayer(&client, nickname);
-    if (response->isError()) {
-        // Couldn't join the match (notify the error)
-        LOG_DEBUG("Couldn't join " + matchID + " by " + nickname + " (full or existing username)");
-        client.sendEvent(std::move(response));
-        return nullptr;
-    }
-    client.sendEvent(std::move(response));  // Send MatchInfo
-    LOG_DEBUG(nickname + " joins " + it->first + ", players " + std::to_string(match->getPlayerCount()));
-    if (match->isFull()) {
-        // If the match became full after joining, start it!
-        LOG_INFO("Start match " + matchID);
-        match->start();
-    }
-    return match.get();
+    return std::visit(visitor{
+                          [&](const Events::Error& /**/) -> MatchHandler* {
+                              // Couldn't join the match (notify the error)
+                              LOG_DEBUG("Couldn't join " + matchID + " by " + nickname + " (full or existing username)");
+                              client.sendEvent(std::make_shared<const Events::OutputEvent>(std::move(response)));
+                              return nullptr;
+                          },
+                          [&](const auto& /**/) -> MatchHandler* {
+                              client.sendEvent(std::make_shared<const Events::OutputEvent>(std::move(response)));  // Send MatchInfo
+                              LOG_DEBUG(nickname + " joins " + it->first + ", players " + std::to_string(match->getPlayerCount()));
+                              if (match->isFull()) {
+                                  // If the match became full after joining, start it!
+                                  LOG_INFO("Start match " + matchID);
+                                  match->start();
+                              }
+                              return match.get();
+                          },
+                      },
+                      response);
 }

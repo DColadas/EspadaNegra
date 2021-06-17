@@ -2,6 +2,8 @@
 
 #include "GameParameter.hpp"
 
+namespace Model {
+
 class GameModifier {
    public:
     GameParameter parameter;
@@ -12,3 +14,5 @@ class GameModifier {
     GameModifier(GameParameter parameter_, int value_) : parameter(parameter_),
                                                          value(value_){};
 };
+
+}  // namespace Model

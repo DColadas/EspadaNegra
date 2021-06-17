@@ -2,9 +2,9 @@
 #include <numeric>
 #include <vector>
 
-#include "Game/Card.hpp"
-#include "Game/CardModel.hpp"
-#include "Game/Deck.hpp"
+#include "Model/Card.hpp"
+#include "Model/CardModel.hpp"
+#include "Model/Deck.hpp"
 #include "IO/Server.hpp"
 #include "Logging/Logger.hpp"
 
@@ -21,13 +21,13 @@ int main(int argc, char** argv) {
 
     // Initialise the CardModel database
     // TODO move this to an actual database or file
-    CardModel::add(1, "Inquisidor", 1, 0, 1, false);
-    CardModel::add(2, "Campo", 2, 0, 1, false);
-    CardModel::add(3, "Guerrero", 2, 1, 0, false);
-    CardModel::add(4, "Caballero", 3, 0, 0, false);
-    CardModel::add(5, "Ciudad", 0, 4, 0, false);
-    CardModel::add(6, "Campesino", 0, 1, 2, false);
-    CardModel::add(7, "Rey", 0, 0, 5, false);
+    Model::CardModel::add(1, "Inquisidor", 1, 0, 1, false);
+    Model::CardModel::add(2, "Campo", 2, 0, 1, false);
+    Model::CardModel::add(3, "Guerrero", 2, 1, 0, false);
+    Model::CardModel::add(4, "Caballero", 3, 0, 0, false);
+    Model::CardModel::add(5, "Ciudad", 0, 4, 0, false);
+    Model::CardModel::add(6, "Campesino", 0, 1, 2, false);
+    Model::CardModel::add(7, "Rey", 0, 0, 5, false);
 
     // Initialise Card database
     std::map<int, int> cards{
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
     int cardId = 1;
     for (const auto& c : cards) {
         for (int i = 0; i < c.second; ++i) {
-            Card::add(cardId, {}, c.first);
+            Model::Card::add(cardId, {}, c.first);
             ++cardId;
         }
     }
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     // Initialise Deck database
     std::vector<int> deck1(48);  // 48 is the amount of cards
     std::iota(deck1.begin(), deck1.end(), 1);
-    Deck::add(1, std::move(deck1));
+    Model::Deck::add(1, std::move(deck1));
 
     auto address = argv[1];
     auto port = static_cast<unsigned short>(std::atoi(argv[2]));

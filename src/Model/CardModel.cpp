@@ -2,6 +2,8 @@
 
 #include "Logging/Logger.hpp"
 
+namespace Model {
+
 std::map<int, CardModel> CardModel::models;
 
 CardModel::CardModel(const std::string& name_,
@@ -35,3 +37,5 @@ const CardModel* CardModel::getById(int id) {
     // still a -Wreturn-type warning (so the return 0; is necessary)
     return nullptr;
 }
+
+}  // namespace Model

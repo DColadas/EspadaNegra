@@ -1,5 +1,7 @@
 #include "MatchConfig.hpp"
 
+namespace Model {
+
 MatchConfig::MatchConfig(unsigned int numPlayers_)
     : numPlayers(numPlayers_) {
     //TODO
@@ -20,3 +22,9 @@ bool MatchConfig::operator==(const MatchConfig& rhs) const {
 bool MatchConfig::operator!=(const MatchConfig& rhs) const {
     return !(*this == rhs);
 }
+
+void to_json(nlohmann::json& j, const MatchConfig& config) {
+    j = {{"numPlayers", config.numPlayers}};
+}
+
+}  // namespace Model

@@ -1,55 +1,44 @@
 #include "Match.hpp"
 
 #include <algorithm>
+#include <variant>
 
 #include "Events/InputEvent.hpp"
-#include "Events/OfferResult.hpp"
-#include "Events/PassResult.hpp"
-#include "Events/AttackResult.hpp"
-#include "Events/Complex.hpp"
-#include "Events/Draw.hpp"
-#include "Events/Earn.hpp"
-#include "Events/Error.hpp"
-#include "Events/GetCard.hpp"
-#include "Events/IsAuctioneer.hpp"
-#include "Events/Pay.hpp"
-#include "Events/SetGold.hpp"
-#include "Events/Winner.hpp"
+#include "Events/OutputEvent.hpp"
 #include "Logging/Logger.hpp"
 #include "Utils/Random.hpp"
 #include "Utils/Visitor.hpp"
 
-using OT = OutputEvent::Type;
-
-Match::Match(const MatchConfig& config_, const Deck& deck_)
+Match::Match(const Model::MatchConfig& config_, const Model::Deck& deck_)
     : config(std::move(config_)), deck(std::move(deck_)) {
 }
 
-void Match::addEvent(std::unique_ptr<OutputEvent> event) {
-    if (!updateEvent) {
-        // No event: just move the new one
-        updateEvent = std::move(event);
-    } else if (updateEvent->getType() != OT::Complex) {
-        // There was a simple event: create a complex one and add both to it
-        auto complex = std::make_unique<Complex>();
-        complex->add(std::move(updateEvent));
-        complex->add(std::move(event));
-        updateEvent = std::move(complex);
-    } else {
-        // The event is already Complex: just add the new one
-        auto c = static_cast<Complex*>(updateEvent.get());
-        c->add(std::move(event));
-    }
+void Match::addEvent(const Events::OutputEvent& event) {
+    std::visit(visitor{
+                   [&](std::monostate& /**/) {
+                       // No event
+                        updateEvent = event;
+                   },
+                   [&](Events::Complex& c) {
+                       // updateEvent is Complex: add the new Event
+                       c += event;
+                   },
+                   [&](const auto& /**/) {
+                       // updateEvent is not Complex
+                       updateEvent = Events::Complex{{updateEvent, event}};
+                   },
+               },
+               updateEvent);
 }
 
 void Match::setError(const std::string& message) {
     // If the InputEvent is invalid, there is no other game state update
     // Therefore, delete the old update
-    updateEvent = std::make_unique<Error>(message);
+    updateEvent = Events::Error{message};
 }
 
 unsigned int Match::getPlayerIndex(const std::string& nickname) const {
-    const auto it = std::find_if(players.begin(), players.end(), [nickname](const Player& p) {
+    const auto it = std::find_if(players.begin(), players.end(), [nickname](const Model::Player& p) {
         return p.name == nickname;
     });
     const unsigned int index = static_cast<unsigned int>(std::distance(players.begin(), it));
@@ -62,12 +51,12 @@ unsigned int Match::getPlayerIndex(const std::string& nickname) const {
     return 0;
 }
 
-void Match::applyToPlayers(std::function<void(Player&)> func) {
+void Match::applyToPlayers(std::function<void(Model::Player&)> func) {
     std::for_each(players.begin(), players.end(), func);
 }
 
-void Match::setNewAuctionTie(Player& newTying) {
-    applyToPlayers([](Player& p) {
+void Match::setNewAuctionTie(Model::Player& newTying) {
+    applyToPlayers([](Model::Player& p) {
         if (p.isAuctionWinner()) {
             p.setInAuctionTie();
         }
@@ -75,8 +64,8 @@ void Match::setNewAuctionTie(Player& newTying) {
     newTying.setInAuctionTie();
 }
 
-void Match::setNewAuctionWinner(Player& auctionWinner) {
-    applyToPlayers([](Player& p) {
+void Match::setNewAuctionWinner(Model::Player& auctionWinner) {
+    applyToPlayers([](Model::Player& p) {
         if (p.isAuctionWinner() || p.isInAuctionTie()) {
             p.resetAuctionState();
         }
@@ -91,18 +80,18 @@ void Match::nextAuctioneer() {
     }
     currentPlayer = currentAuctioneer;
     const auto& name = players[static_cast<std::size_t>(currentAuctioneer)].name;
-    addEvent(std::make_unique<IsAuctioneer>(name));
+    addEvent(Events::IsAuctioneer{name});
     LOG_TRACE(name + " is the auctioneer");
 }
 
 bool Match::arePossibleAttacks(int amount) const {
-    return std::any_of(players.begin(), players.end(), [amount](const Player& p) {
+    return std::any_of(players.begin(), players.end(), [amount](const Model::Player& p) {
         return p.canAttack(amount);
     });
 }
 
 bool Match::arePossibleOffers(int amount) const {
-    return std::any_of(players.begin(), players.end(), [amount](const Player& p) {
+    return std::any_of(players.begin(), players.end(), [amount](const Model::Player& p) {
         return p.canOffer(amount);
     });
 }
@@ -117,7 +106,7 @@ bool Match::isThereWinner() const {
 }
 
 std::optional<unsigned int> Match::getCurrentWinner() const {
-    const auto it = std::find_if(players.begin(), players.end(), [](const Player& p) {
+    const auto it = std::find_if(players.begin(), players.end(), [](const Model::Player& p) {
         return p.isAuctionWinner();
     });
     const unsigned int index = static_cast<unsigned int>(std::distance(players.begin(), it));
@@ -133,7 +122,7 @@ void Match::addPlayer(const std::string& name) {
 
 void Match::removePlayer(const std::string& nickname) {
     //TODO adjust indexes of current auctioneer, player...
-    auto p = std::find_if(players.begin(), players.end(), [&nickname](const Player& a) {
+    auto p = std::find_if(players.begin(), players.end(), [&nickname](const Model::Player& a) {
         return a.name == nickname;
     });
     if (p != players.end()) {
@@ -143,17 +132,17 @@ void Match::removePlayer(const std::string& nickname) {
     }
 }
 
-std::unique_ptr<const OutputEvent> Match::start() {
+Events::OutputEvent Match::start() {
     currentPhase = Phase::GameStart;
     processPhase();
     return std::move(updateEvent);
 }
 
-std::unique_ptr<const OutputEvent> Match::handleInputEvent(const Events::InputEvent& action) {
-    updateEvent = nullptr;
+Events::OutputEvent Match::handleInputEvent(const Events::InputEvent& action) {
+    updateEvent = std::monostate{};
     std::visit(visitor{
                    [&](const Events::AttackRequest& attack) {
-                       Player& p = players[getPlayerIndex(attack.nickname)];
+                       Model::Player& p = players[getPlayerIndex(attack.nickname)];
 
                        // Only valid on Attack phase
                        if (currentPhase != Phase::Attack) {
@@ -174,7 +163,7 @@ std::unique_ptr<const OutputEvent> Match::handleInputEvent(const Events::InputEv
                                setNewAuctionTie(p);
                                LOG_TRACE(p.name + " attacks, sets tie");
                            }
-                           addEvent(std::make_unique<AttackResult>(attack));
+                           addEvent(Events::AttackResult{attack});
                        } else {
                            const auto message = "Invalid Attack (" + p.name + ")";
                            setError(message);
@@ -182,7 +171,7 @@ std::unique_ptr<const OutputEvent> Match::handleInputEvent(const Events::InputEv
                        }
                    },
                    [&](const Events::OfferRequest& offer) {
-                       Player& p = players[getPlayerIndex(offer.nickname)];
+                       Model::Player& p = players[getPlayerIndex(offer.nickname)];
                        // Only valid on Auction phase
                        if (currentPhase != Phase::Auction) {
                            const auto message = "Offer on non-offer phase (" + p.name + ")";
@@ -209,7 +198,7 @@ std::unique_ptr<const OutputEvent> Match::handleInputEvent(const Events::InputEv
                                setNewAuctionTie(p);
                                LOG_TRACE(p.name + " offers " + std::to_string(gold) + ", sets tie");
                            }
-                           addEvent(std::make_unique<OfferResult>(offer));
+                           addEvent(Events::OfferResult{offer});
                        } else {
                            const auto message = "Invalid Offer (" + p.name + " offered " + std::to_string(gold) + ")";
                            setError(message);
@@ -217,7 +206,7 @@ std::unique_ptr<const OutputEvent> Match::handleInputEvent(const Events::InputEv
                        }
                    },
                    [&](const Events::PassRequest& pass) {
-                       Player& p = players[getPlayerIndex(pass.nickname)];
+                       Model::Player& p = players[getPlayerIndex(pass.nickname)];
                        // Only valid on Attack and Auction phases
                        if (currentPhase != Phase::Attack && currentPhase != Phase::Auction) {
                            const auto message = "Pass on invalid phase (" + p.name + ")";
@@ -227,7 +216,7 @@ std::unique_ptr<const OutputEvent> Match::handleInputEvent(const Events::InputEv
                        }
                        if (p.canPass()) {
                            p.pass();
-                           addEvent(std::make_unique<PassResult>(pass));
+                           addEvent(Events::PassResult{pass});
                            LOG_TRACE(p.name + " passes");
                        } else {
                            const auto message = "Invalid Pass (" + p.name + ")";
@@ -242,10 +231,20 @@ std::unique_ptr<const OutputEvent> Match::handleInputEvent(const Events::InputEv
                    }},
                action);
     // If the input action was valid, update the state of the game
-    LOG_PANIC_IF(!updateEvent, "No return OutputEvent was set");
-    if (!updateEvent->isError()) {
-        processPhase();
-    }
+    std::visit(visitor{
+                   [&](const std::monostate& /**/) {
+                       // No OutputEvents
+                       LOG_PANIC("No return OutputEvent was set");
+                   },
+                   [&](const Events::Error& /**/) {
+                       // Error event: don't process anything
+                   },
+                   [&](const auto& /**/) {
+                       // Normal events processed
+                       processPhase();
+                   },
+               },
+               updateEvent);
     return std::move(updateEvent);
 }
 
@@ -254,16 +253,16 @@ void Match::onGameStartPhase() {
     currentAuctioneer = Random::randInt(0, static_cast<int>(players.size()) - 1);
     currentPlayer = currentAuctioneer;
     const auto& name = players[static_cast<std::size_t>(currentAuctioneer)].name;
-    addEvent(std::make_unique<IsAuctioneer>(name));
+    addEvent(Events::IsAuctioneer{name});
     LOG_TRACE(name + " is the auctioneer");
 
     // Set initial gold
-    applyToPlayers([&](Player& p) {
+    applyToPlayers([&](Model::Player& p) {
         p.gold = static_cast<int>(config.initialGold);
     });
     players[static_cast<std::size_t>(currentAuctioneer)].gold -= config.auctioneerGoldDisadvantage;
     for (const auto& p : players) {
-        addEvent(std::make_unique<SetGold>(p.name, p.gold));
+        addEvent(Events::SetGold{p.name, p.gold});
         LOG_TRACE(p.name + " has " + std::to_string(p.gold) + " gold");
     }
 
@@ -294,7 +293,7 @@ void Match::onTurnStartPhase() {
     // Inform about current cards
     const auto auctionCards = table.getCards();
     for (const auto& c : auctionCards) {
-        addEvent(std::make_unique<Draw>(c));
+        addEvent(Events::Draw{c});
         LOG_TRACE("Card " + std::to_string(c.id) + ", " + c.getName());
     }
 
@@ -317,7 +316,7 @@ void Match::onAttackPhase() {
             player.addCard(table.pop());
             currentPhase = table.isEmpty() ? Phase::TurnEnd : Phase::Attack;
             // Notify the players
-            addEvent(std::make_unique<GetCard>(player.name));
+            addEvent(Events::GetCard{player.name});
             LOG_TRACE(player.name + " gets the card on AttackPhase with attack " +
                       std::to_string(currentAttack));
         } else {
@@ -335,7 +334,7 @@ void Match::onAttackPhase() {
     }
 
     // Reset control values
-    applyToPlayers([](Player& p) {
+    applyToPlayers([](Model::Player& p) {
         p.resetAuctionState();
     });
     currentAttack = 0;
@@ -357,8 +356,8 @@ void Match::onAuctionPhase() {
             player.addCard(table.pop());
             player.pay(currentOffer);
             // Notify the players
-            addEvent(std::make_unique<Pay>(player.name, currentOffer));
-            addEvent(std::make_unique<GetCard>(player.name));
+            addEvent(Events::Pay{player.name, currentOffer});
+            addEvent(Events::GetCard{player.name});
             LOG_TRACE(player.name + " gets the card on AuctionPhase with offer " +
                       std::to_string(currentOffer));
         } else {
@@ -381,7 +380,7 @@ void Match::onAuctionPhase() {
     }
 
     // Reset control values
-    applyToPlayers([](Player& p) {
+    applyToPlayers([](Model::Player& p) {
         p.resetAuctionState();
     });
     currentOffer = 0;
@@ -390,12 +389,12 @@ void Match::onAuctionPhase() {
 }
 
 void Match::onTurnEndPhase() {
-    applyToPlayers([](Player& p) {
+    applyToPlayers([](Model::Player& p) {
         p.onTurnEnd();
         p.earn(p.getTotalProduction());
     });
     for (const auto& p : players) {
-        addEvent(std::make_unique<Earn>(p.name, p.getTotalProduction()));
+        addEvent(Events::Earn{p.name, p.getTotalProduction()});
     }
 
     // Change auctioneer (notified to players in the function)
@@ -421,7 +420,7 @@ void Match::onGameEndPhase() {
         }
     }
     for (const auto& w : winners) {
-        addEvent(std::make_unique<Winner>(players[w].name));
+        addEvent(Events::Winner{players[w].name});
         LOG_DEBUG("Winner: " + players[w].name);
     }
 

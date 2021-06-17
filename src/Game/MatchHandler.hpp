@@ -4,11 +4,14 @@
 #include <string>
 
 #include "Events/InputEvent.hpp"
-#include "Events/MatchInfo.hpp"
+#include "Events/OutputEvent.hpp"
 #include "Match.hpp"
 
 class IOHandler;
-class OutputEvent;
+namespace Model {
+class MatchConfig;
+class Deck;
+};  // namespace Model
 class MatchHandler {
    private:
     Match match;
@@ -16,10 +19,10 @@ class MatchHandler {
     unsigned int maxPlayers;
 
     // Inform every player about the OutputEvent
-    void notifyPlayers(const std::shared_ptr<const OutputEvent>& event);
+    void notifyPlayers(const std::shared_ptr<const Events::OutputEvent>& event);
 
     // Returns MatchInfo from the current match
-    std::unique_ptr<const MatchInfo> getMatchInfo() const;
+    Events::MatchInfo getMatchInfo() const;
 
    public:
     //TODO consider making private and using a factory to create Match
@@ -27,13 +30,13 @@ class MatchHandler {
     // Creates a match of 2 people and deck 1
     MatchHandler();
 
-    MatchHandler(const MatchConfig& config, const Deck& deck);
+    MatchHandler(const Model::MatchConfig& config, const Model::Deck& deck);
 
     // Add a new player to the match
     // Returns MatchInfo if successfully joined
     // Returs Error if nickname already exists, match is full or running
-    std::unique_ptr<const OutputEvent> addPlayer(IOHandler* client,
-                                                 const std::string& nickname);
+    Events::OutputEvent addPlayer(IOHandler* client,
+                                  const std::string& nickname);
 
     // Remove player from the match
     void removePlayer(const std::string& nickname);
@@ -48,7 +51,7 @@ class MatchHandler {
     // Receive an input event from a client
     // If there is a valid state update, returns nullptr
     // If the input event is invalid, returns a pointer with Error
-    std::unique_ptr<const OutputEvent> handleInputEvent(const Events::InputEvent& action);
+    Events::OutputEvent handleInputEvent(const Events::InputEvent& action);
 
     // True if the match is running
     bool isRunning() const;

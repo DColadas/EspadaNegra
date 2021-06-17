@@ -4,11 +4,11 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include "Events/OutputEvent.hpp"
 
-class OutputEvent;
 class IOHandler {
    public:
-    virtual void sendEvent(const std::shared_ptr<const OutputEvent>& event) = 0;
+    virtual void sendEvent(const std::shared_ptr<const Events::OutputEvent>& event) = 0;
     virtual void receiveMessage(const std::string& message) = 0;
     virtual void sendMessage(const std::shared_ptr<const std::string>& ss) = 0;
 

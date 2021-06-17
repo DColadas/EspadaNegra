@@ -3,11 +3,11 @@
 #include <algorithm>
 #include <iterator>
 
-void Table::add(Card card) {
+void Table::add(Model::Card card) {
     cardsInAuction.push_back(std::move(card));
 }
 
-Card Table::pop() {
+Model::Card Table::pop() {
     const auto card = cardsInAuction.front();
     cardsInAuction.pop_front();
     return card;
@@ -22,8 +22,8 @@ void Table::discard() {
     cardsInAuction.pop_front();
 }
 
-std::vector<Card> Table::getCards() const {
-    std::vector<Card> v;
+std::vector<Model::Card> Table::getCards() const {
+    std::vector<Model::Card> v;
     std::copy(cardsInAuction.begin(), cardsInAuction.end(), std::back_inserter(v));
     return v;
 }

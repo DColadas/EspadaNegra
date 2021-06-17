@@ -4,6 +4,9 @@
 
 #include "CardModel.hpp"
 #include "GameModifier.hpp"
+#include <nlohmann/json.hpp>
+
+namespace Model {
 
 class Card {
    private:
@@ -40,3 +43,7 @@ class Card {
     bool operator==(const Card&) const;
     bool operator!=(const Card&) const;
 };
+
+void to_json(nlohmann::json&, const Card&);
+
+}  // namespace Model

@@ -1,5 +1,7 @@
 #pragma once
 
+namespace Model {
+
 enum class GameParameter {
     Nothing,
     CardsPerTurn,
@@ -10,3 +12,5 @@ enum class GameParameter {
     PlayerWithMostCardsIsAuctioneer
     //TODO add the rest
 };
+
+}  // namespace Model

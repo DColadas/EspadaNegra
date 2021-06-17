@@ -1,9 +1,12 @@
 #include "Deck.hpp"
 
 #include <algorithm>
+#include <nlohmann/json.hpp>
 
 #include "Logging/Logger.hpp"
 #include "Utils/Random.hpp"
+
+namespace Model {
 
 std::map<int, Deck> Deck::decks;
 
@@ -63,3 +66,9 @@ bool Deck::operator==(const Deck& rhs) const {
 bool Deck::operator!=(const Deck& rhs) const {
     return !(*this == rhs);
 }
+
+void to_json(nlohmann::json& j, const Deck& deck) {
+    j = nlohmann::json{{"cards", deck.getCards()}};
+}
+
+}  // namespace Model

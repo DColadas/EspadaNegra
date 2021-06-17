@@ -1,10 +1,13 @@
 #pragma once
 
 #include "GameModifier.hpp"
+#include <nlohmann/json.hpp>
+
+namespace Model {
 
 class MatchConfig {
    public:
-    const unsigned int numPlayers;
+    unsigned int numPlayers;
     unsigned int cardsPerTurn = numPlayers + 2;
     unsigned int initialGold = 10;
     int auctioneerGoldDisadvantage = 1;
@@ -17,3 +20,7 @@ class MatchConfig {
     bool operator==(const MatchConfig&) const;
     bool operator!=(const MatchConfig&) const;
 };
+
+void to_json(nlohmann::json&, const MatchConfig&);
+
+}  // namespace Model

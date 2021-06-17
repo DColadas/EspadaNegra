@@ -3,6 +3,8 @@
 #include <map>
 #include <string>
 
+namespace Model {
+
 class CardModel {
    private:
     //TODO should provide a set of models per match, to apply modifiers to them
@@ -33,3 +35,5 @@ class CardModel {
     // Returns nullptr if the id doesn't exist (should never happen)
     static const CardModel* getById(int id);
 };
+
+}  // namespace Model

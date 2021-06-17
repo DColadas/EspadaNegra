@@ -1,27 +1,22 @@
 add_library(Game
-  Card.hpp
-  Card.cpp
-  CardModel.hpp
-  CardModel.cpp
-  Deck.cpp
-  Deck.hpp
-  GameModifier.hpp
-  GameParameter.hpp
   Match.cpp
   Match.hpp
-  MatchConfig.cpp
-  MatchConfig.hpp
   MatchHandler.cpp
   MatchHandler.hpp
   Phase.hpp
   PhaseHandler.cpp
   PhaseHandler.hpp
-  Player.cpp
-  Player.hpp
   Table.cpp
   Table.hpp
 )
-find_package(nlohmann_json CONFIG REQUIRED)
 
+target_link_libraries(Game 
+  PRIVATE 
+  Utils 
+  Logging 
+)
 
-target_link_libraries(Game PRIVATE Utils Logging nlohmann_json::nlohmann_json)
+target_link_libraries(Game 
+  PUBLIC 
+  Model
+)
