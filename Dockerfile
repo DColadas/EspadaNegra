@@ -16,8 +16,8 @@ RUN cd /tmp && \
 RUN /tmp/vcpkg/vcpkg install catch2 \
     boost-asio \
     boost-beast \
-    boost-property-tree \
-    boost-iostreams
+    nlohmann-json \
+    fmt
 
 # Copy project code and compile it
 COPY . /EspadaNegra
