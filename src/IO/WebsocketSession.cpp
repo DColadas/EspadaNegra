@@ -1,19 +1,14 @@
 #include "WebsocketSession.hpp"
 
 #include "Logging/Logger.hpp"
+#include "Manager/MatchManager.hpp"
 
-WebsocketSession::WebsocketSession(tcp::socket socket)
-    : ws(std::move(socket)) {
-}
-
-WebsocketSession::WebsocketSession(
-    tcp::socket socket,
-    const std::shared_ptr<WebsocketHandler>& handler_)
-    : ws(std::move(socket)), handler(handler_) {
-}
+WebsocketSession::WebsocketSession(const std::shared_ptr<MatchManager>& manager_,
+                                   tcp::socket socket)
+    : IOHandler(manager_), ws(std::move(socket)) {}
 
 WebsocketSession::~WebsocketSession() {
-    handler->leave();
+    leave();
 }
 
 void WebsocketSession::fail(error_code ec, char const* what) {
@@ -40,7 +35,7 @@ void WebsocketSession::onAccept(error_code ec) {
     }
 
     // Add this session to the list of active sessions
-    handler->join();
+    join();
 
     // Read a message
     doRead();
@@ -72,7 +67,7 @@ void WebsocketSession::onRead(error_code ec, std::size_t) {
 
     LOG_TRACE("onRead: " + beast::buffers_to_string(buffer.data()));
     // Notifies the handler about the new message
-    handler->dispatchMessage(beast::buffers_to_string(buffer.data()));
+    manager->dispatchMessage(*this, beast::buffers_to_string(buffer.data()));
 
     // Clear the buffer
     buffer.consume(buffer.size());
@@ -81,9 +76,9 @@ void WebsocketSession::onRead(error_code ec, std::size_t) {
     doRead();
 }
 
-void WebsocketSession::send(const std::shared_ptr<const std::string>& ss) {
+void WebsocketSession::sendMessage(const std::shared_ptr<const std::string>& message) {
     // Add message to queue
-    queue.push_back(ss);
+    queue.push_back(message);
 
     // If not writing already, start to write
     if (queue.size() > 1) {
@@ -113,8 +108,4 @@ void WebsocketSession::run() {
 
 bool WebsocketSession::isOpen() const {
     return ws.is_open();
-}
-
-void WebsocketSession::setHandler(const std::shared_ptr<WebsocketHandler>& handler_) {
-    this->handler = handler_;
 }

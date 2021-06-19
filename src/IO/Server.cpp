@@ -1,6 +1,11 @@
 #include "Server.hpp"
 
+#include "IOHandler.hpp"
+#include "Listener.hpp"
 #include "Logging/Logger.hpp"
+#include "Manager/MatchManager.hpp"
+#include "WebsocketSession.hpp"
+
 Server::Server(const char* address,
                unsigned short port) {
     LOG_INFO("Creating server at " + std::string(address) + ":" + std::to_string(port));
@@ -8,12 +13,8 @@ Server::Server(const char* address,
         ioc,
         tcp::endpoint{asio::ip::make_address(address), port},
         [this](tcp::socket&& socket) {
-            //TODO make this construction in a factory
-            auto wsHandler = std::make_shared<WebsocketHandler>(matches);
-            auto wsSession = std::make_shared<WebsocketSession>(std::move(socket));
-            wsHandler->setSession(wsSession.get());
-            wsSession->setHandler(wsHandler);
-            wsSession->run();
+            std::shared_ptr<IOHandler> io = std::make_shared<WebsocketSession>(matches, std::move(socket));
+            io->run();
             LOG_TRACE("Created new session");
         });
 }

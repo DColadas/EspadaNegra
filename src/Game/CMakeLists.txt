@@ -14,9 +14,11 @@ target_link_libraries(Game
   PRIVATE 
   Utils 
   Logging 
+  Manager
 )
 
 target_link_libraries(Game 
   PUBLIC 
+  Events
   Model
 )

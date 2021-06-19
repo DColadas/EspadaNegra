@@ -1,25 +1,30 @@
 #include "MatchHandler.hpp"
 
 #include <algorithm>
+#include <memory>
 #include <variant>
 
 #include "Events/InputEvent.hpp"
 #include "Events/OutputEvent.hpp"
-#include "IO/IOHandler.hpp"
 #include "Logging/Logger.hpp"
+#include "Manager/MatchManager.hpp"
 #include "Model/Deck.hpp"
 #include "Model/MatchConfig.hpp"
 #include "Phase.hpp"
 #include "Utils/Random.hpp"
 #include "Utils/Visitor.hpp"
 
-MatchHandler::MatchHandler()
-    : match(Model::MatchConfig(2), Model::Deck::getById(1)),
+MatchHandler::MatchHandler(MatchManager* manager_)
+    : manager(manager_),
+      match(Model::MatchConfig(2), Model::Deck::getById(1)),
       maxPlayers(match.config.numPlayers) {
 }
 
-MatchHandler::MatchHandler(const Model::MatchConfig& config, const Model::Deck& deck)
-    : match(std::move(config), std::move(deck)),
+MatchHandler::MatchHandler(MatchManager* manager_,
+                           const Model::MatchConfig& config,
+                           const Model::Deck& deck)
+    : manager(manager_),
+      match(std::move(config), std::move(deck)),
       maxPlayers(match.config.numPlayers) {
 }
 
@@ -29,8 +34,7 @@ Events::MatchInfo MatchHandler::getMatchInfo() const {
                              match.deck};
 }
 
-Events::OutputEvent MatchHandler::addPlayer(IOHandler* client,
-                                    const std::string& name) {
+Events::OutputEvent MatchHandler::addPlayer(const std::string& name) {
     if (isFull()) {
         const auto message = "Cannot join the match (full)";
         LOG_DEBUG(message);
@@ -40,47 +44,48 @@ Events::OutputEvent MatchHandler::addPlayer(IOHandler* client,
         LOG_DEBUG(message);
         return Events::Error{message};
     }
-    const auto inserted = handlers.emplace(name, client).second;
-    if (!inserted) {
+    // Check if there's a player with the same nickname
+    const auto& ps = match.players;
+    const auto available = std::none_of(ps.begin(), ps.end(), [&](const auto& i) {
+        return i == name;
+    });
+    if (!available) {
         // The nickname existed already
         const auto message = "Cannot join the match (nickname " + name + " already exists)";
         LOG_DEBUG(message);
         return Events::Error{message};
     }
     match.addPlayer(name);
-    notifyPlayers(std::make_shared<const Events::OutputEvent>(Events::JoinMatchResult{name}));
+    notifyPlayers(Events::JoinMatchResult{name});
     return getMatchInfo();
 }
 
 void MatchHandler::removePlayer(const std::string& nickname) {
-    handlers.erase(nickname);
     match.removePlayer(nickname);
 }
 
 std::size_t MatchHandler::getPlayerCount() const {
-    return handlers.size();
+    return match.players.size();
 }
 
 void MatchHandler::start() {
-    notifyPlayers(std::make_shared<const Events::OutputEvent>(match.start()));
+    notifyPlayers(match.start());
 }
 
-void MatchHandler::notifyPlayers(const std::shared_ptr<const Events::OutputEvent>& event) {
-    for (auto& h : handlers) {
-        h.second->sendEvent(event);
-    }
+void MatchHandler::notifyPlayers(const Events::OutputEvent& event) {
+    manager->broadcast(*this, std::make_shared<const std::string>(Events::toMessage(event)));
 }
 
 Events::OutputEvent MatchHandler::handleInputEvent(const Events::InputEvent& action) {
-    auto event = match.handleInputEvent(action);
+    const auto event = match.handleInputEvent(action);
     return std::visit(visitor{
                           [&](const Events::Error& /**/) -> Events::OutputEvent {
                               // If the input was invalid, send the error to the client who sent it
-                              return std::move(event);
+                              return event;
                           },
                           [&](const auto& /**/) -> Events::OutputEvent {
                               // If there is an update in the state of match, broadcast it
-                              notifyPlayers(std::make_shared<const Events::OutputEvent>(event));
+                              notifyPlayers(event);
                               return std::monostate{};
                           },
                       },
@@ -93,5 +98,5 @@ bool MatchHandler::isRunning() const {
 }
 
 bool MatchHandler::isFull() const {
-    return maxPlayers == handlers.size();
+    return maxPlayers == getPlayerCount();
 }

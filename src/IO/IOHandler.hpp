@@ -1,21 +1,33 @@
 #pragma once
 
-#include <chrono>
-#include <functional>
 #include <memory>
 #include <string>
-#include "Events/OutputEvent.hpp"
+
+class MatchManager;
 
 class IOHandler {
    public:
-    virtual void sendEvent(const std::shared_ptr<const Events::OutputEvent>& event) = 0;
-    virtual void receiveMessage(const std::string& message) = 0;
+    IOHandler(const std::shared_ptr<MatchManager>& manager);
+
+    // Join or leave the MatchManager
+    void join();
+    void leave();
+
+    // Start the connection
+    virtual void run() = 0;
+
+    // Send message to the client
     virtual void sendMessage(const std::shared_ptr<const std::string>& ss) = 0;
 
-    IOHandler() = default;
+    // True if the connection is valid
+    [[nodiscard]] virtual bool isOpen() const = 0;
+
     virtual ~IOHandler() = default;
     IOHandler(const IOHandler&) = delete;
     IOHandler& operator=(const IOHandler&) = delete;
     IOHandler(IOHandler&&) = delete;
     IOHandler& operator=(IOHandler&&) = delete;
+
+   protected:
+    std::shared_ptr<MatchManager> manager;
 };

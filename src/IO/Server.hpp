@@ -5,9 +5,9 @@
 #include <unordered_set>
 
 #include "Asio.hpp"
-#include "Listener.hpp"
-#include "MatchManager.hpp"
-#include "WebsocketSession.hpp"
+#include "Manager/MatchManager.hpp"
+
+class Listener;
 
 // Accepts incoming connections and launches the sessions
 class Server {
@@ -17,7 +17,6 @@ class Server {
     // Works until the defined signals are received
     asio::signal_set signals = asio::signal_set(ioc, SIGINT, SIGTERM);
     std::shared_ptr<MatchManager> matches = std::make_shared<MatchManager>();
-    //std::unordered_set<std::shared_ptr<WebsocketSession>> wss;
 
    public:
     Server(const char* address, unsigned short port);

@@ -7,36 +7,24 @@
 #include "Events/OutputEvent.hpp"
 #include "Match.hpp"
 
-class IOHandler;
+class MatchManager;
 namespace Model {
 class MatchConfig;
 class Deck;
 };  // namespace Model
 class MatchHandler {
-   private:
-    Match match;
-    std::map<std::string, IOHandler*> handlers;  //nickname, handler
-    unsigned int maxPlayers;
-
-    // Inform every player about the OutputEvent
-    void notifyPlayers(const std::shared_ptr<const Events::OutputEvent>& event);
-
-    // Returns MatchInfo from the current match
-    Events::MatchInfo getMatchInfo() const;
-
    public:
-    //TODO consider making private and using a factory to create Match
-
     // Creates a match of 2 people and deck 1
-    MatchHandler();
+    MatchHandler(MatchManager* manager);
 
-    MatchHandler(const Model::MatchConfig& config, const Model::Deck& deck);
+    MatchHandler(MatchManager* manager,
+                 const Model::MatchConfig& config,
+                 const Model::Deck& deck);
 
     // Add a new player to the match
     // Returns MatchInfo if successfully joined
     // Returs Error if nickname already exists, match is full or running
-    Events::OutputEvent addPlayer(IOHandler* client,
-                                  const std::string& nickname);
+    Events::OutputEvent addPlayer(const std::string& nickname);
 
     // Remove player from the match
     void removePlayer(const std::string& nickname);
@@ -58,4 +46,15 @@ class MatchHandler {
 
     // True if the match is full (no more players can join)
     bool isFull() const;
+
+   private:
+    MatchManager* manager;
+    Match match;
+    unsigned int maxPlayers;
+
+    // Returns MatchInfo from the current match
+    Events::MatchInfo getMatchInfo() const;
+
+    // Inform every player about the $event
+    void notifyPlayers(const Events::OutputEvent& event);
 };
