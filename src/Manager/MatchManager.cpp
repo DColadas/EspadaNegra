@@ -24,6 +24,9 @@ void MatchManager::leave(IOHandler& handler) {
         it != handlerMatch.end()) {
         const auto& [match, nickname] = it->second;
         // Delete handler from every helper container
+        if(!match) {
+            return;
+        }
         match->removePlayer(nickname);
         const auto range = matchHandlers.equal_range(match);
         for (auto i = range.first; i != range.second; ++i) {
