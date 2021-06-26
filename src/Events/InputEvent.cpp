@@ -37,7 +37,7 @@ void from_json(const nlohmann::json& j, InputEvent& event) {
                 .matchID = j.at("matchID")};
             break;
         case OfferRequest_:
-            event = OfferRequest{{}, {.nickname = {}}, j.at("gold")};
+            event = OfferRequest{{}, {{.nickname = {}}, j.at("gold")}};
             break;
         case PassRequest_:
             event = PassRequest{};

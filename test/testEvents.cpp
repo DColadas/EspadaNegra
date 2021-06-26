@@ -73,8 +73,8 @@ TEST_CASE("Test deserialization of InputEvent", "[events]") {
 }
 
 TEST_CASE("Test serialization of OutputEvent", "[events]") {
-    SECTION("AttackResult") {
-        const Events::OutputEvent e = Events::AttackResult{{"n1"}};
+    SECTION("Attack") {
+        const Events::OutputEvent e = Events::Attack{{"n1"}};
         const nlohmann::json j = e;
         REQUIRE(j.at("type") == "attack");
         REQUIRE(j.at("nickname") == "n1");
@@ -82,7 +82,7 @@ TEST_CASE("Test serialization of OutputEvent", "[events]") {
 
     SECTION("Complex") {
         const Events::OutputEvent e = Events::Complex{
-            {Events::AttackResult{"n1"},
+            {Events::Attack{"n1"},
              Events::Earn{{"n2"}, 123}}};
         const nlohmann::json j = e;
         const auto events = j.at("events");

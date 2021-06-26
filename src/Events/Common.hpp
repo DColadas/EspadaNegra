@@ -26,4 +26,15 @@ struct Error {
     std::string message;
 };
 
+// Event representing the amount of gold offered for the current card.
+struct Offer: public PlayerEvent {
+    int gold;
+};
+
+// Event by which the player is not interested in the current attack/auction phase.
+struct Pass: public PlayerEvent {};
+
+// Event by which the player intents to attack the current card.
+struct Attack: public PlayerEvent {};
+
 }  // namespace Events

@@ -16,15 +16,13 @@ struct JoinMatchRequest {
 };
 
 // Input event representing the amount of gold offered for the current card.
-struct OfferRequest : public TimedEvent, public PlayerEvent {
-    int gold;
-};
+struct OfferRequest : public TimedEvent, public Offer {};
 
 // Input event by which the player is not interested in the current attack/auction phase.
-struct PassRequest : public TimedEvent, public PlayerEvent {};
+struct PassRequest : public TimedEvent, public Pass {};
 
 // Input event by which the player intents to attack the current card.
-struct AttackRequest : public TimedEvent, public PlayerEvent {};
+struct AttackRequest : public TimedEvent, public Attack {};
 
 // Event received from the players.
 using InputEvent = std::variant<

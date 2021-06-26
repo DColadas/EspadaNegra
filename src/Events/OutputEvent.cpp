@@ -15,7 +15,7 @@
 
 namespace Events {
 
-void to_json(nlohmann::json& j, const AttackResult& event) {
+void to_json(nlohmann::json& j, const Attack& event) {
     j = nlohmann::json{{"type", "attack"},
                        {"nickname", event.nickname}};
 }
@@ -69,13 +69,13 @@ void to_json(nlohmann::json& j, const MatchInfo& event) {
                        {"matchConfig", event.config}};
 }
 
-void to_json(nlohmann::json& j, const OfferResult& event) {
+void to_json(nlohmann::json& j, const Offer& event) {
     j = nlohmann::json{{"type", "offer"},
                        {"nickname", event.nickname},
                        {"gold", event.gold}};
 }
 
-void to_json(nlohmann::json& j, const PassResult& event) {
+void to_json(nlohmann::json& j, const Pass& event) {
     j = nlohmann::json{{"type", "pass"},
                        {"nickname", event.nickname}};
 }

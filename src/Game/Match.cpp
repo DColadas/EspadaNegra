@@ -163,7 +163,7 @@ Events::OutputEvent Match::handleInputEvent(const Events::InputEvent& action) {
                                setNewAuctionTie(p);
                                LOG_TRACE(p.name + " attacks, sets tie");
                            }
-                           addEvent(Events::AttackResult{attack});
+                           addEvent(Events::Attack{attack});
                        } else {
                            const auto message = "Invalid Attack (" + p.name + ")";
                            setError(message);
@@ -198,7 +198,7 @@ Events::OutputEvent Match::handleInputEvent(const Events::InputEvent& action) {
                                setNewAuctionTie(p);
                                LOG_TRACE(p.name + " offers " + std::to_string(gold) + ", sets tie");
                            }
-                           addEvent(Events::OfferResult{offer});
+                           addEvent(Events::Offer{offer});
                        } else {
                            const auto message = "Invalid Offer (" + p.name + " offered " + std::to_string(gold) + ")";
                            setError(message);
@@ -216,7 +216,7 @@ Events::OutputEvent Match::handleInputEvent(const Events::InputEvent& action) {
                        }
                        if (p.canPass()) {
                            p.pass();
-                           addEvent(Events::PassResult{pass});
+                           addEvent(Events::Pass{pass});
                            LOG_TRACE(p.name + " passes");
                        } else {
                            const auto message = "Invalid Pass (" + p.name + ")";

@@ -14,15 +14,6 @@
 
 namespace Events {
 
-// PlayerEvent broadcasted when a valid AttackRequest is received.
-struct AttackResult : public PlayerEvent {
-    explicit AttackResult(const std::string& nickname_)
-        : PlayerEvent{nickname_} {};
-
-    explicit AttackResult(const AttackRequest& o)
-        : PlayerEvent{o.nickname} {}
-};
-
 // Composite OutputEvent, formed by many others
 struct Complex;
 
@@ -65,20 +56,6 @@ struct MatchInfo {
     Model::Deck deck;
 };
 
-// PlayerEvent broadcasted when a valid OfferRequest is received.
-struct OfferResult : public PlayerEvent {
-    int gold;
-
-    explicit OfferResult(const OfferRequest& o)
-        : PlayerEvent{o.nickname}, gold{o.gold} {}
-};
-
-// PlayerEvent broadcasted when a valid PassRequest is received.
-struct PassResult : public PlayerEvent {
-    explicit PassResult(const PassRequest& o)
-        : PlayerEvent{o.nickname} {}
-};
-
 // PlayerEvent representing the amount of gold paid for the current card.
 struct Pay : public PlayerEvent {
     int gold;
@@ -96,7 +73,7 @@ struct Winner : public PlayerEvent {};
 using OutputEvent = std::variant<
     std::monostate,
     Error,
-    AttackResult,
+    Attack,
     Complex,
     Draw,
     Earn,
@@ -105,8 +82,8 @@ using OutputEvent = std::variant<
     JoinMatchResult,
     Leave,
     MatchInfo,
-    OfferResult,
-    PassResult,
+    Offer,
+    Pass,
     Pay,
     SetGold,
     Winner>;
@@ -122,7 +99,7 @@ struct Complex {
 };
 
 // Here comes a clusterduck of boilerplate! Could be improved with templates.
-void to_json(nlohmann::json& j, const AttackResult& event);
+void to_json(nlohmann::json& j, const Attack& event);
 void to_json(nlohmann::json& j, const Complex& event);
 void to_json(nlohmann::json& j, const Draw& event);
 void to_json(nlohmann::json& j, const Earn& event);
@@ -132,8 +109,8 @@ void to_json(nlohmann::json& j, const IsAuctioneer& event);
 void to_json(nlohmann::json& j, const JoinMatchResult& event);
 void to_json(nlohmann::json& j, const Leave& event);
 void to_json(nlohmann::json& j, const MatchInfo& event);
-void to_json(nlohmann::json& j, const OfferResult& event);
-void to_json(nlohmann::json& j, const PassResult& event);
+void to_json(nlohmann::json& j, const Offer& event);
+void to_json(nlohmann::json& j, const Pass& event);
 void to_json(nlohmann::json& j, const Pay& event);
 void to_json(nlohmann::json& j, const SetGold& event);
 void to_json(nlohmann::json& j, const Winner& event);
