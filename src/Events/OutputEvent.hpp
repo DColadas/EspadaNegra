@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 #include <string>
+#include <string_view>
 #include <variant>
 #include <vector>
 
@@ -116,8 +117,8 @@ void to_json(nlohmann::json& j, const SetGold& event);
 void to_json(nlohmann::json& j, const Winner& event);
 void to_json(nlohmann::json& j, const OutputEvent& event);
 
-// Returns $event in JSON.
-// Output messages:
+// Returns $event in JSON, or $message as OutputEvent.
+// Output/Input messages:
 //  {"type": "joinMatch", "nickname": "XXX"}
 //  {"type": "attack", "nickname": "XXX"}
 //  {"type": "offer", "nickname": "XXX", "gold": int}
@@ -145,5 +146,6 @@ void to_json(nlohmann::json& j, const OutputEvent& event);
 //  MatchConfig: {"numPlayers": int}
 //  Event: any other event object
 [[nodiscard]] std::string toMessage(const OutputEvent& event);
+[[nodiscard]] OutputEvent toOutputEvent(std::string_view message);
 
 }  // namespace Events

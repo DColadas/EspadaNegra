@@ -1,5 +1,7 @@
 #include "OutputEvent.hpp"
 
+#include <fmt/format.h>
+
 #include <nlohmann/json.hpp>
 #include <string>
 #include <variant>
@@ -108,6 +110,115 @@ void to_json(nlohmann::json& j, const OutputEvent& event) {
 [[nodiscard]] std::string toMessage(const OutputEvent& event) {
     nlohmann::json j = event;
     return j.dump();
+}
+
+void from_json(const nlohmann::json& j, OutputEvent& event) {
+    enum class EventType {
+        Attack_,
+        Complex_,
+        Draw_,
+        Earn_,
+        Error_,
+        GetCard_,
+        IsAuctioneer_,
+        JoinMatchResult_,
+        Leave_,
+        MatchInfo_,
+        Offer_,
+        Pass_,
+        SetGold_,
+        Winner_,
+        Invalid
+    };
+
+    using enum EventType;
+    constexpr static auto toType = [&](std::string_view text) {
+        if (text == "attack") {
+            return Attack_;
+        } else if (text == "complex") {
+            return Complex_;
+        } else if (text == "draw") {
+            return Draw_;
+        } else if (text == "earn") {
+            return Earn_;
+        } else if (text == "error") {
+            return Error_;
+        } else if (text == "getCard") {
+            return GetCard_;
+        } else if (text == "isAuctioneer") {
+            return IsAuctioneer_;
+        } else if (text == "joinMatch") {
+            return JoinMatchResult_;
+        } else if (text == "leave") {
+            return Leave_;
+        } else if (text == "matchInfo") {
+            return MatchInfo_;
+        } else if (text == "offer") {
+            return Offer_;
+        } else if (text == "pass") {
+            return Pass_;
+        } else if (text == "setGold") {
+            return SetGold_;
+        } else if (text == "winner") {
+            return Winner_;
+        } else
+            return Invalid;
+    };
+
+    switch (toType(j.at("type").get<std::string_view>())) {
+        case Attack_:
+            event = Attack{{.nickname = j.at("nickname")}};
+            break;
+        case Complex_: {
+            std::vector<OutputEvent> v;
+            for (const auto& ev : j.at("events")) {
+                v.push_back(toOutputEvent(ev.get<std::string_view>()));
+            }
+            event = Complex{std::move(v)};
+        } break;
+        case Draw_:
+            //event = Draw{.card = j.at("card")};
+            break;
+        case Earn_:
+            event = Earn{{.nickname = j.at("nickname")}, j.at("gold")};
+            break;
+        case Error_:
+            event = Error{.message = j.at("message")};
+            break;
+        case GetCard_:
+            event = GetCard{{.nickname = j.at("nickname")}};
+            break;
+        case IsAuctioneer_:
+            event = IsAuctioneer{{.nickname = j.at("nickname")}};
+            break;
+        case JoinMatchResult_:
+            event = JoinMatchResult{j.at("nickname")};
+            break;
+        case Invalid:
+            event = Error{fmt::format("{} is not a valid input type", j.at("type").get<std::string_view>())};
+            break;
+        default:
+            // TODO
+            event = Error{};
+            break;
+    }
+}
+
+[[nodiscard]] OutputEvent toOutputEvent(std::string_view message) {
+    try {
+        const auto j = nlohmann::json::parse(message);
+        OutputEvent e = j;
+        return e;
+    } catch (const nlohmann::json::out_of_range& ex) {
+        // Missing key
+        return Error{"Missing necessary event key-value"};
+    } catch (const nlohmann::json::parse_error& ex) {
+        // Malformed JSON
+        return Error{"Malformed JSON received"};
+    } catch (const std::exception& ex) {
+        // Anything I'm missing :)
+        return Error{"Error in received message"};
+    }
 }
 
 }  // namespace Events

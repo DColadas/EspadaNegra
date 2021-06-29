@@ -50,6 +50,7 @@ void Card::add(int id,
 }
 
 Card Card::getById(int id) {
+    // TODO don't panic on invalid while the json parser uses getById
     const auto it = cards.find(id);
     LOG_PANIC_IF(it == cards.end(), "Card " + std::to_string(id) + " does not exist");
     return it->second;
@@ -71,6 +72,10 @@ void to_json(nlohmann::json& j, const Card& card) {
         {"victory", card.getVictory()},
         {"isBerserk", card.isBerserk()},
     };
+}
+
+void from_json(const nlohmann::json& j, Card& card) {
+    card = Card::getById(j.at("id"));
 }
 
 }  // namespace Model

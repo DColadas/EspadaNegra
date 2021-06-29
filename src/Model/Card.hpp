@@ -45,5 +45,6 @@ class Card {
 };
 
 void to_json(nlohmann::json&, const Card&);
+void from_json(const nlohmann::json&, Card&);
 
 }  // namespace Model
