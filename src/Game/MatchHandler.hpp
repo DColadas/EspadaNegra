@@ -39,7 +39,7 @@ class MatchHandler {
     // Receive an input event from a client
     // If there is a valid state update, returns nullptr
     // If the input event is invalid, returns a pointer with Error
-    Events::OutputEvent handleInputEvent(const Events::InputEvent& action);
+    Events::OutputEvent handleEvent(const Events::InputEvent& action);
 
     // True if the match is running
     bool isRunning() const;

@@ -17,7 +17,7 @@ void Match::addEvent(const Events::OutputEvent& event) {
     std::visit(visitor{
                    [&](std::monostate& /**/) {
                        // No event
-                        updateEvent = event;
+                       updateEvent = event;
                    },
                    [&](Events::Complex& c) {
                        // updateEvent is Complex: add the new Event
@@ -96,8 +96,28 @@ bool Match::arePossibleOffers(int amount) const {
     });
 }
 
-void Match::processPhase() {
-    phaseHandler.processPhase();
+void Match::processPhase(bool isMatchStart) {
+    // Quick dirty fix :)
+    if (isMatchStart) {
+        phaseHandler.processPhase();
+        return;
+    }
+
+    // If the input action was valid, update the state of the game
+    std::visit(visitor{
+                   [&](const std::monostate& /**/) {
+                       // No OutputEvents
+                       LOG_PANIC("No return OutputEvent was set");
+                   },
+                   [&](const Events::Error& /**/) {
+                       // Error event: don't process anything
+                   },
+                   [&](const auto& /**/) {
+                       // Normal events processed
+                       phaseHandler.processPhase();
+                   },
+               },
+               updateEvent);
 }
 
 bool Match::isThereWinner() const {
@@ -134,117 +154,111 @@ void Match::removePlayer(const std::string& nickname) {
 
 Events::OutputEvent Match::start() {
     currentPhase = Phase::GameStart;
+    processPhase(true);
+    return std::move(updateEvent);
+}
+
+Events::OutputEvent Match::handleEvent(const Events::Attack& attack) {
+    updateEvent = std::monostate{};
+    Model::Player& p = players[getPlayerIndex(attack.nickname)];
+    // Only valid on Attack phase
+    if (currentPhase != Phase::Attack) {
+        const auto message = "Attack on non-attack phase (" + p.name + ")";
+        setError(message);
+        LOG_DEBUG(message);
+        return std::move(updateEvent);
+    }
+    if (p.canAttack(currentAttack)) {
+        const auto attackAmount = p.attack();
+        if (currentAttack < attackAmount) {
+            // If attacking with higher attack than everyone, it's the only winner
+            setNewAuctionWinner(p);
+            currentAttack = attackAmount;
+            LOG_TRACE(p.name + " attacks, is current winner");
+        } else {
+            // Same attack, sets new tie
+            setNewAuctionTie(p);
+            LOG_TRACE(p.name + " attacks, sets tie");
+        }
+        addEvent(Events::Attack{attack});
+    } else {
+        const auto message = "Invalid Attack (" + p.name + ")";
+        setError(message);
+        LOG_DEBUG(message);
+    }
+    // Update state
     processPhase();
     return std::move(updateEvent);
 }
 
-Events::OutputEvent Match::handleInputEvent(const Events::InputEvent& action) {
+Events::OutputEvent Match::handleEvent(const Events::Offer& offer) {
     updateEvent = std::monostate{};
-    std::visit(visitor{
-                   [&](const Events::AttackRequest& attack) {
-                       Model::Player& p = players[getPlayerIndex(attack.nickname)];
+    Model::Player& p = players[getPlayerIndex(offer.nickname)];
+    // Only valid on Auction phase
+    if (currentPhase != Phase::Auction) {
+        const auto message = "Offer on non-offer phase (" + p.name + ")";
+        setError(message);
+        LOG_DEBUG(message);
+        return std::move(updateEvent);
+    }
+    const auto gold = offer.gold;
+    if (gold > 0 && currentOffer <= gold && p.canOffer(gold)) {
+        if (currentOffer < gold) {
+            // If the new offer is higher, the current player is the new current winner
+            setNewAuctionWinner(p);
+            currentOffer = gold;
+            LOG_TRACE(p.name + " offers " + std::to_string(gold) + ", is current winner");
+        } else {
+            if (p.isInAuctionTie()) {
+                // Cannot offer if it is already in a tie
+                const auto message = "Invalid Offer (" + p.name + " was already in a tie)";
+                setError(message);
+                LOG_DEBUG(message);
+                return std::move(updateEvent);
+            }
+            // Same offer, sets new tie
+            setNewAuctionTie(p);
+            LOG_TRACE(p.name + " offers " + std::to_string(gold) + ", sets tie");
+        }
+        addEvent(Events::Offer{offer});
+    } else {
+        const auto message = "Invalid Offer (" + p.name + " offered " + std::to_string(gold) + ")";
+        setError(message);
+        LOG_DEBUG(message);
+    }
+    // Update state
+    processPhase();
+    return std::move(updateEvent);
+}
 
-                       // Only valid on Attack phase
-                       if (currentPhase != Phase::Attack) {
-                           const auto message = "Attack on non-attack phase (" + p.name + ")";
-                           setError(message);
-                           LOG_DEBUG(message);
-                           return;
-                       }
-                       if (p.canAttack(currentAttack)) {
-                           const auto attackAmount = p.attack();
-                           if (currentAttack < attackAmount) {
-                               // If attacking with higher attack than everyone, it's the only winner
-                               setNewAuctionWinner(p);
-                               currentAttack = attackAmount;
-                               LOG_TRACE(p.name + " attacks, is current winner");
-                           } else {
-                               // Same attack, sets new tie
-                               setNewAuctionTie(p);
-                               LOG_TRACE(p.name + " attacks, sets tie");
-                           }
-                           addEvent(Events::Attack{attack});
-                       } else {
-                           const auto message = "Invalid Attack (" + p.name + ")";
-                           setError(message);
-                           LOG_DEBUG(message);
-                       }
-                   },
-                   [&](const Events::OfferRequest& offer) {
-                       Model::Player& p = players[getPlayerIndex(offer.nickname)];
-                       // Only valid on Auction phase
-                       if (currentPhase != Phase::Auction) {
-                           const auto message = "Offer on non-offer phase (" + p.name + ")";
-                           setError(message);
-                           LOG_DEBUG(message);
-                           return;
-                       }
-                       const auto gold = offer.gold;
-                       if (gold > 0 && currentOffer <= gold && p.canOffer(gold)) {
-                           if (currentOffer < gold) {
-                               // If the new offer is higher, the current player is the new current winner
-                               setNewAuctionWinner(p);
-                               currentOffer = gold;
-                               LOG_TRACE(p.name + " offers " + std::to_string(gold) + ", is current winner");
-                           } else {
-                               if (p.isInAuctionTie()) {
-                                   // Cannot offer if it is already in a tie
-                                   const auto message = "Invalid Offer (" + p.name + " was already in a tie)";
-                                   setError(message);
-                                   LOG_DEBUG(message);
-                                   return;
-                               }
-                               // Same offer, sets new tie
-                               setNewAuctionTie(p);
-                               LOG_TRACE(p.name + " offers " + std::to_string(gold) + ", sets tie");
-                           }
-                           addEvent(Events::Offer{offer});
-                       } else {
-                           const auto message = "Invalid Offer (" + p.name + " offered " + std::to_string(gold) + ")";
-                           setError(message);
-                           LOG_DEBUG(message);
-                       }
-                   },
-                   [&](const Events::PassRequest& pass) {
-                       Model::Player& p = players[getPlayerIndex(pass.nickname)];
-                       // Only valid on Attack and Auction phases
-                       if (currentPhase != Phase::Attack && currentPhase != Phase::Auction) {
-                           const auto message = "Pass on invalid phase (" + p.name + ")";
-                           setError(message);
-                           LOG_DEBUG(message);
-                           return;
-                       }
-                       if (p.canPass()) {
-                           p.pass();
-                           addEvent(Events::Pass{pass});
-                           LOG_TRACE(p.name + " passes");
-                       } else {
-                           const auto message = "Invalid Pass (" + p.name + ")";
-                           setError(message);
-                           LOG_DEBUG(message);
-                       }
-                   },
-                   [&](const auto& /**/) {
-                       const auto message = "Invalid action";
-                       setError(message);
-                       LOG_ERROR(message);
-                   }},
-               action);
-    // If the input action was valid, update the state of the game
-    std::visit(visitor{
-                   [&](const std::monostate& /**/) {
-                       // No OutputEvents
-                       LOG_PANIC("No return OutputEvent was set");
-                   },
-                   [&](const Events::Error& /**/) {
-                       // Error event: don't process anything
-                   },
-                   [&](const auto& /**/) {
-                       // Normal events processed
-                       processPhase();
-                   },
-               },
-               updateEvent);
+Events::OutputEvent Match::handleEvent(const Events::Pass& pass) {
+    updateEvent = std::monostate{};
+    Model::Player& p = players[getPlayerIndex(pass.nickname)];
+    // Only valid on Attack and Auction phases
+    if (currentPhase != Phase::Attack && currentPhase != Phase::Auction) {
+        const auto message = "Pass on invalid phase (" + p.name + ")";
+        setError(message);
+        LOG_DEBUG(message);
+        return std::move(updateEvent);
+    }
+    if (p.canPass()) {
+        p.pass();
+        addEvent(Events::Pass{pass});
+        LOG_TRACE(p.name + " passes");
+    } else {
+        const auto message = "Invalid Pass (" + p.name + ")";
+        setError(message);
+        LOG_DEBUG(message);
+    }
+    // Update state
+    processPhase();
+    return std::move(updateEvent);
+}
+
+Events::OutputEvent Match::handleEvent(const Events::InputEvent& /**/) {
+    const auto message = "Invalid action";
+    setError(message);
+    LOG_ERROR(message);
     return std::move(updateEvent);
 }
 

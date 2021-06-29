@@ -75,7 +75,7 @@ void MatchManager::dispatchMessage(IOHandler& client, std::string_view message) 
             visitor{
                 [&]<class T>(const T& pe) requires std::is_base_of_v<Events::PlayerEvent, T> {
                     LOG_TRACE("User " + pe.nickname + ": valid InputEvent received");
-                    const auto response = currentMatch->handleInputEvent(event);
+                    const auto response = currentMatch->handleEvent(event);
                     // There is a specific message for this client (an Error)
                     if (std::holds_alternative<Events::Error>(response)) {
             sendEvent(client, response);

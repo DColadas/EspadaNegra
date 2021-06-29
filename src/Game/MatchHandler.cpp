@@ -76,8 +76,8 @@ void MatchHandler::notifyPlayers(const Events::OutputEvent& event) {
     manager->broadcast(*this, std::make_shared<const std::string>(Events::toMessage(event)));
 }
 
-Events::OutputEvent MatchHandler::handleInputEvent(const Events::InputEvent& action) {
-    const auto event = match.handleInputEvent(action);
+Events::OutputEvent MatchHandler::handleEvent(const Events::InputEvent& action) {
+    const auto event = std::visit([&](const auto& e) { return match.handleEvent(e); }, action);
     return std::visit(visitor{
                           [&](const Events::Error& /**/) -> Events::OutputEvent {
                               // If the input was invalid, send the error to the client who sent it

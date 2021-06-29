@@ -51,7 +51,7 @@ class Match {
     bool arePossibleOffers(int amount) const;
 
     // Carry out computations regarding the current state of the game
-    void processPhase();
+    void processPhase(bool isMatchStart = false);
 
     // True if some player offered or attacked the current card
     bool isThereWinner() const;
@@ -85,7 +85,10 @@ class Match {
 
     // Process the input event and return OutputEvent with update of the Match's state
     // Returns Error if there is no valid update in the state
-    Events::OutputEvent handleInputEvent(const Events::InputEvent& action);
+    Events::OutputEvent handleEvent(const Events::Attack& attack);
+    Events::OutputEvent handleEvent(const Events::Pass& pass);
+    Events::OutputEvent handleEvent(const Events::Offer& offer);
+    Events::OutputEvent handleEvent(const Events::InputEvent& /**/);
 
     // Methods for each Phase in the game
     void onGameStartPhase();
