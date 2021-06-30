@@ -15,37 +15,37 @@ void from_json(const nlohmann::json& j, InputEvent& event) {
         AttackRequest_,
         Invalid
     };
+    using ET = EventType;  // Clang 12 doesn't support using enum :)
 
-    using enum EventType;
     constexpr static auto toType = [&](std::string_view text) {
         if (text == "joinMatchRequest") {
-            return JoinMatchRequest_;
+            return ET::JoinMatchRequest_;
         } else if (text == "offer") {
-            return OfferRequest_;
+            return ET::OfferRequest_;
         } else if (text == "pass") {
-            return PassRequest_;
+            return ET::PassRequest_;
         } else if (text == "attack") {
-            return AttackRequest_;
+            return ET::AttackRequest_;
         } else
-            return Invalid;
+            return ET::Invalid;
     };
 
     switch (toType(j.at("type").get<std::string_view>())) {
-        case JoinMatchRequest_:
+        case ET::JoinMatchRequest_:
             event = JoinMatchRequest{
                 .nickname = j.at("nickname"),
                 .matchID = j.at("matchID")};
             break;
-        case OfferRequest_:
+        case ET::OfferRequest_:
             event = OfferRequest{{}, {{.nickname = {}}, j.at("gold")}};
             break;
-        case PassRequest_:
+        case ET::PassRequest_:
             event = PassRequest{};
             break;
-        case AttackRequest_:
+        case ET::AttackRequest_:
             event = AttackRequest{};
             break;
-        case Invalid:
+        case ET::Invalid:
             event = Error{fmt::format("{} is not a valid input type", j.at("type").get<std::string_view>())};
             break;
     }

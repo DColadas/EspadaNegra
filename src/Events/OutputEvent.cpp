@@ -130,71 +130,71 @@ void from_json(const nlohmann::json& j, OutputEvent& event) {
         Winner_,
         Invalid
     };
+    using ET = EventType;  // Clang 12 doesn't support using enum :)
 
-    using enum EventType;
     constexpr static auto toType = [&](std::string_view text) {
         if (text == "attack") {
-            return Attack_;
+            return ET::Attack_;
         } else if (text == "complex") {
-            return Complex_;
+            return ET::Complex_;
         } else if (text == "draw") {
-            return Draw_;
+            return ET::Draw_;
         } else if (text == "earn") {
-            return Earn_;
+            return ET::Earn_;
         } else if (text == "error") {
-            return Error_;
+            return ET::Error_;
         } else if (text == "getCard") {
-            return GetCard_;
+            return ET::GetCard_;
         } else if (text == "isAuctioneer") {
-            return IsAuctioneer_;
+            return ET::IsAuctioneer_;
         } else if (text == "joinMatch") {
-            return JoinMatchResult_;
+            return ET::JoinMatchResult_;
         } else if (text == "leave") {
-            return Leave_;
+            return ET::Leave_;
         } else if (text == "matchInfo") {
-            return MatchInfo_;
+            return ET::MatchInfo_;
         } else if (text == "offer") {
-            return Offer_;
+            return ET::Offer_;
         } else if (text == "pass") {
-            return Pass_;
+            return ET::Pass_;
         } else if (text == "setGold") {
-            return SetGold_;
+            return ET::SetGold_;
         } else if (text == "winner") {
-            return Winner_;
+            return ET::Winner_;
         } else
-            return Invalid;
+            return ET::Invalid;
     };
 
     switch (toType(j.at("type").get<std::string_view>())) {
-        case Attack_:
+        case ET::Attack_:
             event = Attack{{.nickname = j.at("nickname")}};
             break;
-        case Complex_: {
+        case ET::Complex_: {
             std::vector<OutputEvent> v;
             for (const auto& ev : j.at("events")) {
                 v.push_back(toOutputEvent(ev.get<std::string_view>()));
             }
             event = Complex{std::move(v)};
         } break;
-        case Draw_:
+        case ET::Draw_:
             //event = Draw{.card = j.at("card")};
             break;
-        case Earn_:
+        case ET::Earn_:
             event = Earn{{.nickname = j.at("nickname")}, j.at("gold")};
             break;
-        case Error_:
+        case ET::Error_:
             event = Error{.message = j.at("message")};
             break;
-        case GetCard_:
+        case ET::GetCard_:
             event = GetCard{{.nickname = j.at("nickname")}};
             break;
-        case IsAuctioneer_:
+        case ET::IsAuctioneer_:
             event = IsAuctioneer{{.nickname = j.at("nickname")}};
             break;
-        case JoinMatchResult_:
+        case ET::JoinMatchResult_:
             event = JoinMatchResult{j.at("nickname")};
             break;
-        case Invalid:
+        case ET::Invalid:
             event = Error{fmt::format("{} is not a valid input type", j.at("type").get<std::string_view>())};
             break;
         default:

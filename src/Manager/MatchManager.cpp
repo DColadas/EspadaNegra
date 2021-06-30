@@ -49,6 +49,7 @@ void MatchManager::broadcast(MatchHandler& match,
 void MatchManager::dispatchMessage(IOHandler& client, std::string_view message) {
     // TODO check if client exists in the map? I don't think it's needed
     const auto& [currentMatch, nickname] = handlerMatch.find(&client)->second;
+    const auto& curr = currentMatch;  // Quick fix for clang :)
     auto event = Events::toInputEvent(nickname, message);
     // If the event is Error, report it
     if (std::holds_alternative<Events::Error>(event)) {
@@ -75,7 +76,7 @@ void MatchManager::dispatchMessage(IOHandler& client, std::string_view message) 
             visitor{
                 [&]<class T>(const T& pe) requires std::is_base_of_v<Events::PlayerEvent, T> {
                     LOG_TRACE("User " + pe.nickname + ": valid InputEvent received");
-                    const auto response = currentMatch->handleEvent(event);
+                    const auto response = curr->handleEvent(event);
                     // There is a specific message for this client (an Error)
                     if (std::holds_alternative<Events::Error>(response)) {
             sendEvent(client, response);
