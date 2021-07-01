@@ -1,7 +1,11 @@
 .git/
 .vscode/
 build/
-Design/
+test/
+
+client/dist/
+client/node_modules/
+client/public/espadaNegraClient.*
 
 .env
 .gitignore

@@ -8,8 +8,6 @@ add_library(project_options INTERFACE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-# These option gives an error with Boost
-#target_compile_features(project_options INTERFACE cxx_std_17)
 
 # Enable cache
 include(cmake/Cache.cmake)

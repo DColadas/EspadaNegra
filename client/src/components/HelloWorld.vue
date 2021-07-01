@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import createModule from "../../public/espadaNegra";
+import createModule from "../../public/espadaNegraClient";
 let moduleInstance = null;
 export default {
   name: "HelloWorld",

@@ -1,5 +1,3 @@
-// emcc --bind -o match.js EmscriptenBindings.cpp --std=c++2a  -s MODULARIZE=1 -s EXPORT_NAME="createModule" -s WASM=0 -s ENVIRONMENT=web
-
 #include <emscripten/bind.h>
 
 #include <string>

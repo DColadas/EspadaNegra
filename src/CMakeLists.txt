@@ -7,11 +7,24 @@ add_subdirectory(Manager)
 add_subdirectory(Model)
 add_subdirectory(Utils)
 
-add_executable(espadaNegra EmscriptenBindings.cpp)
-set_target_properties(espadaNegra PROPERTIES LINK_FLAGS "--bind --std=c++2a  -s MODULARIZE=1 -s EXPORT_NAME='createModule' -s WASM=0 -s ENVIRONMENT=web --no-entry -s ERROR_ON_UNDEFINED_SYMBOLS=0")
-
-target_link_libraries(espadaNegra 
-  PRIVATE 
-  Events
-  Utils
-)
+if(${EMSCRIPTEN})
+  add_executable(espadaNegraClient EmscriptenBindings.cpp)
+  set_target_properties(espadaNegraClient PROPERTIES LINK_FLAGS "--bind --std=c++2a -s MODULARIZE=1 -s EXPORT_NAME='createModule' -s WASM=0 -s ENVIRONMENT=web --memory-init-file 0")
+  target_link_libraries(espadaNegraClient 
+    PRIVATE 
+    Events
+    Utils
+  )
+else()
+  add_executable(espadaNegraServer main.cpp)
+  target_link_libraries(espadaNegraServer 
+    PRIVATE 
+    Events
+    Game
+    IO 
+    Logging
+    Manager
+    Model
+    Utils
+  )
+endif()
