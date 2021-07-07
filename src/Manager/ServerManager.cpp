@@ -1,4 +1,4 @@
-#include "MatchManager.hpp"
+#include "ServerManager.hpp"
 
 #include <variant>
 
@@ -15,11 +15,11 @@ void sendEvent(IOHandler& client, const Events::OutputEvent event) {
 }
 }  // namespace
 
-void MatchManager::join(IOHandler& handler) {
+void ServerManager::join(IOHandler& handler) {
     handlerMatch.insert({&handler, {}});
 }
 
-void MatchManager::leave(IOHandler& handler) {
+void ServerManager::leave(IOHandler& handler) {
     if (const auto& it = handlerMatch.find(&handler);
         it != handlerMatch.end()) {
         const auto& [match, nickname] = it->second;
@@ -38,7 +38,7 @@ void MatchManager::leave(IOHandler& handler) {
     }
 }
 
-void MatchManager::broadcast(MatchHandler& match,
+void ServerManager::broadcast(MatchHandler& match,
                              const std::shared_ptr<const std::string>& message) {
     const auto handlers = matchHandlers.equal_range(&match);
     for (auto i = handlers.first; i != handlers.second; ++i) {
@@ -46,7 +46,7 @@ void MatchManager::broadcast(MatchHandler& match,
     }
 }
 
-void MatchManager::dispatchMessage(IOHandler& client, std::string_view message) {
+void ServerManager::dispatchMessage(IOHandler& client, std::string_view message) {
     // TODO check if client exists in the map? I don't think it's needed
     const auto& [currentMatch, nickname] = handlerMatch.find(&client)->second;
     const auto& curr = currentMatch;  // Quick fix for clang :)
@@ -90,7 +90,7 @@ void MatchManager::dispatchMessage(IOHandler& client, std::string_view message) 
 }
 }
 
-void MatchManager::joinMatch(IOHandler& client, const Events::JoinMatchRequest& req) {
+void ServerManager::joinMatch(IOHandler& client, const Events::JoinMatchRequest& req) {
     const auto& matchID = req.matchID;
     const auto& nickname = req.nickname;
     auto it = matches.find(matchID);

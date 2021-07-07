@@ -6,6 +6,7 @@
 
 #include "Asio.hpp"
 #include "Manager/MatchManager.hpp"
+#include "Manager/ServerManager.hpp"
 
 class Listener;
 
@@ -16,7 +17,7 @@ class Server {
     std::shared_ptr<Listener> listener;
     // Works until the defined signals are received
     asio::signal_set signals = asio::signal_set(ioc, SIGINT, SIGTERM);
-    std::shared_ptr<MatchManager> matches = std::make_shared<MatchManager>();
+    std::shared_ptr<MatchManager> matches = std::make_shared<ServerManager>();
 
    public:
     Server(const char* address, unsigned short port);

@@ -1,6 +1,8 @@
 add_library(Manager
-  MatchManager.cpp
   MatchManager.hpp
+  NoopManager.hpp
+  ServerManager.cpp
+  ServerManager.hpp
 )
 
 target_link_libraries(Manager 
