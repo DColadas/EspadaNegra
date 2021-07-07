@@ -14,6 +14,26 @@ Card::Card(const CardModel* baseModel_,
                                                     id(id_),
                                                     initialCondition(initialCondition_) {}
 
+void Card::init() {
+    std::map<int, int> cardAmount{
+        // modelId, amount
+        {1, 10},
+        {2, 9},
+        {3, 3},
+        {4, 1},
+        {5, 2},
+        {6, 15},
+        {7, 8},
+    };
+    int cardId = 1;
+    for (const auto& [modelId, amount] : cardAmount) {
+        for (int i = 0; i < amount; ++i) {
+            cards.insert({cardId, {CardModel::getById(modelId), cardId, {}}});
+            ++cardId;
+        }
+    }
+}
+
 std::string Card::getName() const {
     return base->name;
 }
@@ -34,21 +54,6 @@ bool Card::isBerserk() const {
     return base->isBerserk;
 }
 
-void Card::add(int id,
-               const GameModifier& initialCondition,
-               const CardModel* model) {
-    LOG_PANIC_IF(cards.find(id) != cards.end(),
-                 "Card " + std::to_string(id) + " already exists");
-    cards.emplace(id, Card(model, id, std::move(initialCondition)));
-}
-
-void Card::add(int id,
-               const GameModifier& initialCondition,
-               int modelId) {
-    const auto model = CardModel::getById(modelId);
-    add(id, initialCondition, model);
-}
-
 Card Card::getById(int id) {
     // TODO don't panic on invalid while the json parser uses getById
     const auto it = cards.find(id);
@@ -64,14 +69,7 @@ bool Card::operator!=(const Card& rhs) const {
 }
 
 void to_json(nlohmann::json& j, const Card& card) {
-    j = nlohmann::json{
-        {"id", card.id},
-        {"name", card.getName()},
-        {"attack", card.getAttack()},
-        {"production", card.getProduction()},
-        {"victory", card.getVictory()},
-        {"isBerserk", card.isBerserk()},
-    };
+    j = nlohmann::json{{"id", card.id}};
 }
 
 void from_json(const nlohmann::json& j, Card& card) {

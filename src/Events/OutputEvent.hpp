@@ -135,12 +135,7 @@ void to_json(nlohmann::json& j, const OutputEvent& event);
 //  {"type": "draw", "card": Card}
 //  {"type": "complex", "events": [Event]}
 // where:
-//  Card: {"id": int,
-//         "name": "XXX",
-//         "attack": int,
-//         "production": int,
-//         "victory": int,
-//         "isBerserk": bool}
+//  Card: {"id": int}
 //  Deck: {"cards": [Card]}
 //  Player: {"nickname": "XXX"}
 //  MatchConfig: {"numPlayers": int}

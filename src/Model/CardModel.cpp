@@ -4,7 +4,15 @@
 
 namespace Model {
 
-std::map<int, CardModel> CardModel::models;
+const std::map<int, CardModel> CardModel::models = {
+    {1, {"Inquisidor", 1, 0, 1, false}},
+    {2, {"Campo", 2, 0, 1, false}},
+    {3, {"Guerrero", 2, 1, 0, false}},
+    {4, {"Caballero", 3, 0, 0, false}},
+    {5, {"Ciudad", 0, 4, 0, false}},
+    {6, {"Campesino", 0, 1, 2, false}},
+    {7, {"Rey", 0, 0, 5, false}},
+};
 
 CardModel::CardModel(const std::string& name_,
                      int attack_,
@@ -15,17 +23,6 @@ CardModel::CardModel(const std::string& name_,
                                         production(production_),
                                         victory(victory_),
                                         isBerserk(isBerserk_) {}
-
-void CardModel::add(int id,
-                    const std::string& name,
-                    int attack,
-                    int production,
-                    int victory,
-                    bool isBerserk) {
-    LOG_PANIC_IF(models.find(id) != models.end(),
-                 "CardModel " + std::to_string(id) + " already exists");
-    models.emplace(id, CardModel(name, attack, production, victory, isBerserk));
-}
 
 const CardModel* CardModel::getById(int id) {
     const auto it = models.find(id);
