@@ -1,19 +1,34 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <ConnectionForm @connectionData="joinMatch" />
+    <Match />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Match from "./components/Match.vue";
+import ConnectionForm from "./components/ConnectionForm.vue";
+import { ClientWS } from "./js/ClientWS";
 
+let ws = null;
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
+    Match,
+    ConnectionForm,
+  },
+  methods: {
+    joinMatch(data) {
+      ws = new ClientWS(data.url);
+      ws.ready().then(() => {
+        ws.joinMatch(data.nickname, data.matchID);
+      });
+    },
+  },
+  beforeDestroy() {
+    ws.close();
   }
-}
+};
 </script>
 
 <style>
