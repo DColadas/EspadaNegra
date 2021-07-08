@@ -3,8 +3,11 @@
 
 #include "Events/InputEvent.hpp"
 #include "Events/OutputEvent.hpp"
+#include "Model/Card.hpp"
+#include "Model/Deck.hpp"
+#include "Model/Player.hpp"
 
-TEST_CASE("Test deserialization of InputEvent", "[events]") {
+TEST_CASE("Test deserialization of Events", "[events]") {
     SECTION("JoinMatchRequest") {
         const Events::InputEvent event = Events::toInputEvent(
             {}, R"({"type": "joinMatchRequest", "matchID": "m1", "nickname": "n1"})");
@@ -48,6 +51,23 @@ TEST_CASE("Test deserialization of InputEvent", "[events]") {
             REQUIRE(att.nickname == "n1");
         } catch (const std::bad_variant_access& ex) {
             FAIL("AttackRequest parsed incorrectly");
+        }
+    }
+
+    SECTION("MatchInfo") {
+        Model::Card::init();
+        const Events::OutputEvent event = Events::toOutputEvent(
+            R"({"type": "matchInfo",
+                "matchConfig": {"numPlayers": 3},
+                "deck": {"cards": [{"id": 1}, {"id": 2}]},
+                "players": [{"nickname": "n1"}]})");
+        try {
+            const auto info = std::get<Events::MatchInfo>(event);
+            REQUIRE(info.config == Model::MatchConfig{3});
+            REQUIRE(info.deck == Model::Deck{{1, 2}});
+            REQUIRE(info.players == std::vector<Model::Player>{Model::Player{"n1"}});
+        } catch (const std::bad_variant_access& ex) {
+            FAIL("MatchInfo parsed incorrectly");
         }
     }
 

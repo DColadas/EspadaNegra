@@ -135,7 +135,7 @@ void to_json(nlohmann::json& j, const Player& player) {
 }
 
 void from_json(const nlohmann::json& j, Player& player) {
-    player = Player{j.at("nickname")};
+    player = Player{j.at("nickname").get<std::string>()};
 }
 
 }  // namespace Model

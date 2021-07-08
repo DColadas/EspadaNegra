@@ -15,6 +15,7 @@ class Deck {
     std::vector<Card> cards;
 
    public:
+    Deck() = default;
     explicit Deck(const std::vector<int>& cardIds);
     explicit Deck(const std::vector<Card>& cards);
 
@@ -45,5 +46,6 @@ class Deck {
 };
 
 void to_json(nlohmann::json&, const Deck&);
+void from_json(const nlohmann::json&, Deck&);
 
 }  // namespace Model

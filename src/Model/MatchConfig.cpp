@@ -28,7 +28,7 @@ void to_json(nlohmann::json& j, const MatchConfig& config) {
 }
 
 void from_json(const nlohmann::json& j, MatchConfig& config) {
-    config = MatchConfig{j.at("numPlayers")};
+    config = MatchConfig{j.at("numPlayers").get<unsigned int>()};
 }
 
 }  // namespace Model

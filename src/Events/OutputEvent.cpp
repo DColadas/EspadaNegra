@@ -204,7 +204,7 @@ void from_json(const nlohmann::json& j, OutputEvent& event) {
             event = MatchInfo{
                 j.at("matchConfig"),
                 j.at("players"),
-                Model::Deck{j.at("deck").get<std::vector<Model::Card>>()}};
+                j.at("deck")};
             break;
         case ET::Invalid:
             event = Error{fmt::format("{} is not a valid input type", j.at("type").get<std::string_view>())};

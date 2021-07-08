@@ -71,4 +71,8 @@ void to_json(nlohmann::json& j, const Deck& deck) {
     j = nlohmann::json{{"cards", deck.getCards()}};
 }
 
+void from_json(const nlohmann::json& j, Deck& deck) {
+    deck = Deck{j.at("cards").get<std::vector<Card>>()};
+}
+
 }  // namespace Model
