@@ -8,7 +8,7 @@
 
 class IOHandler;
 namespace Events {
-class JoinMatchRequest;
+struct JoinMatchRequest;
 }
 
 // Controls the communications between clients and matches and the open sessions

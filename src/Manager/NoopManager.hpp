@@ -9,7 +9,7 @@
 
 class IOHandler;
 namespace Events {
-class JoinMatchRequest;
+struct JoinMatchRequest;
 }
 
 // MatchManager whose methods do absolutely nothing
