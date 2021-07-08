@@ -14,10 +14,10 @@ class Deck {
 
     std::vector<Card> cards;
 
-    Deck(const std::vector<int>& cardIds);
-    Deck(const std::vector<Card>& cards);
-
    public:
+    explicit Deck(const std::vector<int>& cardIds);
+    explicit Deck(const std::vector<Card>& cards);
+
     // Gets a view to the cards in the deck
     const std::vector<Card>& getCards() const;
 

@@ -12,7 +12,8 @@ class MatchConfig {
     unsigned int initialGold = 10;
     int auctioneerGoldDisadvantage = 1;
 
-    MatchConfig(unsigned int numPlayers);
+    MatchConfig() = default;
+    explicit MatchConfig(unsigned int numPlayers);
 
     // Changes current parameters according to the modifier
     void applyModifier(const GameModifier& modifier);
@@ -22,5 +23,6 @@ class MatchConfig {
 };
 
 void to_json(nlohmann::json&, const MatchConfig&);
+void from_json(const nlohmann::json&, MatchConfig&);
 
 }  // namespace Model

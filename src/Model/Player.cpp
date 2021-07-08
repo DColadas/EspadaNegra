@@ -134,4 +134,8 @@ void to_json(nlohmann::json& j, const Player& player) {
     j = nlohmann::json{{"nickname", player.name}};
 }
 
+void from_json(const nlohmann::json& j, Player& player) {
+    player = Player{j.at("nickname")};
+}
+
 }  // namespace Model

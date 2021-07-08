@@ -47,7 +47,7 @@ Events::OutputEvent MatchHandler::addPlayer(const std::string& name) {
     // Check if there's a player with the same nickname
     const auto& ps = match.players;
     const auto available = std::none_of(ps.begin(), ps.end(), [&](const auto& i) {
-        return i == name;
+        return i.name == name;
     });
     if (!available) {
         // The nickname existed already

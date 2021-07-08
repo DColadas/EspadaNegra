@@ -22,6 +22,8 @@ class Card {
     //TODO consider allowing more than one modifier
     GameModifier initialCondition;
 
+    Card() = default;
+
     // Initialises the Card database
     // Must be run before any other Card method
     static void init();

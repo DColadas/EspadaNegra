@@ -21,7 +21,8 @@ class Player {
     std::vector<Card> activeCards{};
     std::vector<Card> purchasedThisTurnCards{};
 
-    Player(const std::string& name);
+    Player() = default;
+    explicit Player(const std::string& name);
 
     // Add the attack of every active attack card
     // Doesn't consider ${hasAttacked} or ${purchasedThisTurnCards}
@@ -77,5 +78,6 @@ class Player {
 };
 
 void to_json(nlohmann::json&, const Player&);
+void from_json(const nlohmann::json&, Player&);
 
 }  // namespace Model

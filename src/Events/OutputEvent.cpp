@@ -177,29 +177,41 @@ void from_json(const nlohmann::json& j, OutputEvent& event) {
             event = Complex{std::move(v)};
         } break;
         case ET::Draw_:
-            //event = Draw{.card = j.at("card")};
+            event = Draw{.card = j.at("card")};
             break;
-        case ET::Earn_:
-            event = Earn{{.nickname = j.at("nickname")}, j.at("gold")};
-            break;
+        // case ET::Earn_:
+        //     event = Earn{{.nickname = j.at("nickname")}, j.at("gold")};
+        //     break;
         case ET::Error_:
             event = Error{.message = j.at("message")};
             break;
-        case ET::GetCard_:
-            event = GetCard{{.nickname = j.at("nickname")}};
-            break;
-        case ET::IsAuctioneer_:
-            event = IsAuctioneer{{.nickname = j.at("nickname")}};
-            break;
+        // case ET::GetCard_:
+        //     event = GetCard{{.nickname = j.at("nickname")}};
+        //     break;
+        // case ET::IsAuctioneer_:
+        //     event = IsAuctioneer{{.nickname = j.at("nickname")}};
+        //     break;
         case ET::JoinMatchResult_:
             event = JoinMatchResult{j.at("nickname")};
+            break;
+        case ET::Offer_:
+            event = Offer{{j.at("nickname")}, j.at("gold")};
+            break;
+        case ET::Pass_:
+            event = Pass{j.at("nickname")};
+            break;
+        case ET::MatchInfo_:
+            event = MatchInfo{
+                j.at("matchConfig"),
+                j.at("players"),
+                Model::Deck{j.at("deck").get<std::vector<Model::Card>>()}};
             break;
         case ET::Invalid:
             event = Error{fmt::format("{} is not a valid input type", j.at("type").get<std::string_view>())};
             break;
         default:
             // TODO
-            event = Error{};
+            event = {};
             break;
     }
 }
