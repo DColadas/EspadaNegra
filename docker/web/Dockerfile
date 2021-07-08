@@ -52,10 +52,11 @@ RUN mkdir -p build && \
 
 
 FROM node:latest as build-node
-COPY ./client /client
-COPY --from=build-cpp /EspadaNegra/build/src/espadaNegraClient.* /client/public/
 WORKDIR /client
+COPY ./client/package*.json ./
 RUN npm install
+COPY ./client .
+COPY --from=build-cpp /EspadaNegra/build/src/espadaNegraClient.* ./public/
 RUN npm run build
 
 FROM nginx:latest as production
