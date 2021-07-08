@@ -8,7 +8,7 @@ export class EventDispatcher {
                 this.onDraw(event.card.id);
                 break;
             case "matchInfo":
-                this.onMatchInfo(event.config, event.players, event.deck);
+                this.onMatchInfo(event.matchConfig, event.players, event.deck);
                 break;
             case "getCard":
                 this.onGetCard(event.nickname);

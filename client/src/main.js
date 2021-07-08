@@ -6,6 +6,7 @@ import createModule from "../public/espadaNegraClient";
 Vue.config.productionTip = false
 
 createModule().then((myModule) => {
+  myModule.init();
   Vue.prototype.$wasm = myModule;
 });
 

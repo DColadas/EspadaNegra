@@ -3,6 +3,8 @@
     <div>
       <button @click="processAttack">Attack</button>
       <p>Result: {{ resultAttack }}</p>
+      <button @click="processInfo">Info</button>
+      <p>Result: {{ resultInfo }}</p>
     </div>
   </div>
 </template>
@@ -16,6 +18,7 @@ export default {
   data() {
     return {
       resultAttack: null,
+      resultInfo: null,
     };
   },
   methods: {
@@ -25,6 +28,14 @@ export default {
       );
       this.resultAttack = this.$wasm.dispatch(att);
       att.delete();
+    },
+    processInfo() {
+      let info = this.$wasm.newMatch(
+        `{"numPlayers": 3}`,
+        `{"cards": [{"id": 1}, {"id": 2}]}`
+      );
+      this.resultInfo = info;
+      console.log(`RESULT: ${info}`);
     },
   },
 };

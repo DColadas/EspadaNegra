@@ -5,8 +5,8 @@ const sleep = async (time) => {
 };
 
 export class ClientWS {
-    constructor(serverURL) {
-        this.dispatcher = new EventDispatcher();
+    constructor(serverURL, dispatcher = new EventDispatcher()) {
+        this.dispatcher = dispatcher;
         this.ws = new WebSocket(serverURL);
         this.ws.onmessage = (ev) => {
             console.log(ev.data);
