@@ -1,32 +1,22 @@
 # Espada Negra
-The Espada Negra online game.
+The Espada Negra online game (still unplayable!).
 
 Based on the real [*Espada Negra: juego de mesa*](https://espadanegra.net/jdm.php) (you can [download](http://espadanegra.net/descargar.php?d=7) the printable deck!).
 
-## Requirements
-- `C++17` compiler.
-  - Tested with `gcc 7.5.0`.
-- At least `CMake 3.11`.
-- At least [`Boost 1.66`](https://www.boost.org/users/download/) (needs the `Asio`, `Beast` and `Property Tree` libraries).
-- [`Catch2`](https://github.com/catchorg/Catch2). The `PrepareCatch2.cmake` script downloads it automatically if not found, if the `INSTALL_CATCH2` option is set.
+## Building 
+### With Docker
+Just run `docker-compose up` at the root of the project! This will create two containers --one serving the frontend, the other one deploying the Websocket server--. 
 
-## Compile
-```
-mkdir build
-cd build
-cmake ..
-make
-```
-You can add your number of available threads to the command `make` to make the compilation faster, like `make -j8` (if you have 8 threads).
+Once the build is up and running, access the web interface at `http://localhost:8080`. You can change the ports used by the containers by switching the values in `.env`.
 
-## Folder structure
-- `client`: the web client that connects to the server to play the game.
-- `cmake`: relevant CMake scripts and utilities to keep the root `CMakeLists.txt` more modular and clean. 
-- `src`: the main C++ game server.
-  - `Events`: defines the event hierarchies (`InputEvent` and `OutputEvent`) -classes with information about valid received player actions and output game state updates-.
-  - `Game`: main game logic.
-  - `IO`: main server. Manages client connections to it and the existing matches. 
-  - `Logging`: simple module used to log relevant messages. Apart from the usual logging levels (`Error`, `Info`, `Debug` and `Trace` -a more in-depth debug level-) it also defines `Panic`, which aborts the program whenever an impossible critical state is reached.
-  - `Parsing`: utilities to serialize and deserialize the events (`Events` module) to and from JSON format in order to communicate with the client.
-  - `Utils`: helper libraries with useful functions use wherever in the rest of the codebase (random number generation, time libraries, text coloring...).
-- `test`: relevant unit tests for the rest of the code.
+### Locally
+The project is still under development --during my free time :P-- and I'm constantly experimenting and changing the build process, so I won't bother writing a detailed description; just mimic the commands in the Dockerfiles if you want to develop locally. 
+
+In general lines, the required technologies are the following:
+
+- `C++20` compiler.
+  - Tested with `gcc 11.1`, `clang 12.0`.
+- At least `CMake 3.18`.
+- `vcpkg`.
+- `emscripten`.
+- `Vue.js 2.6.11`.
